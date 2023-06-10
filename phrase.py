@@ -1,4 +1,6 @@
 profile = 'Профиль'
-search_game = 'Найти игру'
+search_game = 'Поиск'
 library = 'Библиотека'
-store = 'Магазин'
+shop = 'Магазин'
+store = 'Подборка'
+main_menu = 'На главное меню'

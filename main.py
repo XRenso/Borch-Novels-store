@@ -95,7 +95,7 @@ async def get_text(message: types.Message):
                                  f'\nВаши достижения:'
                                  f'\n{achivments}')
         case phr.search_game:
-            await message.answer('Отправьте название игры, которую хотите найти')
+            await message.answer('Отправьте название игры, которую хотите найти. \nОтправьте 0 для отмены')
             await Store.search_game.set()
 
 
@@ -106,17 +106,23 @@ async def get_text(message: types.Message):
                 await message.answer(f'Игры отсутсвуют в магазине')
             else:
                 await message.answer(f'Выберите интересующую вас категорию', reply_markup=markup)
-
+        case phr.shop:
+            await message.answer('Выберите интересующую вас функцию', reply_markup=kb.shop_kb)
+        case phr.main_menu:
+            await message.answer('Добро пожаловать на главное меню', reply_markup=kb.main_kb)
 
 @dp.message_handler(state=Store.search_game)
 async def search_game_by_name(message: types.Message, state: FSMContext):
     search = message.text
-    games = db.search_game_by_name(search)
-    markup = kb.return_library(games)
-    if not len(markup['inline_keyboard']):
-        await message.answer(f'К сожалению у нас нет игр по запросу {search}')
+    if search != '0':
+        games = db.search_game_by_name(search)
+        markup = kb.return_library(games)
+        if not len(markup['inline_keyboard']):
+            await message.answer(f'К сожалению у нас нет игр по запросу {search}')
+        else:
+            await message.answer(f'Результат поиска по запросу {search}:', reply_markup=markup)
     else:
-        await message.answer(f'Результат поиска по запросу {search}:', reply_markup=markup)
+        await message.answer('Успешная отмена')
     await state.finish()
 
 

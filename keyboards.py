@@ -41,10 +41,15 @@ battle_kb = InlineKeyboardMarkup().add(fight_btn,heal_btn)
 main_kb = ReplyKeyboardMarkup(resize_keyboard=True)
 about_me = KeyboardButton(phr.profile)
 library = KeyboardButton(phr.library)
-find_game = KeyboardButton(phr.search_game)
-store = KeyboardButton(phr.store)
-main_kb.add(store,find_game).row(library,about_me)
+shop = KeyboardButton(phr.shop)
+main_kb.add(shop).row(library,about_me)
 
+##Shop kb
+store = KeyboardButton(phr.store)
+find_game = KeyboardButton(phr.search_game)
+main_menu = KeyboardButton(phr.main_menu)
+shop_kb = ReplyKeyboardMarkup(resize_keyboard=True)
+shop_kb.add(store,find_game).add(main_menu)
 
 def return_library(games):
     markup = InlineKeyboardMarkup()
