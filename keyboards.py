@@ -26,3 +26,5 @@ battle_kb = InlineKeyboardMarkup().add(fight_btn,heal_btn)
 
 ##Main kb
 about_me = KeyboardButton('Профиль')
+library = KeyboardButton('Библиотека игр')
+find_game = KeyboardButton('Найти игру')

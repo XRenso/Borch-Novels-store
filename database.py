@@ -84,7 +84,13 @@ class Mongo:
                 except:
                     pass
 
-
+    def return_game_cfg(self, user_id, game_code):
+        user = self.return_user_info(user_id)
+        if user:
+            for i in user['games_config']:
+                for key,value in i.items():
+                    if key == game_code:
+                        return i
     def return_game_info(self, game_code):
         if self.game.count_documents({'game_code': game_code}) == 1:
             return self.game.find_one({'game_code': game_code})
@@ -100,9 +106,12 @@ class Mongo:
             return self.frame.find_one({'frame_num':frame_num})
         else:
             return 0
-    def update_user_frame_num(self,user_id,frame_num):
-        if self.user.count_documents({'user_id':user_id}):
-            self.user.update_one({'user_id':user_id}, {'$set':{'frame_num':int(frame_num)}})
+
+    def update_user_frame_num(self,user_id,frame_num, game_code):
+        user = self.return_user_info(user_id)
+        if user:
+            self.user.update_one({'user_id':user_id, f'games_config.{game_code}': {'$exists':True}},
+                                  {'$set': {f'games_config.$.{game_code}.frame_num' : int(frame_num)}})
         else:
             return 0
 
@@ -110,12 +119,30 @@ class Mongo:
         return self.game.find({'game_name': re.compile(rf"(?i){search}")})
         # return self.game.find({'game_name': f"/{search}/i"})
 
-
+    def return_user_library_games(self,user_id:int) -> list or 0:
+        user = self.return_user_info(user_id)
+        if user:
+            games = []
+            for i in user['games_config']:
+                try:
+                    for key, value in i.items():
+                        games.append(self.return_game_info(key))
+                except:
+                    return 0
+            return games
+        else:
+            return 0
 
 if __name__ == '__main__':
     print('Тест')
-    # check = Mongo()
-    # check.__init__()
+    check = Mongo()
+    check.__init__()
+    check.update_user_frame_num(user_id=483058216,game_code='f',frame_num='1')
+    check.update_user_frame_num(user_id=483058216,game_code='pim_pam',frame_num='1')
+    # for i in check.return_user_library_games(483058216):
+    #     print(i['game_name'])
+
+
     # game_name = input('Game: ')
     # for i in check.search_game_by_name(game_name):
     #     print(i['game_name'])
@@ -123,10 +150,15 @@ if __name__ == '__main__':
     #     'super_bas': ['joper'],
     #     'tis':5
     # }
-    # check.add_game(code='param_pam', name='Bus simulator', description='Крутая игра для всех', cover='AgACAgIAAxkBAAMHZIOzWevS-gGso07A2fbOQtcLmEMAAkvIMRso9iFIjTr7ebImDK4BAAMCAAN5AAMvBA', genre_code='hohma',genre='Хохма',creator='Me',price=0,config=game_config)
+    # check.add_game(code='param_pam', name='Bus simulator', description='Крутая игра для всех', cover='AgACAgIAAxkBAAMHZIOzWevS-gGso07A2fbOQtcLmEMAAkvIMRso9iFIjTr7ebImDK4BAAMCAAN5AAMvBA', genre_code='hohma',genre='Хохма',creator='Me',price=0,config=game_config, publisher='Me')
+    # check.add_game(code='pim_pam', name='Jojo sim', description='Крутая игра для всех', cover='AgACAgIAAxkBAAMHZIOzWevS-gGso07A2fbOQtcLmEMAAkvIMRso9iFIjTr7ebImDK4BAAMCAAN5AAMvBA', genre_code='hohma',genre='Хохма',creator='Me',price=0,config=game_config, publisher='Me')
+    # check.add_game(code='f', name='Jin', description='Крутая игра для всех', cover='AgACAgIAAxkBAAMHZIOzWevS-gGso07A2fbOQtcLmEMAAkvIMRso9iFIjTr7ebImDK4BAAMCAAN5AAMvBA', genre_code='hohma',genre='Хохма',creator='Me',price=0,config=game_config, publisher='Me')
+
     # check.add_user(4810)
     # check.return_user_info(4810)
 
-    # check.give_game_to_user(game_code='testing_game', user_id=483058216)
+    # check.give_game_to_user(game_code='param_pam', user_id=483058216)
+    # check.give_game_to_user(game_code='pim_pam', user_id=483058216)
+    # check.give_game_to_user(game_code='f', user_id=483058216)
     # check.give_game_to_user(game_code='basta', user_id=483058216)
     # print(check.return_user_info(483058216)['games_config'])

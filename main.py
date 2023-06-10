@@ -28,11 +28,6 @@ dp = Dispatcher(bot=bot,storage=storage)
 db = mg()
 db.__init__()
 
-# db.add_frame(frame_num=1,content_code=1,desc='Добрый день путник, видимо ты здесь впервые. Нужно вспомнить текст, раз сюда кто-то пришёл. Картинки будут с тобой не так часто, однако помни.', is_variants=0, content='AgACAgIAAxkBAAPOZH6pNoXHiaDwS4KA8IpKqtWZP9AAAkrGMRs1z_lLdReqGFE8JpgBAAMCAAN5AAMvBA')
-# db.add_frame(frame_num=2,content_code=1,desc='Компьютер это круто, это слишком круто. Ты не представляешь насколько. Его нужно найти. Найти. Поможет тебе только', is_variants=0, content='AgACAgIAAxkBAAPMZH6pM13VRgG5wl7RQhPsbR7hvBMAAknGMRs1z_lL3X1HI6WIDY8BAAMCAAN5AAMvBA')
-# db.add_frame(frame_num=3,content_code=1,desc='Этот ученный сможет изменить всю вселенную, ты просто не предствляешь. Он умеет делать компьютеры. Он даже купил когда-то Nvidia ULTRA RTX DELUXE MEGA DUBA 9080', is_variants=1, content='AgACAgIAAxkBAAPKZH6pMPJrBmY4m54Wz9ctwMjHqScAAkjGMRs1z_lLHdgMdaHQtPUBAAMCAAN5AAMvBA', variants='Ударить учёного\nУбежать', variants_frame='4\n5')
-# db.add_frame(frame_num=4,content_code=0,desc='Ты зачем Виталика ударил? Вот балбес. Уходи отсюда, таким здесь не рады.',is_variants=1, variants='➤', variants_frame='9', modificators='battle',sticker='CAACAgQAAxkBAAIDoWR_158KoH6R-wtlm4xjc4PM1staAAIJCQACMN5JUzWGOv3zwoLlLwQ')
-# db.add_frame(frame_num=5,content_code=0,desc='Эй куда ты убежал. Эй. Стой', is_variants=1, variants='➤', variants_frame='6')
 
 
 
@@ -40,14 +35,6 @@ class Cache(StatesGroup):
     enemy = State()
     frame = State()
 
-# Начало игры
-# @dp.message_handler(commands='start_game')
-# async def start_game(message: types.Message):
-#     await message.answer(f'Приветствуем вас , {message.from_user.first_name}!'
-#                          f'\nДобро пожаловать в магазин новелл<code> Borch Novels</code>!'
-#                          f'\n'
-#                          f'\n<code>Borch Novels</code> - Магазин, что позволяет вам играть в любимые новеллы на базе Telegram. ',parse_mode="HTML", reply_markup=kb.start_game)
-#
 
 
 
@@ -162,14 +149,23 @@ async def continue_battle(call, state):
 
 
 
-async def change_frames(call,state):
+async def change_frames(call, state):
+    cb_data = call.data
+    user = db.return_user_info(call.message.chat.id)
+    now_frame = db.return_add_conditions_of_game(call.message.chat.id,user['game_code'])['frame_num']
+    match cb_data:
+        case cb_data.startswith('start_play_game'):
+            await call.message.delete()
+        case cb_data.startswith('frame_'):
+            k = db.update_user_frame_num(call.message.chat.id, cb_data[6:], user['curr_game_code'])
+
+async def change_frames_old(call,state):
 
         cb_data = call.data
         now_frame_num = db.return_user_info(call.message.chat.id)['frame_num']
         k=0
         if cb_data == 'start_play_game':
             await call.message.delete()
-            db.change_user_state(call.message.chat.id, 0)
         if cb_data.startswith('frame_'):
             k = db.update_user_frame_num(call.message.chat.id, cb_data[6:])
         elif cb_data.startswith('next_frame'):
