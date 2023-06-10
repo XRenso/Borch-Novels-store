@@ -44,30 +44,35 @@ class Store(StatesGroup):
 @dp.message_handler(commands = ['start'])
 async def start(message: types.Message):
     db.add_user(message.from_user.id)
-    # await message.answer('MVP показ возможностей для телеграм игры. \nСмерть, продажа, покупка, воскрешение', reply_markup=kb.start_game)
     await message.answer(f'Здравствуй, {message.from_user.first_name}!'
                             f'\nДобро пожаловать в магазин Borch Novels.', reply_markup=kb.main_kb)
+
+
 @dp.message_handler(content_types=['photo'])
 async def handle_photo(message: types.Message):
-    id_photo = message.photo[-1].file_id
-    await message.answer_photo(id_photo,caption=id_photo)
+    if db.return_user_info(message.from_user.id)['is_admin'] == 1:
+        id_photo = message.photo[-1].file_id
+        await message.answer_photo(id_photo,caption=id_photo)
 @dp.message_handler(content_types=['video'])
 async def handle_photo(message: types.Message):
-    id_video = message.video.file_id
-    await message.answer_video(id_video,caption=id_video)
+    if db.return_user_info(message.from_user.id)['is_admin'] == 1:
+        id_video = message.video.file_id
+        await message.answer_video(id_video,caption=id_video)
 @dp.message_handler(content_types=['sticker'])
 async def handle_photo(message: types.Message):
-    id_sticker = message.sticker.file_id
-    await message.answer_sticker(id_sticker)
-    await message.answer(id_sticker)
+    if db.return_user_info(message.from_user.id)['is_admin'] == 1:
+        id_sticker = message.sticker.file_id
+        await message.answer_sticker(id_sticker)
+        await message.answer(id_sticker)
 @dp.message_handler(content_types=['audio'])
 async def handle_photo(message: types.Message):
-    id_audio = message.audio.file_id
-    await message.answer_audio(id_audio,caption=id_audio)
+    if db.return_user_info(message.from_user.id)['is_admin'] == 1:
+        id_audio = message.audio.file_id
+        await message.answer_audio(id_audio,caption=id_audio)
 
 
-@dp.message_handler(commands=['reset'])
-async def reset(message:types.Message):
+
+async def reset_cur_game(message:types.Message):
     user = db.return_user_info(message.from_user.id)
     db.update_user_frame_num(message.from_user.id, 1,user['curr_game_code'])
     await message.answer('Успешно сброшено')
@@ -77,7 +82,11 @@ async def reset(message:types.Message):
 async def get_text(message: types.Message):
     match message.text:
         case phr.library:
-            await message.answer('Ваша библиотека', reply_markup=kb.return_library(db.return_user_library_games(message.from_user.id)))
+            markup = kb.return_library(db.return_user_library_games(message.from_user.id))
+            if not len(markup['inline_keyboard']):
+                await message.answer('У вас нет игр')
+            else:
+                await message.answer('Ваша библиотека', reply_markup=markup)
         case phr.profile:
             user_info = db.return_user_info(message.from_user.id)
             curr_game = db.return_game_info(user_info['curr_game_code'])
@@ -354,26 +363,51 @@ async def store_handler(call:types.CallbackQuery, callback_data: dict):
         markup = kb.store_kb_genres(genres)
         await call.message.edit_text(f'Выберите интересующую вас категорию', reply_markup=markup)
 
+
+
+@dp.callback_query_handler(kb.buy_game.filter())
+async def buy_game(call:types.CallbackQuery, callback_data: dict):
+    game_code = callback_data['game_code']
+    game = db.return_game_info(game_code)
+    match game['price']:
+        case 0:
+            db.give_game_to_user(game_code,call.message.chat.id, 0)
+            await call.message.edit_text(f'{game["game_name"]} успешно добавлена в библиотеку')
+        case _:
+            pass
+
+
 @dp.callback_query_handler(kb.show_more_info_game.filter())
 async def show_game_info(call:types.CallbackQuery, callback_data: dict):
     game = db.return_game_info(callback_data['game_code'])
     await call.message.delete()
     media = types.MediaGroup()
-    game_info_text = f'{game["game_name"]}' \
-                     f'\nИздатель - {game["publisher"]}' \
-                     f'\nРазработчик - {game["creator"]}' \
-                     f'\nЖанр - {game["genre"]}' \
-                     f'\nОписание:' \
-                     f'\n{game["game_description"]}' \
-                     f'\nЦена - {game["price"]}'
+    markup = kb.get_game(game['game_code'], db.check_is_game_in_user_library(call.message.chat.id,game['game_code']), game['price'])
+    if game['price'] > 0:
+        game_info_text = f'{game["game_name"]}' \
+                         f'\nИздатель - {game["publisher"]}' \
+                         f'\nРазработчик - {game["creator"]}' \
+                         f'\nЖанр - {game["genre"]}' \
+                         f'\nОписание:' \
+                         f'\n{game["game_description"]}' \
+                         f'\nЦена - {game["price"]}'
+    else:
+        game_info_text = f'{game["game_name"]}' \
+                         f'\nИздатель - {game["publisher"]}' \
+                         f'\nРазработчик - {game["creator"]}' \
+                         f'\nЖанр - {game["genre"]}' \
+                         f'\nОписание:' \
+                         f'\n{game["game_description"]}' \
+                         f'\nЦена - Бесплатно'
+
     for index, file_id in enumerate(game['game_cover'].split('\n')):
         match index:
             case 0:
                 match file_id.lower()[0]:
                     case 'b':
-                        media.attach_video(video=file_id,caption=game_info_text)
+                        media.attach_video(video=file_id)
                     case 'a':
-                        media.attach_photo(photo=file_id, caption=game_info_text)
+                        media.attach_photo(photo=file_id)
             case _:
                 match file_id.lower()[0]:
                     case 'b':
@@ -381,6 +415,7 @@ async def show_game_info(call:types.CallbackQuery, callback_data: dict):
                     case 'a':
                         media.attach_photo(photo=file_id)
     await call.message.answer_media_group(media)
+    await call.message.answer(game_info_text, reply_markup=markup)
 
 
 

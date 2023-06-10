@@ -8,9 +8,16 @@ db = mg()
 db.__init__()
 #Callback data preset
 frame_change = CallbackData('frame','frame_num')
+play_game = CallbackData('playing_game', 'game_code')
+
 show_by_genre = CallbackData('gen', 'genre_code')
 show_more_info_game = CallbackData('game', 'game_code')
 show_more_game_genre = CallbackData('genre','genre_code')
+
+buy_game = CallbackData('game_buying', 'game_code')
+get_demo = CallbackData('demo_game', 'game_code')
+
+
 store_action = CallbackData('store', 'action')
 
 
@@ -61,4 +68,20 @@ def store_kb_genres(genre):
     markup = InlineKeyboardMarkup()
     for i in genre:
         markup.add(InlineKeyboardButton(db.return_genre_name_by_code(i),callback_data=show_more_game_genre.new(i)))
+    return markup
+
+def get_game(game_code:str, have_it_user:int, price:int) -> InlineKeyboardMarkup:
+    match have_it_user:
+        case 1:
+            markup = InlineKeyboardMarkup()
+            markup.add(InlineKeyboardButton('Играть', callback_data=play_game.new(game_code)))
+        case _:
+            markup = InlineKeyboardMarkup()
+            match price:
+                case 0:
+                    markup.add(InlineKeyboardButton('Получить', callback_data=buy_game.new(game_code)))
+                case _:
+                    markup.add(InlineKeyboardButton('Купить', callback_data=buy_game.new(game_code)))
+                    markup.add(InlineKeyboardButton('Получить демо', callback_data=get_demo.new(game_code)))
+
     return markup

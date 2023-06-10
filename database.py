@@ -19,15 +19,14 @@ class Mongo:
         else:
             return 0
 
-    def add_frame(self,game_code:str, frame_num:int, is_demo:int, content_code:int, text:str, is_variants:str, content:str=None, variants:str=None, variants_frame:str=None, modificators:str=None, sticker:str=None, change_add_conditions:str=None,check_add_conditions:str=None, achivement:str=None) -> 0:
-        if self.frame.count_documents({'frame_num':frame_num}) == 0 and self.game.count_documents({'game_code':game_code}) == 1:
+    def add_frame(self,game_code:str, frame_num:int, is_demo:int, content_code:int, text:dict,variants:str, variants_frame:str, content:str=None,  modificators:str=None, sticker:str=None, change_add_conditions:str=None,check_add_conditions:str=None, achivement:str=None) -> 0:
+        if self.frame.count_documents({'frame_num':frame_num, 'game_code':game_code}) == 0 and self.game.count_documents({'game_code':game_code}) == 1:
             frame = {
                 'game_code':game_code, #Уникальный код игры
                 'frame_num': frame_num, # уникальный номер кадра
                 'content_code' : content_code, # Контент код, что необходимо отправить 0 - текст, 1 - фото, 2 -видео, 3 - аудио
                 'is_demo':is_demo, # Является ли кадр демо или нет
                 'text' : text, # Основной текст кадра
-                'is_variants' : is_variants, # Имеются ли разные варианты событий
                 'content' : content, # Медиа файл, согласно контент коду
                 'variants': variants, # Варианты событий, разделяются через \n
                 'variants_frame': variants_frame, # Кадры в которые ведут варианты, пишутся на том же месте, что и текст вариантов. Разделяются через \n
@@ -152,6 +151,14 @@ class Mongo:
         else:
             return 0
 
+    def check_is_game_in_user_library(self, user_id,game_code) -> int:
+        library = self.return_user_library_games(user_id)
+        for i in library:
+            if i['game_code'] == game_code:
+                return 1
+        return 0
+
+
     def return_genres(self):
         return self.game.distinct('genre_code')
     def return_game_by_genre(self, genre_code):
@@ -162,6 +169,9 @@ if __name__ == '__main__':
     check = Mongo()
     check.__init__()
 
+    check.add_frame(game_code='param_pam',frame_num=1,is_demo=0,content_code=0,text={'ru':'Просто проверочка'}, variants='Я\nТы', variants_frame='2\n3')
+
+
     # for i in check.return_user_library_games(483058216):
     #     print(i['game_name'])
 
@@ -171,11 +181,11 @@ if __name__ == '__main__':
     #     print(i['game_name'])
     #
 
-    game_config = {
-        'super_bas': ['joper'],
-        'tis':5
-    }
-    check.add_game(code='cool', name='Cool game', description='Игра, что вернула мне жизнь', cover='BAACAgIAAxkBAANgZIQNvW-Wqtz3-7B3_Aa_EfVBHfwAAowrAAJtuCFI_K_v-jdfKlQvBA\nAgACAgIAAxkBAANkZIQN0TZFoDrorfr9EumGuN_FPs0AAhnHMRttuCFIjwbJJG8er1wBAAMCAAN4AAMvBA', genre_code='kok',genre='Для любителей покрепче',creator='Ваша жизнь',price=0,config=game_config, publisher='Ваш дом',discount=0)
+    # game_config = {
+    #     'super_bas': ['joper'],
+    #     'tis':5
+    # }
+    # check.add_game(code='cool', name='Cool game', description='Игра, что вернула мне жизнь', cover='BAACAgIAAxkBAANgZIQNvW-Wqtz3-7B3_Aa_EfVBHfwAAowrAAJtuCFI_K_v-jdfKlQvBA\nAgACAgIAAxkBAANkZIQN0TZFoDrorfr9EumGuN_FPs0AAhnHMRttuCFIjwbJJG8er1wBAAMCAAN4AAMvBA', genre_code='kok',genre='Для любителей покрепче',creator='Ваша жизнь',price=0,config=game_config, publisher='Ваш дом',discount=0)
     # check.add_game(code='pim_pam', name='Jojo sim', description='Крутая игра для всех', cover='AgACAgIAAxkBAAMHZIOzWevS-gGso07A2fbOQtcLmEMAAkvIMRso9iFIjTr7ebImDK4BAAMCAAN5AAMvBA', genre_code='hohma',genre='Хохма',creator='Me',price=0,config=game_config, publisher='Me',discount=0)
     # check.add_game(code='f', name='Jin', description='Крутая игра для всех', cover='AgACAgIAAxkBAAMHZIOzWevS-gGso07A2fbOQtcLmEMAAkvIMRso9iFIjTr7ebImDK4BAAMCAAN5AAMvBA', genre_code='hohma',genre='Хохма',creator='Me',price=0,config=game_config, publisher='Me', discount=0)
     #
