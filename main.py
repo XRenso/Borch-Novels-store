@@ -3,7 +3,8 @@ import random
 import aiogram.utils.exceptions
 from aiogram.types import ReplyKeyboardRemove, \
     ReplyKeyboardMarkup, KeyboardButton, \
-    InlineKeyboardMarkup, InlineKeyboardButton
+    InlineKeyboardMarkup, InlineKeyboardButton, \
+    LabeledPrice, PreCheckoutQuery
 from aiogram import Bot, types
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.dispatcher import Dispatcher, FSMContext
@@ -287,9 +288,67 @@ async def buy_game(call:types.CallbackQuery, callback_data: dict):
             db.give_game_to_user(game_code,call.message.chat.id, 0)
             await call.message.edit_text(f'{game["game_name"]} успешно добавлена в библиотеку')
         case _:
-            pass
+            await call.message.delete()
+            await call.bot.send_invoice(
+                chat_id=call.message.chat.id,
+                title= f'Покупка игры {game["game_name"]}',
+                description=game['game_description'],
+                payload=f'{game["game_code"]}',
+                provider_token='381764678:TEST:59097',
+                currency='rub',
+                prices=[
+                    LabeledPrice(
+                        label='Доступ к игре',
+                        amount=game['price']*100
+                    ),
+                    LabeledPrice(
+                        label='Скидка',
+                        amount=-game['discount'] * 100
+                    )
+                ],
+                max_tip_amount=150*100,
+                suggested_tip_amounts=[10*100,50*100,100*100,150*100],
+                start_parameter='no',
+                provider_data=None,
+                # photo_url=game['game_cover'].split('\n')[0],
+                # photo_size=100,
+                # photo_width=800,
+                # photo_height=450,
+                need_name=False,
+                need_email=False,
+                need_phone_number=False,
+                need_shipping_address=False,
+                send_phone_number_to_provider=False,
+                send_email_to_provider=False,
+                is_flexible=False,
+                disable_notification=False,
+                protect_content=False,
+                reply_to_message_id=False,
+                allow_sending_without_reply=True,
+                reply_markup=None,
+
+            )
 
 
+
+@dp.pre_checkout_query_handler()
+async def give_paid_game_to_user(pre_checkout_query:PreCheckoutQuery):
+    await bot.answer_pre_checkout_query(pre_checkout_query.id,ok=True)
+
+
+@dp.message_handler(content_types=['successful_payment'])
+async def uspeh_buy(message:types.Message):
+    game = db.return_game_info(message.successful_payment.invoice_payload)
+    db.give_game_to_user(game['game_code'], message.from_user.id, 0)
+    await message.answer(f'Благодарим вас за покупку на сумму {message.successful_payment.total_amount//100} руб.'
+                         f'\n Игра - {game["game_name"]}  - успешно добавлена в вашу библиотеку')
+
+@dp.callback_query_handler(kb.unavailable_game.filter())
+async def unavailable_game(call:types.CallbackQuery, callback_data: dict):
+    game = db.return_game_info(callback_data['game_code'])
+    await call.message.edit_text(f'Мы понимаем как вы хотите поиграть в {game["game_name"]}'
+                                 f'\nОднако сейчас игра недоступнка. Наши сожаления'
+                                 f'\nПодождите официального выхода')
 @dp.callback_query_handler(kb.show_more_info_game.filter())
 async def show_game_info(call:types.CallbackQuery, callback_data: dict):
     game = db.return_game_info(callback_data['game_code'])
@@ -303,7 +362,7 @@ async def show_game_info(call:types.CallbackQuery, callback_data: dict):
                          f'\nЖанр - {game["genre"]}' \
                          f'\nОписание:' \
                          f'\n{game["game_description"]}' \
-                         f'\nЦена - {game["price"]}'
+                         f'\nЦена - {game["price"]} руб'
     else:
         game_info_text = f'{game["game_name"]}' \
                          f'\nИздатель - {game["publisher"]}' \

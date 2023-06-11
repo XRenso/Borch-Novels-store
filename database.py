@@ -42,7 +42,7 @@ class Mongo:
         else:
             return 0
 
-    def add_game(self, code: str, name: str, description: str, cover: str, creator:str, publisher:str, price: int, discount:int, genre_code:str, genre:str, config: dict) -> 0 or None:
+    def add_game(self, code: str, name: str, description: str, cover: str, creator:str, publisher:str,can_buy:int, price: int, discount:int, genre_code:str, genre:str, config: dict) -> 0 or None:
         if self.game.count_documents({'game_code':code}) == 0:
             cfg = {
                 'frame_num': 1,
@@ -57,6 +57,7 @@ class Mongo:
             'creator': creator, #Разработчик
             'publisher': publisher, # Издатель
             'price': price, # Цена
+            'can_buy':can_buy, #Доступна ли игра для продажи
             'discount':discount, # Скидка
             'genre_code': genre_code, # Код жанра
             'genre': genre, #Жанр
@@ -176,9 +177,9 @@ if __name__ == '__main__':
     check = Mongo()
     check.__init__()
 
-    check.add_frame(game_code='param_pam',frame_num=1,is_demo=0,content_code=0,text={'ru':'Просто проверочка'}, variants='Я\nТы', variants_frame='2\n3')
-    check.add_frame(game_code='param_pam',frame_num=2,is_demo=0,content_code=0,text={'ru':'Ты эгоист. \nБудем это знать'}, variants='Боль', variants_frame='5')
-    check.add_frame(game_code='param_pam',frame_num=3,is_demo=0,content_code=0,text={'ru':'Так ты подстилка. \nКак же славно, молодой раб'}, variants='Разочарование', variants_frame='5')
+    # check.add_frame(game_code='param_pam',frame_num=1,is_demo=0,content_code=0,text={'ru':'Просто проверочка'}, variants='Я\nТы', variants_frame='2\n3')
+    # check.add_frame(game_code='param_pam',frame_num=2,is_demo=0,content_code=0,text={'ru':'Ты эгоист. \nБудем это знать'}, variants='Боль', variants_frame='5')
+    # check.add_frame(game_code='param_pam',frame_num=3,is_demo=0,content_code=0,text={'ru':'Так ты подстилка. \nКак же славно, молодой раб'}, variants='Разочарование', variants_frame='5')
 
 
     # for i in check.return_user_library_games(483058216):
@@ -190,13 +191,16 @@ if __name__ == '__main__':
     #     print(i['game_name'])
     #
 
-    # game_config = {
-    #     'super_bas': ['joper'],
-    #     'tis':5
-    # }
-    # check.add_game(code='cool', name='Cool game', description='Игра, что вернула мне жизнь', cover='BAACAgIAAxkBAANgZIQNvW-Wqtz3-7B3_Aa_EfVBHfwAAowrAAJtuCFI_K_v-jdfKlQvBA\nAgACAgIAAxkBAANkZIQN0TZFoDrorfr9EumGuN_FPs0AAhnHMRttuCFIjwbJJG8er1wBAAMCAAN4AAMvBA', genre_code='kok',genre='Для любителей покрепче',creator='Ваша жизнь',price=0,config=game_config, publisher='Ваш дом',discount=0)
+    game_config = {
+        'super_bas': ['joper'],
+        'tis':5
+    }
+
+    check.add_game(code='monster',can_buy=1, name='Если бы море было водкой', description='Игра, что уничтожила здравый смысл. \nНе стоит в это играть', cover='AgACAgIAAxkBAAIClmSFLbAv9IGCpIIRJ7lw2Ud1r68pAAK4yjEbW04pSBssKYYPFrkQAQADAgADeAADLwQ', genre_code='paid',genre='Донатные помойки',creator='Борис Водка',price=300,config=game_config, publisher='Завод №297 им. Гнилой Водяры',discount=0)
+
+    #check.add_game(code='cool', name='Cool game', description='Игра, что вернула мне жизнь', cover='BAACAgIAAxkBAANgZIQNvW-Wqtz3-7B3_Aa_EfVBHfwAAowrAAJtuCFI_K_v-jdfKlQvBA\nAgACAgIAAxkBAANkZIQN0TZFoDrorfr9EumGuN_FPs0AAhnHMRttuCFIjwbJJG8er1wBAAMCAAN4AAMvBA', genre_code='kok',genre='Для любителей покрепче',creator='Ваша жизнь',price=0,config=game_config, publisher='Ваш дом',discount=0)
     # check.add_game(code='pim_pam', name='Jojo sim', description='Крутая игра для всех', cover='AgACAgIAAxkBAAMHZIOzWevS-gGso07A2fbOQtcLmEMAAkvIMRso9iFIjTr7ebImDK4BAAMCAAN5AAMvBA', genre_code='hohma',genre='Хохма',creator='Me',price=0,config=game_config, publisher='Me',discount=0)
-    # check.add_game(code='f', name='Jin', description='Крутая игра для всех', cover='AgACAgIAAxkBAAMHZIOzWevS-gGso07A2fbOQtcLmEMAAkvIMRso9iFIjTr7ebImDK4BAAMCAAN5AAMvBA', genre_code='hohma',genre='Хохма',creator='Me',price=0,config=game_config, publisher='Me', discount=0)
+    check.add_game(code='param_pam', name='Bus simulator', description='Крутая игра для всех', can_buy=0,cover='AgACAgIAAxkBAAMHZIOzWevS-gGso07A2fbOQtcLmEMAAkvIMRso9iFIjTr7ebImDK4BAAMCAAN5AAMvBA', genre_code='hohma',genre='Хохма',creator='Me',price=0,config=game_config, publisher='Me', discount=0)
     #
     #
     # check.give_game_to_user(game_code='param_pam', user_id=483058216, is_demo=1)

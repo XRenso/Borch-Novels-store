@@ -17,6 +17,7 @@ show_more_game_genre = CallbackData('genre','genre_code')
 buy_game = CallbackData('game_buying', 'game_code')
 get_demo = CallbackData('demo_game', 'game_code')
 
+unavailable_game = CallbackData('unavailable', 'game_code')
 
 store_action = CallbackData('store', 'action')
 
@@ -71,17 +72,21 @@ def store_kb_genres(genre):
     return markup
 
 def get_game(game_code:str, have_it_user:int, price:int) -> InlineKeyboardMarkup:
-    match have_it_user:
-        case 1:
-            markup = InlineKeyboardMarkup()
-            markup.add(InlineKeyboardButton('Играть', callback_data=play_game.new(game_code)))
-        case _:
-            markup = InlineKeyboardMarkup()
-            match price:
-                case 0:
-                    markup.add(InlineKeyboardButton('Получить', callback_data=buy_game.new(game_code)))
-                case _:
-                    markup.add(InlineKeyboardButton('Купить', callback_data=buy_game.new(game_code)))
-                    markup.add(InlineKeyboardButton('Получить демо', callback_data=get_demo.new(game_code)))
+    check_frame = db.return_frame(1,game_code)
+    game = db.return_game_info(game_code)
+    markup = InlineKeyboardMarkup()
+    if check_frame != 0 and game['can_buy'] != 0:
+        match have_it_user:
+            case 1:
+                markup.add(InlineKeyboardButton('Играть', callback_data=play_game.new(game_code)))
+            case _:
+                match price:
+                    case 0:
+                        markup.add(InlineKeyboardButton('Получить', callback_data=buy_game.new(game_code)))
+                    case _:
 
+                            markup.add(InlineKeyboardButton('Купить', callback_data=buy_game.new(game_code)))
+                            markup.add(InlineKeyboardButton('Получить демо', callback_data=get_demo.new(game_code)))
+    else:
+        markup.add(InlineKeyboardButton('Игра недоступна', callback_data=unavailable_game.new(game_code)))
     return markup
