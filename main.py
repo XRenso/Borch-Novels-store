@@ -1,5 +1,3 @@
-import random
-
 import aiogram.utils.exceptions
 from aiogram.types import ReplyKeyboardRemove, \
     ReplyKeyboardMarkup, KeyboardButton, \
@@ -41,6 +39,7 @@ class Store(StatesGroup):
 
 class Cache(StatesGroup):
     sound = State()
+    game_text = State()
 
 
 @dp.message_handler(commands = ['start'])
@@ -178,16 +177,17 @@ async def change_frames(call:types.CallbackQuery, callback_data: dict, state:FSM
                     await call.message.delete()
                 except:
                     pass
-                match frame['content_code']:
-                    case 1:
-                        await call.message.answer_photo(frame['content'], caption=frame['text']['ru'], reply_markup=markup)
-                    case 2:
-                        await call.message.answer_video(frame['content'], caption=frame['text']['ru'], reply_markup=markup)
-                    case 3:
-                        await call.message.answer_audio(frame['content'], caption=frame['text']['ru'], reply_markup=markup)
-                    case _:
-                        await call.message.answer(frame['text']['ru'], reply_markup=markup)
-
+                async with state.proxy():
+                    match frame['content_code']:
+                        case 1:
+                           message = await call.message.answer_photo(frame['content'], caption=frame['text']['ru'], reply_markup=markup)
+                        case 2:
+                            message = await call.message.answer_video(frame['content'], caption=frame['text']['ru'], reply_markup=markup)
+                        case 3:
+                            message = await call.message.answer_audio(frame['content'], caption=frame['text']['ru'], reply_markup=markup)
+                        case _:
+                            message = await call.message.answer(frame['text']['ru'], reply_markup=markup)
+                    await state.update_data(game_text=message)
         else:
             await call.message.delete()
             await call.message.answer('На этом демо игры заканчивается. Приобретите полную версию игры')
@@ -220,6 +220,9 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
     data = await state.get_data()
     await call.message.delete()
     if frame != 0:
+        if data.get('game_text'):
+            await call.bot.delete_message(chat_id=call.message.chat.id,message_id=data.get('game_text').message_id)
+
         db.update_now_user_game(call.message.chat.id,game['game_code'])
 
         match frame['content_code']:
@@ -244,16 +247,17 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
                 await call.message.delete()
             except:
                 pass
-            match frame['content_code']:
-                case 1:
-                    await call.message.answer_photo(frame['content'], caption=frame['text']['ru'], reply_markup=markup)
-                case 2:
-                    await call.message.answer_video(frame['content'], caption=frame['text']['ru'],reply_markup=markup)
-                case 3:
-                    await call.message.answer_audio(frame['content'], caption=frame['text']['ru'],reply_markup=markup)
-                case _:
-                    await call.message.answer(frame['text']['ru'],reply_markup=markup)
-
+            async with state.proxy():
+                match frame['content_code']:
+                    case 1:
+                        message = await call.message.answer_photo(frame['content'], caption=frame['text']['ru'], reply_markup=markup)
+                    case 2:
+                        message = await call.message.answer_video(frame['content'], caption=frame['text']['ru'],reply_markup=markup)
+                    case 3:
+                        message = await call.message.answer_audio(frame['content'], caption=frame['text']['ru'],reply_markup=markup)
+                    case _:
+                        message = await call.message.answer(frame['text']['ru'],reply_markup=markup)
+                await state.update_data(game_text=message)
         if frame['sound']:
             if data.get('sound') == None:
                 async with state.proxy():
