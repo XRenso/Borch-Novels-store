@@ -61,8 +61,9 @@ shop_kb.add(store,find_game).add(main_menu)
 
 def return_library(games):
     markup = InlineKeyboardMarkup()
-    for i in games:
-        markup.add(InlineKeyboardButton(i['game_name'], callback_data=show_more_info_game.new(i['game_code'])))
+    if games != 0:
+        for i in games:
+            markup.add(InlineKeyboardButton(i['game_name'], callback_data=show_more_info_game.new(i['game_code'])))
     return markup
 
 def store_kb_genres(genre):
