@@ -361,7 +361,7 @@ async def show_game_info(call:types.CallbackQuery, callback_data: dict):
     game = db.return_game_info(callback_data['game_code'])
     await call.message.delete()
     media = types.MediaGroup()
-    markup = kb.get_game(game['game_code'], db.check_is_game_in_user_library(call.message.chat.id,game['game_code']), game['price'])
+    markup = kb.get_game(game['game_code'], db.check_is_game_in_user_library(call.message.chat.id,game['game_code']), game['price'], user_id=call.message.chat.id)
     if game['price'] > 0:
         game_info_text = f'{game["game_name"]}' \
                          f'\nИздатель - {game["publisher"]}' \
