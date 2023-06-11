@@ -2,7 +2,7 @@ import pymongo
 import re
 class Mongo:
     def __init__(self):
-        self.connection = pymongo.MongoClient("mongodb://localhost:27017/")['store']
+        self.connection = pymongo.MongoClient("mongodb://admin:safeKillPassword@79.143.29.191/admin")['store']
         self.user = self.connection['user']
         self.frame = self.connection['frame']
         self.game = self.connection['game']
