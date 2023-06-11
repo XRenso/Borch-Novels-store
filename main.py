@@ -223,8 +223,10 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
     await call.message.delete()
     if frame != 0:
         if data.get('game_text'):
-            await call.bot.delete_message(chat_id=call.message.chat.id,message_id=data.get('game_text').message_id)
-
+            try:
+                await call.bot.delete_message(chat_id=call.message.chat.id,message_id=data.get('game_text').message_id)
+            except aiogram.utils.exceptions.MessageToDeleteNotFound:
+                pass
         db.update_now_user_game(call.message.chat.id,game['game_code'])
 
         match frame['content_code']:
