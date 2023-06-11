@@ -63,6 +63,8 @@ def return_library(games):
     markup = InlineKeyboardMarkup()
     if games != 0:
         for i in games:
+            print(games)
+            print(i)
             markup.add(InlineKeyboardButton(i['game_name'], callback_data=show_more_info_game.new(i['game_code'])))
     return markup
 
