@@ -85,10 +85,14 @@ def get_game(game_code:str, have_it_user:int, price:int, user_id:int) -> InlineK
                     case 0:
                         markup.add(InlineKeyboardButton('Получить', callback_data=buy_game.new(game_code)))
                     case _:
-                            if game_cfg == 0 or game_cfg['is_demo'] == 1:
+                            if game_cfg == 0:
                                 markup.add(InlineKeyboardButton('Купить', callback_data=buy_game.new(game_code)))
+                            elif game_cfg['is_demo'] == 1:
+                                markup.add(InlineKeyboardButton('Купить полную версию игры', callback_data=buy_game.new(game_code)))
                             if game_cfg == 0:
                                 markup.add(InlineKeyboardButton('Получить демо', callback_data=get_demo.new(game_code)))
+                            else:
+                                markup.add(InlineKeyboardButton('Играть', callback_data=play_game.new(game_code)))
     else:
         markup.add(InlineKeyboardButton('Игра недоступна', callback_data=unavailable_game.new(game_code)))
     return markup
