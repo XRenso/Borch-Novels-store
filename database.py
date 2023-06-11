@@ -169,6 +169,7 @@ class Mongo:
 
     def return_genres(self):
         return self.game.distinct('genre_code')
+
     def return_game_by_genre(self, genre_code):
         return self.game.find({'genre_code':genre_code})
 
@@ -177,9 +178,9 @@ if __name__ == '__main__':
     check = Mongo()
     check.__init__()
 
-    # check.add_frame(game_code='param_pam',frame_num=1,is_demo=0,content_code=0,text={'ru':'Просто проверочка'}, variants='Я\nТы', variants_frame='2\n3')
-    # check.add_frame(game_code='param_pam',frame_num=2,is_demo=0,content_code=0,text={'ru':'Ты эгоист. \nБудем это знать'}, variants='Боль', variants_frame='5')
-    # check.add_frame(game_code='param_pam',frame_num=3,is_demo=0,content_code=0,text={'ru':'Так ты подстилка. \nКак же славно, молодой раб'}, variants='Разочарование', variants_frame='5')
+    check.add_frame(game_code='param_pam',frame_num=1,is_demo=1,content_code=0,text={'ru':'Просто проверочка'}, variants='Я\nТы', variants_frame='2\n3')
+    check.add_frame(game_code='param_pam',frame_num=2,is_demo=0,content_code=0,text={'ru':'Ты эгоист. \nБудем это знать'}, variants='Боль', variants_frame='5')
+    check.add_frame(game_code='param_pam',frame_num=3,is_demo=0,content_code=0,text={'ru':'Так ты подстилка. \nКак же славно, молодой раб'}, variants='Разочарование', variants_frame='5')
 
 
     # for i in check.return_user_library_games(483058216):
@@ -191,17 +192,16 @@ if __name__ == '__main__':
     #     print(i['game_name'])
     #
 
-    game_config = {
-        'super_bas': ['joper'],
-        'tis':5
-    }
 
-    check.add_game(code='monster',can_buy=1, name='Если бы море было водкой', description='Игра, что уничтожила здравый смысл. \nНе стоит в это играть', cover='AgACAgIAAxkBAAIClmSFLbAv9IGCpIIRJ7lw2Ud1r68pAAK4yjEbW04pSBssKYYPFrkQAQADAgADeAADLwQ', genre_code='paid',genre='Донатные помойки',creator='Борис Водка',price=300,config=game_config, publisher='Завод №297 им. Гнилой Водяры',discount=0)
+
+    # check.add_game(code='guide_store',can_buy=0, name='Обучение правилам магазина', description='Это обучающий продукт, что расскажет вам о нашем магазине.', cover='AgACAgIAAxkBAAIDkWSFX-SFGTYUga7qaew-QGHuGya1AAKUxzEbW04xSFGbj_VtXqsJAQADAgADeAADLwQ', genre_code='off_guides',genre='Официальные инструкции',creator='Borch Store',price=0,config={}, publisher='Borch Store',discount=0)
+
+    # check.add_game(code='silent',can_buy=0, name='Помолчим', description='Молчание', cover='AgACAgIAAxkBAAIDkWSFX-SFGTYUga7qaew-QGHuGya1AAKUxzEbW04xSFGbj_VtXqsJAQADAgADeAADLwQ', genre_code='test',genre='Проверка',creator='Test',price=0,config={}, publisher='Test',discount=0)
 
     #check.add_game(code='cool', name='Cool game', description='Игра, что вернула мне жизнь', cover='BAACAgIAAxkBAANgZIQNvW-Wqtz3-7B3_Aa_EfVBHfwAAowrAAJtuCFI_K_v-jdfKlQvBA\nAgACAgIAAxkBAANkZIQN0TZFoDrorfr9EumGuN_FPs0AAhnHMRttuCFIjwbJJG8er1wBAAMCAAN4AAMvBA', genre_code='kok',genre='Для любителей покрепче',creator='Ваша жизнь',price=0,config=game_config, publisher='Ваш дом',discount=0)
     # check.add_game(code='pim_pam', name='Jojo sim', description='Крутая игра для всех', cover='AgACAgIAAxkBAAMHZIOzWevS-gGso07A2fbOQtcLmEMAAkvIMRso9iFIjTr7ebImDK4BAAMCAAN5AAMvBA', genre_code='hohma',genre='Хохма',creator='Me',price=0,config=game_config, publisher='Me',discount=0)
-    check.add_game(code='param_pam', name='Bus simulator', description='Крутая игра для всех', can_buy=0,cover='AgACAgIAAxkBAAMHZIOzWevS-gGso07A2fbOQtcLmEMAAkvIMRso9iFIjTr7ebImDK4BAAMCAAN5AAMvBA', genre_code='hohma',genre='Хохма',creator='Me',price=0,config=game_config, publisher='Me', discount=0)
-    #
+    # check.add_game(code='param_pam', name='Bus simulator', description='Здесь просят деньги, просто уйдите', can_buy=1,cover='AgACAgIAAxkBAAIDzGSFZkltqub9IJ9up44fBZJflti4AAKgyjEbW04pSMaXeCFs5lfJAQADAgADeQADLwQ', genre_code='paid',genre='Донатный мусор',creator='Доллар',price=100,config={}, publisher='ЦБ Мира', discount=0)
+
     #
     # check.give_game_to_user(game_code='param_pam', user_id=483058216, is_demo=1)
     # check.give_game_to_user(game_code='pim_pam', user_id=483058216, is_demo=1)

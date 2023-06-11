@@ -209,8 +209,10 @@ async def change_frames(call:types.CallbackQuery, callback_data: dict, state:FSM
            await call.message.answer('На этом игра заканчивается. Благодарим за прохождение')
 
 
-
-
+@dp.callback_query_handler(kb.get_demo.filter())
+async def get_demo_to_user(call:types.CallbackQuery, callback_data: dict, state:FSMContext):
+    db.give_game_to_user(user_id=call.message.chat.id, game_code=callback_data['game_code'], is_demo=1)
+    await call.message.edit_text(f'Успешно полученая демо-версия игры - {db.return_game_info(callback_data["game_code"])["game_name"]}')
 
 @dp.callback_query_handler(kb.play_game.filter())
 async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMContext):
@@ -280,6 +282,7 @@ async def store_handler(call:types.CallbackQuery, callback_data: dict):
         genres = db.return_genres()
         markup = kb.store_kb_genres(genres)
         await call.message.edit_text(f'Выберите интересующую вас категорию', reply_markup=markup)
+
 
 
 
