@@ -220,7 +220,6 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
     await call.message.delete()
     if frame != 0:
         db.update_now_user_game(call.message.chat.id,game['game_code'])
-        await call.message.answer('Ждите. Настраиваются последние штрихи')
 
         match frame['content_code']:
             case 1:
