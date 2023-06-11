@@ -91,7 +91,7 @@ class Mongo:
                     self.user.update_one({'user_id': user_id, f'games_config.{game_code}': {'$exists': True}},
                                          {'$set': {f'games_config.$.{game_code}.is_demo': 0}})
 
-            elif check != 0 and is_demo == 0 and check[game_code]['is_demo'] == 1:
+            elif check != 0 and is_demo == 0 and check['is_demo'] == 1:
                 self.user.update_one({'user_id': user_id, f'games_config.{game_code}': {'$exists': True}},
                                      {'$set': {f'games_config.$.{game_code}.is_demo': 0}})
             else:
