@@ -161,9 +161,10 @@ class Mongo:
 
     def check_is_game_in_user_library(self, user_id,game_code) -> int:
         library = self.return_user_library_games(user_id)
-        for i in library:
-            if i['game_code'] == game_code:
-                return 1
+        if library != 0:
+            for i in library:
+                if i['game_code'] == game_code:
+                    return 1
         return 0
 
 
@@ -193,6 +194,10 @@ if __name__ == '__main__':
     #
 
 
+    check.add_game(code='zeleria_new_year',can_buy=0, name='С новым годом зелирия', description='«С Новым годом, Зелирия!» – это новогодняя сказка и в то же время небольшой спин-офф первой части игры Zeliria Sactuary.', cover='AgACAgIAAxkBAAIEN2SFckcHPQhyoyG0wtesNe9YQDa0AALLxzEbW04xSMJeXS9r4p5pAQADAgADeAADLwQ\nAgACAgIAAxkBAAIEOWSFclnQZcYMchS4xkKqNAXWmJ75AALOxzEbW04xSM23JpSY2qdYAQADAgADeAADLwQ\nAgACAgIAAxkBAAIEO2SFcmU8qQNx24dK4DyPILWMMIOKAALPxzEbW04xSFS1YbTMyYogAQADAgADeAADLwQ\nAgACAgIAAxkBAAIEPWSFcnWR3dhJbmDBqURb9jtniCrqAALQxzEbW04xSJqkJwHCRyfkAQADAgADeAADLwQ', genre_code='adventures',genre='Приключения',creator='Salangan Games',price=0,config={}, publisher='Phoenix_co',discount=0)
+    check.add_game(code='zapovednik_zalerii',can_buy=0, name='Заповедник Зелирии', description='Осознание реальности еще не вернулось после эксперимента по телепортации. Фиолетовые хомяки, девушки с хвостами, средневековые рыцари - фантастический мир чужой планеты, по которой вы поведете спецназовца Макса', cover='AgACAgIAAxkBAAIEP2SFct88eoJDQVUCuHuj5zEo5VcfAALRxzEbW04xSO-CDVxXPZVEAQADAgADeAADLwQ\nAgACAgIAAxkBAAIEQWSFcutr8PrgkHU-s7OWSy82rKwjAALSxzEbW04xSCn7fYrwUAbzAQADAgADeQADLwQ\nAgACAgIAAxkBAAIEQ2SFcvVgjxgwObIf0ZhNdXowfI3vAALTxzEbW04xSFcy5Hmv1bVdAQADAgADeAADLwQ\nAgACAgIAAxkBAAIERWSFcv7Jm7pHAodc4HKlUT_0S4tDAALUxzEbW04xSMMyQiAbfqpaAQADAgADeAADLwQ', genre_code='adventures',genre='Приключения',creator='Salangan Games',price=339,config={}, publisher='Phoenix_co',discount=0)
+    check.add_game(code='shadows_of_lost_world',can_buy=0, name='Тени затерянного мира', description='"Тени затерянного мира"—игра в жанре пост-апокалипсис. Разгадайте тайну машины, которая предсказала дату, начала конца.', cover='AgACAgIAAxkBAAIET2SFdCIpqm01cTQpLRd39ObTluzhAALaxzEbW04xSIjUExZ6vpYeAQADAgADeQADLwQ\nAgACAgIAAxkBAAIEUWSFdC1dktH3PXxooE3juIFwjqw9AALbxzEbW04xSHyH50c51RkLAQADAgADeQADLwQ\nAgACAgIAAxkBAAIEU2SFdDtoM8Rgjg8ypPBnmT29Y_KQAALdxzEbW04xSCDncVWIf42QAQADAgADeQADLwQ\nAgACAgIAAxkBAAIEVWSFdEuiBFaxPsueJZ63If3W2OPZAALexzEbW04xSIZngn4gjazNAQADAgADeQADLwQ', genre_code='post_apocalypses',genre='Пост-Апокалипсис',creator=' BORCH Studio',price=149,config={}, publisher=' BORCH Studio ',discount=0)
+    check.add_game(code='1997',can_buy=0, name='1997', description='Визуальная новелла-детектив про тайны городка в России 90-х в стиле аниме.', cover='AgACAgIAAxkBAAIER2SFc18AAZgX9PH34LlCRLCX-Sr-agAC1scxG1tOMUglO_p9fHf1EQEAAwIAA3gAAy8E\nAgACAgIAAxkBAAIESWSFc3BrdrFcHqOe_XDAAqbZmn1qAALXxzEbW04xSMDg42E7-pr_AQADAgADeQADLwQ\nAgACAgIAAxkBAAIES2SFc34O8tePixY_kz01ZczbgDy3AALYxzEbW04xSEzHN7ZhkRlpAQADAgADeQADLwQ\nAgACAgIAAxkBAAIETWSFc43cZxrBGYgKDDUj4dysPomSAALZxzEbW04xSGxF5vAw78pRAQADAgADeQADLwQ', genre_code='detective',genre='Детектив',creator='Hit\'n\'Run Digital Studio, RUZURA Interactive',price=259,config={}, publisher='Hit\'n\'Run Digital Studio',discount=0)
 
     # check.add_game(code='guide_store',can_buy=0, name='Обучение правилам магазина', description='Это обучающий продукт, что расскажет вам о нашем магазине.', cover='AgACAgIAAxkBAAIDkWSFX-SFGTYUga7qaew-QGHuGya1AAKUxzEbW04xSFGbj_VtXqsJAQADAgADeAADLwQ', genre_code='off_guides',genre='Официальные инструкции',creator='Borch Store',price=0,config={}, publisher='Borch Store',discount=0)
 
