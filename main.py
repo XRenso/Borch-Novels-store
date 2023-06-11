@@ -38,7 +38,8 @@ db.__init__()
 class Store(StatesGroup):
     search_game = State()
 
-
+class Cache(StatesGroup):
+    sound = State()
 
 
 @dp.message_handler(commands = ['start'])
@@ -71,10 +72,10 @@ async def handle_photo(message: types.Message):
         await message.answer_audio(id_audio,caption=id_audio)
 
 
-
+@dp.message_handler(commands = ['reset_now_game'])
 async def reset_cur_game(message:types.Message):
     user = db.return_user_info(message.from_user.id)
-    db.update_user_frame_num(message.from_user.id, 1,user['curr_game_code'])
+    db.reset_game_setings(user_id=message.from_user.id,game_code=user['curr_game_code'])
     await message.answer('Успешно сброшено')
 
 
@@ -135,225 +136,138 @@ async def search_game_by_name(message: types.Message, state: FSMContext):
     await state.finish()
 
 
-
-# async def start_battle(call: types.CallbackQuery, state: FSMContext):
-#     data = await state.get_data()
-#     if call.data.startswith('frame') or call.data.endswith('frame'):
-#         await state.update_data(frame=call)
-#     if data.get('enemy') == None:
-#         async with state.proxy():
-#             enemy = enemy_generator.create_monster()
-#             await state.update_data(enemy=enemy)
-#             data = await state.get_data()
-#     enemy = data.get('enemy')
-#     last_action = 'Ничего не произошло'
-#     await call.message.answer(f'Враг - {enemy.get_stat("name")}'
-#                          f'\nРаса - {enemy.get_stat("race")}'
-#                          f'\nРодом из - {enemy.get_stat("country")}'
-#                          f'\nВозраст - {enemy.get_stat("age")}'
-#                          f'\nЗдоровье - {enemy.get_stat("hp")}'
-#                          f'\n#######'
-#                          f'\n{last_action}'
-#                          f'\n#########'
-#                          f'\nВаше здоровье - {db.return_user_info(call.message.chat.id)["hp"]}',reply_markup=kb.battle_kb)
-
-# async def continue_battle(call, state):
-#     cb_data = call.data
-#     data = await state.get_data()
-#     enemy = data.get('enemy')
-#     enemy_move = random.randrange(2)
-#     last_en_action = 'Ничего не произошло'
-#     if cb_data.startswith('punch'):
-#         user_dmg = db.return_user_info(call.message.chat.id)['dmg']
-#         enemy.get_damage(random.randrange(user_dmg // 2, user_dmg + 1))
-#     elif cb_data.startswith('heal'):
-#         db.user_health(call.message.chat.id, random.randrange(1, db.return_user_info(call.message.chat.id)['hp']))
-#     match enemy_move:
-#         case 1:
-#             last_en_action = db.user_get_dmg(call.message.chat.id, enemy.attack())
-#         case 0:
-#             last_en_action = enemy.health()
-#     await state.update_data(enemy=enemy)
-#     if db.return_user_info(call.message.chat.id)['hp'] == 0 and not enemy.dead():
-#         await call.message.answer_sticker('CAACAgEAAxkBAAIDimR_1TToDteE_e_htszvUey4rLOgAAIHAAPJd9FOnQpx5SSzvvQvBA')
-#         await call.message.edit_text('Вы погибли. Земля водой')
-#         await state.reset_state()
-#         db.change_user_state(call.message.chat.id,0)
-#     elif enemy.dead() and db.return_user_info(call.message.chat.id)['hp'] == 0:
-#         await call.message.answer_sticker('CAACAgEAAxkBAAIDimR_1TToDteE_e_htszvUey4rLOgAAIHAAPJd9FOnQpx5SSzvvQvBA')
-#         await call.message.edit_text('Вы оба погибли. Водичка')
-#         await state.reset_state()
-#         db.change_user_state(call.message.chat.id,0)
-#     elif enemy.dead() and db.return_user_info(call.message.chat.id)['hp'] != 0:
-#         await call.message.edit_text('Вы победили. Сыр маслом')
-#         await state.reset_state()
-#         db.change_user_state(call.message.chat.id, 0)
-#         await change_frames(data.get('frame'), state)
-#
-#     else:
-#         try:
-#             await call.message.edit_text(f'Враг - {enemy.get_stat("name")}'
-#                                          f'\nРаса - {enemy.get_stat("race")}'
-#                                          f'\nРодом из - {enemy.get_stat("country")}'
-#                                          f'\nВозраст - {enemy.get_stat("age")}'
-#                                          f'\nЗдоровье - {enemy.get_stat("hp")}'
-#                                          f'\n#######'
-#                                          f'\n{last_en_action}'
-#                                          f'\n#########'
-#                                          f'\nВаше здоровье - {db.return_user_info(call.message.chat.id)["hp"]}',
-#                                          reply_markup=kb.battle_kb)
-#         except aiogram.utils.exceptions.MessageNotModified:
-#             await call.message.edit_text(f'Враг - {enemy.get_stat("name")}'
-#                                          f'\nРаса - {enemy.get_stat("race")}'
-#                                          f'\nРодом из - {enemy.get_stat("country")}'
-#                                          f'\nВозраст - {enemy.get_stat("age")}'
-#                                          f'\nЗдоровье - {enemy.get_stat("hp")}'
-#                                          f'\n#######'
-#                                          f'\n{"Ничего не изменилось"}'
-#                                          f'\n#########'
-#                                          f'\nВаше здоровье - {db.return_user_info(call.message.chat.id)["hp"]}',
-#                                          reply_markup=kb.battle_kb)
-#
-
-
-async def change_frames(call, state):
-    cb_data = call.data
-    user = db.return_user_info(call.message.chat.id)
-    now_frame = db.return_add_conditions_of_game(call.message.chat.id,user['game_code'])['frame_num']
-    match cb_data:
-        case cb_data.startswith('start_play_game'):
-            await call.message.delete()
-        case cb_data.startswith('frame_'):
-            k = db.update_user_frame_num(call.message.chat.id, cb_data[6:], user['curr_game_code'])
-
-async def change_frames_old(call,state):
-
-        cb_data = call.data
-        now_frame_num = db.return_user_info(call.message.chat.id)['frame_num']
-        user = db.return_user_info(call.message.chat.id)
-        k=0
-        if cb_data == 'start_play_game':
-            await call.message.delete()
-        if cb_data.startswith('frame_'):
-            k = db.update_user_frame_num(call.message.chat.id, cb_data[6:],user['curr_game_code'])
-        elif cb_data.startswith('next_frame'):
-            k = db.update_user_frame_num(call.message.chat.id,db.return_user_info(call.message.chat.id)['frame_num']+1,user['curr_game_code'])
-        elif cb_data.startswith('start_play_game'):
-            k = 1
-        frame = db.return_frame(db.return_user_info(call.message.chat.id)['frame_num'])
-        if frame != 0 and k != 0:
-            match frame['modificators']:
-                case 'battle':
-                    if cb_data != 'start_play_game' and now_frame_num != int(cb_data[6:]):
-                        # await start_battle(call,state)
-                        pass
-
-            if frame['content_code'] > 0:
-                match frame['content_code']:
-                    case 1:
-                        content = InputMediaPhoto(media=frame['content'], caption=frame['desc'])
-                    case 2:
-                        content = InputMediaVideo(media=frame['content'],caption=frame['desc'])
-                    case 3:
-                        content = InputMediaAudio(media=frame['content'],caption=frame['desc'])
-                    case _:
-                        content = None
-
-                markup = kb.read_kb
-                if frame['is_variants']:
-                    markup = InlineKeyboardMarkup()
-                    j = frame['variants_frame'].split('\n')
-                    for i in frame['variants'].split('\n'):
-                        markup.add(InlineKeyboardButton(text=i, callback_data=f'frame_{j[0]}'))
-                        j.pop(0)
-
-                if db.return_user_info(call.message.chat.id)['state'] == 'free':
-                    if frame['sticker'] != None:
-                        await call.message.answer_sticker(frame['sticker'])
-                    try:
-
-                        await call.message.edit_media(content, reply_markup=markup)
-                    except:
-                        try:
-                            await call.message.delete()
-                        except:
-                            pass
-                        match frame['content_code']:
-                            case 1:
-                                await call.message.answer_photo(frame['content'], caption=frame['desc'], reply_markup=markup)
-                            case 2:
-                                await call.message.answer_video(frame['content'], caption=frame['desc'], reply_markup=markup)
-                            case 3:
-                                await call.message.answer_audio(frame['content'], caption=frame['desc'], reply_markup=markup)
-                else:
-                    try:
-                        await call.message.delete()
-                    except:
-                        pass
-                    if frame['modificators'] != 'battle':
-                        await call.message.answer('Вы сейчас заняты другой активностью. Возвращайтесь, когда освободитесь')
-            else:
-                markup = kb.read_kb
-                if frame['is_variants']:
-                    markup = InlineKeyboardMarkup()
-                    j = frame['variants_frame'].split('\n')
-                    for i in frame['variants'].split('\n'):
-                        markup.add(InlineKeyboardButton(text=i, callback_data=f'frame_{j[0]}'))
-                        j.pop(0)
-                if db.return_user_info(call.message.chat.id)['state'] == 'free':
-                    if frame['sticker'] != None:
-                        await call.message.answer_sticker(frame['sticker'])
-                    try:
-                        await call.message.edit_text(frame['desc'], reply_markup=markup)
-                    except:
-                        try:
-                            await call.message.delete()
-                        except:
-                            pass
-                        await call.message.answer(frame['desc'], reply_markup=markup)
-                else:
-                    try:
-                        await call.message.delete()
-                    except:
-                        pass
-                    if frame['modificators'] != 'battle':
-                        await call.message.answer('Вы сейчас заняты другой активностью. Возвращайтесь, когда освободитесь')
-        else:
-            if db.return_user_info(call.message.chat.id)['state'] == 'free':
-                try:
-                    await call.message.delete()
-                except:
-                    pass
-                await call.message.answer('На данном моменте сюжет кончается. Спасибо')
-            else:
-                try:
-                    await call.message.delete()
-                except:
-                    pass
-                if frame['modificators'] != 'battle':
-                    await call.message.answer('Вы сейчас заняты другой активностью. Возвращайтесь, когда освободитесь')
-            db.update_user_frame_num(call.message.chat.id, now_frame_num, user['curr_game_code'])
-
-# @dp.callback_query_handler(lambda c: c.data)
-# async def callback (call: types.CallbackQuery, state:FSMContext):
-#     cb_data = call.data
-#
-#     # if cb_data.endswith('_battle'):
-#     #     await continue_battle(call,state)
-#
-#     if cb_data.startswith('frame_'):
-#         await change_frames(call,state)
-#     if cb_data == 'start_play_game':
-#         await change_frames(call,state)
-#     if cb_data == 'next_frame':
-#         await change_frames(call,state)
-
-
 @dp.callback_query_handler(kb.show_more_game_genre.filter())
 async def get_games_by_genre(call:types.CallbackQuery, callback_data: dict):
 
     markup = kb.return_library(db.return_game_by_genre(callback_data['genre_code'])).add(InlineKeyboardButton('Назад', callback_data=kb.store_action.new('go_to_genres')))
     await call.message.edit_text(f'Игры жанра {db.return_genre_name_by_code(callback_data["genre_code"])}:',reply_markup=markup)
+
+
+
+@dp.callback_query_handler(kb.frame_change.filter())
+async def change_frames(call:types.CallbackQuery, callback_data: dict, state:FSMContext):
+    user = db.return_user_info(call.message.chat.id)
+    game = db.return_game_info(user['curr_game_code'])
+    game_cfg = db.return_game_cfg(user['user_id'], game['game_code'])
+    data = await state.get_data()
+    frame_num = int(callback_data['frame_num'])
+    frame = db.return_frame(frame_num=frame_num,game_code=game['game_code'])
+    if frame != 0:
+        if game_cfg['is_demo'] <= frame['is_demo']:
+            db.update_user_frame_num(user['user_id'], frame_num, game['game_code'])
+            match frame['content_code']:
+                case 1:
+                    content = InputMediaPhoto(media=frame['content'], caption=frame['text']['ru'])
+                case 2:
+                    content = InputMediaVideo(media=frame['content'], caption=frame['text']['ru'])
+                case 3:
+                    content = InputMediaAudio(media=frame['content'], caption=frame['text']['ru'])
+                case _:
+                    content = None
+
+            markup = InlineKeyboardMarkup()
+            frame_num = list(frame['variants_frame'].split('\n'))
+            for i in frame['variants'].split('\n'):
+                markup.add(InlineKeyboardButton(i, callback_data=kb.frame_change.new(frame_num[0])))
+                frame_num.pop(0)
+            try:
+                await call.message.edit_media(content, reply_markup=markup)
+            except:
+                try:
+                    await call.message.delete()
+                except:
+                    pass
+                match frame['content_code']:
+                    case 1:
+                        await call.message.answer_photo(frame['content'], caption=frame['text']['ru'], reply_markup=markup)
+                    case 2:
+                        await call.message.answer_video(frame['content'], caption=frame['text']['ru'], reply_markup=markup)
+                    case 3:
+                        await call.message.answer_audio(frame['content'], caption=frame['text']['ru'], reply_markup=markup)
+                    case _:
+                        await call.message.answer(frame['text']['ru'], reply_markup=markup)
+
+        else:
+            await call.message.delete()
+            await call.message.answer('На этом демо игры заканчивается. Приобретите полную версию игры')
+        if frame['sound']:
+            if data.get('sound') == None:
+                async with state.proxy():
+                    sound = await call.message.answer_audio(frame['sound'])
+                    await state.update_data(sound=sound)
+            else:
+                await call.bot.delete_message(message_id=data.get('sound').message_id, chat_id=call.message.chat.id)
+                async with state.proxy():
+                    sound = await call.message.answer_audio(frame['sound'])
+                    await state.update_data(sound=sound)
+    else:
+       try:
+            await call.message.edit_text('На этом игра заканчивается благодарим за прохождение')
+       except:
+           await call.message.delete()
+           await call.message.answer('На этом игра заканчивается. Благодарим за прохождение')
+
+
+
+
+
+@dp.callback_query_handler(kb.play_game.filter())
+async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMContext):
+    game = db.return_game_info(callback_data['game_code'])
+    game_user_cfg = db.return_game_cfg(call.message.chat.id,game['game_code'])
+    frame = db.return_frame(game_code=game['game_code'],frame_num=game_user_cfg['frame_num'])
+    data = await state.get_data()
+    await call.message.delete()
+    if frame != 0:
+        db.update_now_user_game(call.message.chat.id,game['game_code'])
+        await call.message.answer('Ждите. Настраиваются последние штрихи')
+
+        match frame['content_code']:
+            case 1:
+                content = InputMediaPhoto(media=frame['content'], caption=frame['text']['ru'])
+            case 2:
+                content = InputMediaVideo(media=frame['content'], caption=frame['text']['ru'])
+            case 3:
+                content = InputMediaAudio(media=frame['content'], caption=frame['text']['ru'])
+            case _:
+                content = None
+
+        markup = InlineKeyboardMarkup()
+        frame_num = list(frame['variants_frame'].split('\n'))
+        for i in frame['variants'].split('\n'):
+            markup.add(InlineKeyboardButton(i, callback_data=kb.frame_change.new(frame_num[0])))
+            frame_num.pop(0)
+        try:
+            await call.message.edit_media(content, reply_markup=markup)
+        except:
+            try:
+                await call.message.delete()
+            except:
+                pass
+            match frame['content_code']:
+                case 1:
+                    await call.message.answer_photo(frame['content'], caption=frame['text']['ru'], reply_markup=markup)
+                case 2:
+                    await call.message.answer_video(frame['content'], caption=frame['text']['ru'],reply_markup=markup)
+                case 3:
+                    await call.message.answer_audio(frame['content'], caption=frame['text']['ru'],reply_markup=markup)
+                case _:
+                    await call.message.answer(frame['text']['ru'],reply_markup=markup)
+
+        if frame['sound']:
+            if data.get('sound') == None:
+                async with state.proxy():
+                    sound = await call.message.answer_audio(frame['sound'])
+                    await state.update_data(sound=sound)
+            else:
+                await call.bot.delete_message(message_id=data.get('sound').message_id, chat_id=call.message.chat.id)
+                async with state.proxy():
+                    sound = await call.message.answer_audio(frame['sound'])
+
+                    await state.update_data(sound=sound)
+    else:
+        await call.message.answer('У игры пока нет кадров. Но скоро это будет исправлено')
+
 
 
 @dp.callback_query_handler(kb.store_action.filter())
@@ -402,18 +316,14 @@ async def show_game_info(call:types.CallbackQuery, callback_data: dict):
 
     for index, file_id in enumerate(game['game_cover'].split('\n')):
         match index:
-            case 0:
-                match file_id.lower()[0]:
-                    case 'b':
-                        media.attach_video(video=file_id)
-                    case 'a':
-                        media.attach_photo(photo=file_id)
             case _:
                 match file_id.lower()[0]:
                     case 'b':
                         media.attach_video(video=file_id)
                     case 'a':
                         media.attach_photo(photo=file_id)
+
+
     await call.message.answer_media_group(media)
     await call.message.answer(game_info_text, reply_markup=markup)
 
