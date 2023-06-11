@@ -90,20 +90,26 @@ async def get_text(message: types.Message):
                 await message.answer('Ваша библиотека', reply_markup=markup)
         case phr.profile:
             user_info = db.return_user_info(message.from_user.id)
-            curr_game = db.return_game_info(user_info['curr_game_code'])
-            if curr_game == 0:
-                curr_game = 'К сожалению вы не проходите сейчас какую-либо игру'
-            else:
-                curr_game = curr_game['game_name']
-            achivments = user_info['achivements']
-            if len(achivments) < 1:
-                achivments = 'У вас нет достижений'
+            if user_info != 0:
+                curr_game = db.return_game_info(user_info['curr_game_code'])
+                if curr_game == 0:
+                    curr_game = 'К сожалению вы не проходите сейчас какую-либо игру'
+                else:
+                    curr_game = curr_game['game_name']
 
-            await message.answer(f'Ваш id - {user_info["user_id"]}'
-                                 f'\nКоличество игр в библиотеке - {len(db.return_user_library_games(message.from_user.id))}'
-                                 f'\nВы проходите - {curr_game}'
-                                 f'\nВаши достижения:'
-                                 f'\n{achivments}')
+                achivments = user_info['achivements']
+                if len(achivments) < 1:
+                    achivments = 'У вас нет достижений'
+
+                await message.answer(f'Ваш id - {user_info["user_id"]}'
+                                     f'\nКоличество игр в библиотеке - {len(db.return_user_library_games(message.from_user.id))}'
+                                     f'\nВы проходите - {curr_game}'
+                                     f'\nВаши достижения:'
+                                     f'\n{achivments}')
+            else:
+                await message.answer('Пройдите регистрацию. Отправив сообщение /start')
+
+
         case phr.search_game:
             await message.answer('Отправьте название игры, которую хотите найти. \nОтправьте 0 для отмены')
             await Store.search_game.set()
@@ -152,61 +158,68 @@ async def change_frames(call:types.CallbackQuery, callback_data: dict, state:FSM
     data = await state.get_data()
     frame_num = int(callback_data['frame_num'])
     frame = db.return_frame(frame_num=frame_num,game_code=game['game_code'])
-    if frame != 0:
-        if game_cfg['is_demo'] <= frame['is_demo']:
-            db.update_user_frame_num(user['user_id'], frame_num, game['game_code'])
-            match frame['content_code']:
-                case 1:
-                    content = InputMediaPhoto(media=frame['content'], caption=frame['text']['ru'])
-                case 2:
-                    content = InputMediaVideo(media=frame['content'], caption=frame['text']['ru'])
-                case 3:
-                    content = InputMediaAudio(media=frame['content'], caption=frame['text']['ru'])
-                case _:
-                    content = None
-
-            markup = InlineKeyboardMarkup()
-            frame_num = list(frame['variants_frame'].split('\n'))
-            for i in frame['variants'].split('\n'):
-                markup.add(InlineKeyboardButton(i, callback_data=kb.frame_change.new(frame_num[0])))
-                frame_num.pop(0)
-            try:
-                await call.message.edit_media(content, reply_markup=markup)
-            except:
-                try:
-                    await call.message.delete()
-                except:
-                    pass
-                async with state.proxy():
-                    match frame['content_code']:
-                        case 1:
-                           message = await call.message.answer_photo(frame['content'], caption=frame['text']['ru'], reply_markup=markup)
-                        case 2:
-                            message = await call.message.answer_video(frame['content'], caption=frame['text']['ru'], reply_markup=markup)
-                        case 3:
-                            message = await call.message.answer_audio(frame['content'], caption=frame['text']['ru'], reply_markup=markup)
-                        case _:
-                            message = await call.message.answer(frame['text']['ru'], reply_markup=markup)
-                    await state.update_data(game_text=message)
-        else:
+    if data.get('game_text').message_id != call.message.message_id:
+        try:
+            await call.message.edit_text('Сессия устарела\nЗапустите игру заново')
+        except:
             await call.message.delete()
-            await call.message.answer('На этом демо игры заканчивается. Приобретите полную версию игры')
-        if frame['sound']:
-            if data.get('sound') == None:
-                async with state.proxy():
-                    sound = await call.message.answer_audio(frame['sound'])
-                    await state.update_data(sound=sound)
-            else:
-                await call.bot.delete_message(message_id=data.get('sound').message_id, chat_id=call.message.chat.id)
-                async with state.proxy():
-                    sound = await call.message.answer_audio(frame['sound'])
-                    await state.update_data(sound=sound)
+            await call.message.answer('Сессия устарела \nЗапустите игру заново.')
     else:
-       try:
-            await call.message.edit_text('На этом игра заканчивается благодарим за прохождение')
-       except:
-           await call.message.delete()
-           await call.message.answer('На этом игра заканчивается. Благодарим за прохождение')
+        if frame != 0:
+            if game_cfg['is_demo'] <= frame['is_demo']:
+                db.update_user_frame_num(user['user_id'], frame_num, game['game_code'])
+                match frame['content_code']:
+                    case 1:
+                        content = InputMediaPhoto(media=frame['content'], caption=frame['text']['ru'])
+                    case 2:
+                        content = InputMediaVideo(media=frame['content'], caption=frame['text']['ru'])
+                    case 3:
+                        content = InputMediaAudio(media=frame['content'], caption=frame['text']['ru'])
+                    case _:
+                        content = None
+
+                markup = InlineKeyboardMarkup()
+                frame_num = list(frame['variants_frame'].split('\n'))
+                for i in frame['variants'].split('\n'):
+                    markup.add(InlineKeyboardButton(i, callback_data=kb.frame_change.new(frame_num[0])))
+                    frame_num.pop(0)
+                try:
+                    await call.message.edit_media(content, reply_markup=markup)
+                except:
+                    try:
+                        await call.message.delete()
+                    except:
+                        pass
+                    async with state.proxy():
+                        match frame['content_code']:
+                            case 1:
+                               message = await call.message.answer_photo(frame['content'], caption=frame['text']['ru'], reply_markup=markup)
+                            case 2:
+                                message = await call.message.answer_video(frame['content'], caption=frame['text']['ru'], reply_markup=markup)
+                            case 3:
+                                message = await call.message.answer_audio(frame['content'], caption=frame['text']['ru'], reply_markup=markup)
+                            case _:
+                                message = await call.message.answer(frame['text']['ru'], reply_markup=markup)
+                        await state.update_data(game_text=message)
+            else:
+                await call.message.delete()
+                await call.message.answer('На этом демо игры заканчивается. Приобретите полную версию игры')
+            if frame['sound']:
+                if data.get('sound') == None:
+                    async with state.proxy():
+                        sound = await call.message.answer_audio(frame['sound'])
+                        await state.update_data(sound=sound)
+                else:
+                    await call.bot.delete_message(message_id=data.get('sound').message_id, chat_id=call.message.chat.id)
+                    async with state.proxy():
+                        sound = await call.message.answer_audio(frame['sound'])
+                        await state.update_data(sound=sound)
+        else:
+           try:
+                await call.message.edit_text('На этом игра заканчивается благодарим за прохождение')
+           except:
+               await call.message.delete()
+               await call.message.answer('На этом игра заканчивается. Благодарим за прохождение')
 
 
 @dp.callback_query_handler(kb.get_demo.filter())
@@ -356,7 +369,7 @@ async def uspeh_buy(message:types.Message):
 async def unavailable_game(call:types.CallbackQuery, callback_data: dict):
     game = db.return_game_info(callback_data['game_code'])
     await call.message.edit_text(f'Мы понимаем как вы хотите поиграть в {game["game_name"]}'
-                                 f'\nОднако сейчас игра недоступнка. Наши сожаления'
+                                 f'\nОднако сейчас игра недоступна. Наши сожаления'
                                  f'\nПодождите официального выхода')
 @dp.callback_query_handler(kb.show_more_info_game.filter())
 async def show_game_info(call:types.CallbackQuery, callback_data: dict):
