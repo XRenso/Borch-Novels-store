@@ -158,7 +158,7 @@ async def change_frames(call:types.CallbackQuery, callback_data: dict, state:FSM
     data = await state.get_data()
     frame_num = int(callback_data['frame_num'])
     frame = db.return_frame(frame_num=frame_num,game_code=game['game_code'])
-    if data.get('game_text').message_id != call.message.message_id:
+    if data.get('game_text') is not None and data.get('game_text').message_id != call.message.message_id:
         try:
             await call.message.edit_text('Сессия устарела\nЗапустите игру заново')
         except:
@@ -371,6 +371,8 @@ async def unavailable_game(call:types.CallbackQuery, callback_data: dict):
     await call.message.edit_text(f'Мы понимаем как вы хотите поиграть в {game["game_name"]}'
                                  f'\nОднако сейчас игра недоступна. Наши сожаления'
                                  f'\nПодождите официального выхода')
+
+
 @dp.callback_query_handler(kb.show_more_info_game.filter())
 async def show_game_info(call:types.CallbackQuery, callback_data: dict):
     game = db.return_game_info(callback_data['game_code'])
