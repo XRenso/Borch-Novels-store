@@ -40,7 +40,7 @@ class Store(StatesGroup):
 class Cache(StatesGroup):
     sound = State()
     game_text = State()
-
+    achivement = State()
 
 @dp.message_handler(commands = ['start'])
 async def start(message: types.Message):
@@ -158,6 +158,12 @@ async def change_frames(call:types.CallbackQuery, callback_data: dict, state:FSM
     data = await state.get_data()
     frame_num = int(callback_data['frame_num'])
     frame = db.return_frame(frame_num=frame_num,game_code=game['game_code'])
+
+    if data.get('achivement') is not None:
+        try:
+            await call.bot.delete_message(message_id=data.get('achivement').message_id,chat_id=call.message.chat.id)
+        except:
+            pass
     if data.get('game_text') is not None and data.get('game_text').message_id != call.message.message_id:
         try:
             await call.message.edit_text('Сессия устарела\nЗапустите игру заново')
@@ -214,7 +220,19 @@ async def change_frames(call:types.CallbackQuery, callback_data: dict, state:FSM
                     async with state.proxy():
                         sound = await call.message.answer_audio(frame['sound'])
                         await state.update_data(sound=sound)
+
+            if frame['achivement']:
+                achiv = db.give_achivement_to_user(game_code=game['game_code'],achivement_code=frame['achivement'], user_id=call.message.chat.id)
+                if achiv != 0:
+                    async with state.proxy():
+                        achivement = db.return_achivement(game_code=game['game_code'], achivement_code=frame['achivement'])
+                        ok = await call.message.answer(text=f'Получено достижение {achivement["name"]}\nЧтобы посмотреть все достижения перейдите к меню достижений')
+                        await state.update_data(achivement=ok)
+
+
         else:
+
+
            try:
                 await call.message.edit_text('На этом игра заканчивается благодарим за прохождение')
            except:
