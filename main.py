@@ -183,9 +183,9 @@ async def profile_menu(call:types.CallbackQuery, callback_data: dict):
                 markup = kb.profile_kb_not_have_achivements
 
             await call.message.edit_text(f'Ваш id - {user_info["user_id"]}'
-                                 f'\nКоличество игр в библиотеке - {len(db.return_user_library_games(call.message.chat.id))}'
-                                 f'\nВы проходите - {curr_game}'
-                                 f'\nКоличество ваших достижений - '
+                                 f'\nКоличество игр в библиотеке 📂 - {len(db.return_user_library_games(call.message.chat.id))}'
+                                 f'\nВы проходите 🎮 - {curr_game}'
+                                 f'\nКоличество ваших достижений 🌟 - '
                                  f'{len(achivments)}', reply_markup=markup)
 
 
