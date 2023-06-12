@@ -106,7 +106,7 @@ async def get_text(message: types.Message):
                 await message.answer(f'Ваш id - {user_info["user_id"]}'
                                      f'\nКоличество игр в библиотеке 📂- {len(db.return_user_library_games(message.from_user.id))}'
                                      f'\nВы проходите 🎮 - {curr_game}'
-                                     f'\nКоличество ваших достижений ✅ - '
+                                     f'\nКоличество ваших достижений 🌟 - '
                                      f'{len(achivments)}', reply_markup=markup)
             else:
                 await message.answer('Пройдите регистрацию. Отправив сообщение /start')
