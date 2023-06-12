@@ -118,6 +118,7 @@ async def get_text(message: types.Message):
 
 
         case phr.store:
+            print("435425")
             genres = db.return_genres()
             markup = kb.store_kb_genres(genres)
             if not len(markup['inline_keyboard']):
@@ -128,6 +129,7 @@ async def get_text(message: types.Message):
             await message.answer('Выберите интересующую вас функцию 👇 ', reply_markup=kb.shop_kb)
         case phr.main_menu:
             await message.answer('Добро пожаловать на главное меню ✨', reply_markup=kb.main_kb)
+
 
 @dp.message_handler(state=Store.search_game)
 async def search_game_by_name(message: types.Message, state: FSMContext):
