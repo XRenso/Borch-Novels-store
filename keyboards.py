@@ -56,7 +56,7 @@ library = KeyboardButton(phr.library)
 shop = KeyboardButton(phr.shop)
 main_kb.add(shop).row(library,about_me)
 
-##Shop kb
+##Shop kz
 store = KeyboardButton(phr.store)
 find_game = KeyboardButton(phr.search_game)
 main_menu = KeyboardButton(phr.main_menu)
@@ -67,10 +67,10 @@ shop_kb.add(store,find_game).add(main_menu)
 
 
 ##profile keyboard
-back_to_profile = InlineKeyboardButton('Назад', callback_data=profile_action.new('back_to_profile'))
-back_to_games = InlineKeyboardButton('Назад',callback_data=profile_action.new('back_to_games'))
-show_achivements = InlineKeyboardButton('Показать достижения', callback_data=profile_action.new('show_achivements'))
-bad_achivements = InlineKeyboardButton('У вас нет достижений', callback_data=profile_action.new('no_achivements'))
+back_to_profile = InlineKeyboardButton('Назад ↩️', callback_data=profile_action.new('back_to_profile'))
+back_to_games = InlineKeyboardButton('Назад ↩️',callback_data=profile_action.new('back_to_games'))
+show_achivements = InlineKeyboardButton('Показать достижения ✅ ', callback_data=profile_action.new('show_achivements'))
+bad_achivements = InlineKeyboardButton('У вас нет достижений ❌', callback_data=profile_action.new('no_achivements'))
 
 profile_kb_have_achivements = InlineKeyboardMarkup().add(show_achivements)
 
@@ -117,20 +117,20 @@ def get_game(game_code:str, have_it_user:int, price:int, user_id:int) -> InlineK
     if check_frame != 0 and game['can_buy'] != 0:
         match have_it_user:
             case 1 if not game_cfg or game_cfg['is_demo'] == 0:
-                markup.add(InlineKeyboardButton('Играть', callback_data=play_game.new(game_code)))
+                markup.add(InlineKeyboardButton('Играть 🎮', callback_data=play_game.new(game_code)))
             case _:
                 match price:
                     case 0:
-                        markup.add(InlineKeyboardButton('Получить', callback_data=buy_game.new(game_code)))
+                        markup.add(InlineKeyboardButton('Получить 👇', callback_data=buy_game.new(game_code)))
                     case _:
                             if game_cfg == 0:
-                                markup.add(InlineKeyboardButton('Купить', callback_data=buy_game.new(game_code)))
+                                markup.add(InlineKeyboardButton('Купить 💳', callback_data=buy_game.new(game_code)))
                             elif game_cfg['is_demo'] == 1:
-                                markup.add(InlineKeyboardButton('Купить полную версию игры', callback_data=buy_game.new(game_code)))
+                                markup.add(InlineKeyboardButton('Купить полную версию игры 💳', callback_data=buy_game.new(game_code)))
                             if game_cfg == 0:
-                                markup.add(InlineKeyboardButton('Получить демо', callback_data=get_demo.new(game_code)))
+                                markup.add(InlineKeyboardButton('Получить демо 👇', callback_data=get_demo.new(game_code)))
                             else:
-                                markup.add(InlineKeyboardButton('Играть', callback_data=play_game.new(game_code)))
+                                markup.add(InlineKeyboardButton('Играть 🎮', callback_data=play_game.new(game_code)))
     else:
-        markup.add(InlineKeyboardButton('Игра недоступна', callback_data=unavailable_game.new(game_code)))
+        markup.add(InlineKeyboardButton('Игра недоступна ❌', callback_data=unavailable_game.new(game_code)))
     return markup
