@@ -91,7 +91,8 @@ def return_achivements(achivments,game_code):
     markup = InlineKeyboardMarkup()
     for i in achivments:
         achivment = db.return_achivement(game_code=game_code, achivement_code=i)
-        markup.add(InlineKeyboardButton(achivment["name"], callback_data=profile_achivement_code.new(f"{game_code}<@{achivment['achivement_code']}")))
+        if achivment != 0:
+            markup.add(InlineKeyboardButton(achivment["name"], callback_data=profile_achivement_code.new(f"{game_code}<@{achivment['achivement_code']}")))
     return markup
 
 
