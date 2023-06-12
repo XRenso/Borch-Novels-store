@@ -46,7 +46,8 @@ class Cache(StatesGroup):
 async def start(message: types.Message):
     db.add_user(message.from_user.id)
     await message.answer(f'Здравствуй, {message.from_user.first_name}!'
-                            f'\nДобро пожаловать в магазин Borch Novels.', reply_markup=kb.main_kb)
+                            f'\nДобро пожаловать в магазин Borch Novels.'
+                         f'\nУдачного времяпрепровождения!!', reply_markup=kb.main_kb)
 
 
 @dp.message_handler(content_types=['photo'])
@@ -76,7 +77,7 @@ async def handle_photo(message: types.Message):
 async def reset_cur_game(message:types.Message):
     user = db.return_user_info(message.from_user.id)
     db.reset_game_setings(user_id=message.from_user.id,game_code=user['curr_game_code'])
-    await message.answer('Успешно сброшено')
+    await message.answer('Успешно сброшено ✅')
 
 
 @dp.message_handler(content_types=['text'])
@@ -85,27 +86,27 @@ async def get_text(message: types.Message):
         case phr.library:
             markup = kb.return_library(db.return_user_library_games(message.from_user.id))
             if not len(markup['inline_keyboard']):
-                await message.answer('У вас нет игр')
+                await message.answer('У вас нет игр ❌')
             else:
-                await message.answer('Ваша библиотека', reply_markup=markup)
+                await message.answer('Ваша библиотека 📂', reply_markup=markup)
         case phr.profile:
             user_info = db.return_user_info(message.from_user.id)
             if user_info != 0:
                 curr_game = db.return_game_info(user_info['curr_game_code'])
                 if curr_game == 0:
-                    curr_game = 'К сожалению вы не проходите сейчас какую-либо игру'
+                    curr_game = 'К сожалению вы не проходите сейчас какую-либо игру ❌'
                 else:
                     curr_game = curr_game['game_name']
 
                 achivments = user_info['achivements']
                 markup = kb.profile_kb_have_achivements
                 if len(achivments) < 1:
-                    achivments = 'У вас нет достижений'
+                    achivments = 'У вас нет достижений ❌'
                     markup = kb.profile_kb_not_have_achivements
                 await message.answer(f'Ваш id - {user_info["user_id"]}'
-                                     f'\nКоличество игр в библиотеке - {len(db.return_user_library_games(message.from_user.id))}'
-                                     f'\nВы проходите - {curr_game}'
-                                     f'\nКоличество ваших достижений - '
+                                     f'\nКоличество игр в библиотеке 📂- {len(db.return_user_library_games(message.from_user.id))}'
+                                     f'\nВы проходите 🎮 - {curr_game}'
+                                     f'\nКоличество ваших достижений ✅ - '
                                      f'{len(achivments)}', reply_markup=markup)
             else:
                 await message.answer('Пройдите регистрацию. Отправив сообщение /start')
@@ -120,13 +121,13 @@ async def get_text(message: types.Message):
             genres = db.return_genres()
             markup = kb.store_kb_genres(genres)
             if not len(markup['inline_keyboard']):
-                await message.answer(f'Игры отсутсвуют в магазине')
+                await message.answer(f'Игры отсутсвуют в магазине ❌')
             else:
-                await message.answer(f'Выберите интересующую вас категорию', reply_markup=markup)
+                await message.answer(f'Выберите интересующую вас категорию 👇', reply_markup=markup)
         case phr.shop:
-            await message.answer('Выберите интересующую вас функцию', reply_markup=kb.shop_kb)
+            await message.answer('Выберите интересующую вас функцию 👇 ', reply_markup=kb.shop_kb)
         case phr.main_menu:
-            await message.answer('Добро пожаловать на главное меню', reply_markup=kb.main_kb)
+            await message.answer('Добро пожаловать на главное меню ✨', reply_markup=kb.main_kb)
 
 @dp.message_handler(state=Store.search_game)
 async def search_game_by_name(message: types.Message, state: FSMContext):
@@ -135,11 +136,11 @@ async def search_game_by_name(message: types.Message, state: FSMContext):
         games = db.search_game_by_name(search)
         markup = kb.return_library(games)
         if not len(markup['inline_keyboard']):
-            await message.answer(f'К сожалению у нас нет игр по запросу {search}')
+            await message.answer(f'К сожалению у нас нет игр по запросу {search} 😕')
         else:
             await message.answer(f'Результат поиска по запросу {search}:', reply_markup=markup)
     else:
-        await message.answer('Успешная отмена')
+        await message.answer('Успешная отмена ❌')
     await state.finish()
 
 
@@ -152,31 +153,31 @@ async def achivement_info(call:types.CallbackQuery, callback_data: dict):
     achivement_code = info[1]
     achivement  = db.return_achivement(game_code,achivement_code)
     await call.message.delete()
-    await call.message.answer_photo(photo=achivement['cover'], caption=f'Достижение - {achivement["name"]}\nОписание:\n{achivement["description"]}')
+    await call.message.answer_photo(photo=achivement['cover'], caption=f'Достижение ✅ - {achivement["name"]}\nОписание:\n{achivement["description"]}')
 
 @dp.callback_query_handler(kb.profile_achivement_games.filter())
 async def achivments_games(call:types.CallbackQuery, callback_data: dict):
     markup = kb.return_achivements(db.return_user_achivement_by_game_code(call.message.chat.id,callback_data['game_code']), game_code=callback_data['game_code']).add(kb.back_to_games)
-    await call.message.edit_text('Выберите интересующее вас достижение', reply_markup=markup)
+    await call.message.edit_text('Выберите интересующее вас достижение 🤔', reply_markup=markup)
 
 @dp.callback_query_handler(kb.profile_action.filter())
 async def profile_menu(call:types.CallbackQuery, callback_data: dict):
     match callback_data['action']:
         case 'show_achivements':
             markup = kb.return_games_btn_achivement(db.return_user_games_with_achivement(call.message.chat.id)).add(kb.back_to_profile)
-            await call.message.edit_text('Выберите игру, в которой хотите увидеть ваши достижения', reply_markup=markup)
+            await call.message.edit_text('Выберите игру, в которой хотите увидеть ваши достижения 👇', reply_markup=markup)
         case 'back_to_profile':
             user_info = db.return_user_info(call.message.chat.id)
             curr_game = db.return_game_info(user_info['curr_game_code'])
             if curr_game == 0:
-                curr_game = 'К сожалению вы не проходите сейчас какую-либо игру'
+                curr_game = 'К сожалению вы не проходите сейчас какую-либо игру ❌'
             else:
                 curr_game = curr_game['game_name']
 
             achivments = user_info['achivements']
             markup = kb.profile_kb_have_achivements
             if len(achivments) < 1:
-                achivments = 'У вас нет достижений'
+                achivments = 'У вас нет достижений ❌'
                 markup = kb.profile_kb_not_have_achivements
 
             await call.message.edit_text(f'Ваш id - {user_info["user_id"]}'
@@ -188,14 +189,14 @@ async def profile_menu(call:types.CallbackQuery, callback_data: dict):
 
         case 'back_to_games':
             markup = kb.return_games_btn_achivement(db.return_user_games_with_achivement(call.message.chat.id)).add(kb.back_to_profile)
-            await call.message.edit_text('Выберите игру, в которой хотите увидеть ваши достижения', reply_markup=markup)
+            await call.message.edit_text('Выберите игру, в которой хотите увидеть ваши достижения 🎉', reply_markup=markup)
         case 'no_achivements':
-            await call.message.edit_text('К сожалению у вас нет достижений.\nИграйте в игры, чтобы их получить')
+            await call.message.edit_text('К сожалению у вас нет достижений ❌.\nИграйте в игры, чтобы их получить 🎮')
 
 @dp.callback_query_handler(kb.show_more_game_genre.filter())
 async def get_games_by_genre(call:types.CallbackQuery, callback_data: dict):
 
-    markup = kb.return_library(db.return_game_by_genre(callback_data['genre_code'])).add(InlineKeyboardButton('Назад', callback_data=kb.store_action.new('go_to_genres')))
+    markup = kb.return_library(db.return_game_by_genre(callback_data['genre_code'])).add(InlineKeyboardButton('Назад ↩️', callback_data=kb.store_action.new('go_to_genres')))
     await call.message.edit_text(f'Игры жанра {db.return_genre_name_by_code(callback_data["genre_code"])}:',reply_markup=markup)
 
 
@@ -216,10 +217,10 @@ async def change_frames(call:types.CallbackQuery, callback_data: dict, state:FSM
             pass
     if data.get('game_text') is not None and data.get('game_text').message_id != call.message.message_id:
         try:
-            await call.message.edit_text('Сессия устарела\nЗапустите игру заново')
+            await call.message.edit_text('Сессия устарела\nЗапустите игру заново 🔁')
         except:
             await call.message.delete()
-            await call.message.answer('Сессия устарела \nЗапустите игру заново.')
+            await call.message.answer('Сессия устарела \nЗапустите игру заново 🔁.')
     else:
         if frame != 0:
             if game_cfg['is_demo'] <= frame['is_demo']:
@@ -259,7 +260,7 @@ async def change_frames(call:types.CallbackQuery, callback_data: dict, state:FSM
                         await state.update_data(game_text=message)
             else:
                 await call.message.delete()
-                await call.message.answer('На этом демо игры заканчивается. Приобретите полную версию игры')
+                await call.message.answer('На этом демо игры заканчивается. Приобретите полную версию игры 💳')
             if frame['sound']:
                 if data.get('sound') == None:
                     async with state.proxy():
@@ -276,24 +277,22 @@ async def change_frames(call:types.CallbackQuery, callback_data: dict, state:FSM
                 if achiv != 0:
                     async with state.proxy():
                         achivement = db.return_achivement(game_code=game['game_code'], achivement_code=frame['achivement'])
-                        ok = await call.message.answer(text=f'Получено достижение {achivement["name"]}\nЧтобы посмотреть все достижения перейдите к меню достижений')
+                        ok = await call.message.answer(text=f'Получено достижение ✅ {achivement["name"]}\nЧтобы посмотреть все достижения перейдите к меню достижений  📂')
                         await state.update_data(achivement=ok)
-
-
         else:
-
-
            try:
-                await call.message.edit_text('На этом игра заканчивается благодарим за прохождение')
+                await call.message.edit_text('На этом игра заканчивается 🎉'
+                                             '\nБлагодарим за прохождение 🤝')
            except:
                await call.message.delete()
-               await call.message.answer('На этом игра заканчивается. Благодарим за прохождение')
+               await call.message.answer('На этом игра заканчивается 🎉'
+                                         '\nБлагодарим за прохождение 🤝')
 
 
 @dp.callback_query_handler(kb.get_demo.filter())
 async def get_demo_to_user(call:types.CallbackQuery, callback_data: dict, state:FSMContext):
     db.give_game_to_user(user_id=call.message.chat.id, game_code=callback_data['game_code'], is_demo=1)
-    await call.message.edit_text(f'Успешно полученая демо-версия игры - {db.return_game_info(callback_data["game_code"])["game_name"]}')
+    await call.message.edit_text(f'Успешно полученая демо-версия игры ✅ - {db.return_game_info(callback_data["game_code"])["game_name"]}')
 
 @dp.callback_query_handler(kb.play_game.filter())
 async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMContext):
@@ -364,7 +363,7 @@ async def store_handler(call:types.CallbackQuery, callback_data: dict):
     if callback_data['action'] == 'go_to_genres':
         genres = db.return_genres()
         markup = kb.store_kb_genres(genres)
-        await call.message.edit_text(f'Выберите интересующую вас категорию', reply_markup=markup)
+        await call.message.edit_text(f'Выберите интересующую вас категорию 👇', reply_markup=markup)
 
 
 
@@ -376,7 +375,7 @@ async def buy_game(call:types.CallbackQuery, callback_data: dict):
     match game['price']:
         case 0:
             db.give_game_to_user(game_code,call.message.chat.id, 0)
-            await call.message.edit_text(f'{game["game_name"]} успешно добавлена в библиотеку')
+            await call.message.edit_text(f'{game["game_name"]} успешно добавлена в библиотеку ✅')
         case _:
             await call.message.delete()
             await call.bot.send_invoice(
@@ -431,7 +430,7 @@ async def uspeh_buy(message:types.Message):
     game = db.return_game_info(message.successful_payment.invoice_payload)
     db.give_game_to_user(game['game_code'], message.from_user.id, 0)
     await message.answer(f'Благодарим вас за покупку на сумму {message.successful_payment.total_amount//100} руб.'
-                         f'\n Игра - {game["game_name"]}  - успешно добавлена в вашу библиотеку')
+                         f'\n Игра - {game["game_name"]}  - успешно добавлена в вашу библиотеку ✅')
 
 @dp.callback_query_handler(kb.unavailable_game.filter())
 async def unavailable_game(call:types.CallbackQuery, callback_data: dict):
