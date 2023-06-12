@@ -34,6 +34,12 @@ class Mongo:
         else:
             return 0
 
+    def return_user_games_with_achivement(self,user_id:int):
+        return self.user.distinct('achivements.game_code', {'user_id':user_id})
+
+    def return_user_achivement_by_game_code(self,user_id:int,game_code:str):
+        return self.user.distinct('achivements.achivement_code',{'user_id':user_id,'achivements.game_code':game_code})
+
 
     def return_achivement(self,game_code:str,achivement_code:str):
         if self.achivement.count_documents({'game_code':game_code, 'achivement_code':achivement_code}) == 1:
@@ -216,8 +222,9 @@ if __name__ == '__main__':
     check = Mongo()
     check.__init__()
 
-
-    check.add_achivement(game_code='guide_store', name='Рождён читать',achivement_code='store_guide_complete',cover='AgACAgIAAxkBAAILZGSGfvFFhTQ44UkQGYPpwbZGacbtAALwzzEbFMExSICqx1N_4NAyAQADAgADeQADLwQ', description='Вы прошли курс молодого бойца.\nВы узнали тонкости работы магазина и его особености, теперь настало время узнать остальные игры.')
+    b = check.return_user_achivement_by_game_code(483058216, 'guide_store')
+    print(b)
+    # check.add_achivement(game_code='guide_store', name='Рождён читать',achivement_code='store_guide_complete',cover='AgACAgIAAxkBAAILZGSGfvFFhTQ44UkQGYPpwbZGacbtAALwzzEbFMExSICqx1N_4NAyAQADAgADeQADLwQ', description='Вы прошли курс молодого бойца.\nВы узнали тонкости работы магазина и его особености, теперь настало время узнать остальные игры.')
 
     # check.return_genres()
     # check.add_frame(game_code='param_pam',frame_num=1,is_demo=1,content_code=0,text={'ru':'Просто проверочка'}, variants='Я\nТы', variants_frame='2\n3')

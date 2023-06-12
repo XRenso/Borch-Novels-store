@@ -22,6 +22,10 @@ unavailable_game = CallbackData('unavailable', 'game_code')
 store_action = CallbackData('store', 'action')
 
 
+profile_achivement_games = CallbackData('games', 'game_code')
+profile_achivement_code = CallbackData('achivements','achivement_code')
+profile_action = CallbackData('profile', 'action')
+
 
 
 vpered = InlineKeyboardMarkup(row_width=1)
@@ -58,6 +62,38 @@ find_game = KeyboardButton(phr.search_game)
 main_menu = KeyboardButton(phr.main_menu)
 shop_kb = ReplyKeyboardMarkup(resize_keyboard=True)
 shop_kb.add(store,find_game).add(main_menu)
+
+
+
+
+##profile keyboard
+back_to_profile = InlineKeyboardButton('Назад', callback_data=profile_action.new('back_to_profile'))
+back_to_games = InlineKeyboardButton('Назад',callback_data=profile_action.new('back_to_games'))
+show_achivements = InlineKeyboardButton('Показать достижения', callback_data=profile_action.new('show_achivements'))
+bad_achivements = InlineKeyboardButton('У вас нет достижений', callback_data=profile_action.new('no_achivements'))
+
+profile_kb_have_achivements = InlineKeyboardMarkup().add(show_achivements)
+
+profile_kb_not_have_achivements = InlineKeyboardMarkup().add(bad_achivements)
+
+
+
+def return_games_btn_achivement(games):
+    if games != 0:
+        markup = InlineKeyboardMarkup()
+        for i in games:
+            game = db.return_game_info(i)
+            markup.add(InlineKeyboardButton(game['game_name'], callback_data=profile_achivement_games.new(i)))
+        return markup
+
+
+def return_achivements(achivments,game_code):
+    markup = InlineKeyboardMarkup()
+    for i in achivments:
+        achivment = db.return_achivement(game_code=game_code, achivement_code=i)
+        markup.add(InlineKeyboardButton(achivment["name"], callback_data=profile_achivement_code.new(f"{game_code}<@{achivment['achivement_code']}")))
+    return markup
+
 
 def return_library(games):
     markup = InlineKeyboardMarkup()

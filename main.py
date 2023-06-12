@@ -98,14 +98,15 @@ async def get_text(message: types.Message):
                     curr_game = curr_game['game_name']
 
                 achivments = user_info['achivements']
+                markup = kb.profile_kb_have_achivements
                 if len(achivments) < 1:
                     achivments = 'У вас нет достижений'
-
+                    markup = kb.profile_kb_not_have_achivements
                 await message.answer(f'Ваш id - {user_info["user_id"]}'
                                      f'\nКоличество игр в библиотеке - {len(db.return_user_library_games(message.from_user.id))}'
                                      f'\nВы проходите - {curr_game}'
-                                     f'\nВаши достижения:'
-                                     f'\n{achivments}')
+                                     f'\nКоличество ваших достижений - '
+                                     f'{len(achivments)}', reply_markup=markup)
             else:
                 await message.answer('Пройдите регистрацию. Отправив сообщение /start')
 
@@ -141,6 +142,55 @@ async def search_game_by_name(message: types.Message, state: FSMContext):
         await message.answer('Успешная отмена')
     await state.finish()
 
+
+
+
+@dp.callback_query_handler(kb.profile_achivement_code.filter())
+async def achivement_info(call:types.CallbackQuery, callback_data: dict):
+    info = callback_data['achivement_code'].split('<@')
+    game_code = info[0]
+    achivement_code = info[1]
+    achivement  = db.return_achivement(game_code,achivement_code)
+    await call.message.delete()
+    await call.message.answer_photo(photo=achivement['cover'], caption=f'Достижение - {achivement["name"]}\nОписание:\n{achivement["description"]}')
+
+@dp.callback_query_handler(kb.profile_achivement_games.filter())
+async def achivments_games(call:types.CallbackQuery, callback_data: dict):
+    markup = kb.return_achivements(db.return_user_achivement_by_game_code(call.message.chat.id,callback_data['game_code']), game_code=callback_data['game_code']).add(kb.back_to_games)
+    await call.message.edit_text('Выберите интересующее вас достижение', reply_markup=markup)
+
+@dp.callback_query_handler(kb.profile_action.filter())
+async def profile_menu(call:types.CallbackQuery, callback_data: dict):
+    match callback_data['action']:
+        case 'show_achivements':
+            markup = kb.return_games_btn_achivement(db.return_user_games_with_achivement(call.message.chat.id)).add(kb.back_to_profile)
+            await call.message.edit_text('Выберите игру, в которой хотите увидеть ваши достижения', reply_markup=markup)
+        case 'back_to_profile':
+            user_info = db.return_user_info(call.message.chat.id)
+            curr_game = db.return_game_info(user_info['curr_game_code'])
+            if curr_game == 0:
+                curr_game = 'К сожалению вы не проходите сейчас какую-либо игру'
+            else:
+                curr_game = curr_game['game_name']
+
+            achivments = user_info['achivements']
+            markup = kb.profile_kb_have_achivements
+            if len(achivments) < 1:
+                achivments = 'У вас нет достижений'
+                markup = kb.profile_kb_not_have_achivements
+
+            await call.message.edit_text(f'Ваш id - {user_info["user_id"]}'
+                                 f'\nКоличество игр в библиотеке - {len(db.return_user_library_games(call.message.chat.id))}'
+                                 f'\nВы проходите - {curr_game}'
+                                 f'\nКоличество ваших достижений - '
+                                 f'{len(achivments)}', reply_markup=markup)
+
+
+        case 'back_to_games':
+            markup = kb.return_games_btn_achivement(db.return_user_games_with_achivement(call.message.chat.id)).add(kb.back_to_profile)
+            await call.message.edit_text('Выберите игру, в которой хотите увидеть ваши достижения', reply_markup=markup)
+        case 'no_achivements':
+            await call.message.edit_text('К сожалению у вас нет достижений.\nИграйте в игры, чтобы их получить')
 
 @dp.callback_query_handler(kb.show_more_game_genre.filter())
 async def get_games_by_genre(call:types.CallbackQuery, callback_data: dict):
