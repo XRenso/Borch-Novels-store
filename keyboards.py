@@ -130,7 +130,10 @@ def get_game(game_code:str, have_it_user:int, price:int, user_id:int) -> InlineK
                             if game_cfg == 0:
                                 markup.add(InlineKeyboardButton('Получить демо 👇', callback_data=get_demo.new(game_code)))
                             else:
-                                markup.add(InlineKeyboardButton('Играть 🎮', callback_data=play_game.new(game_code)))
+                                    markup.add(InlineKeyboardButton('Играть 🎮', callback_data=play_game.new(game_code)))
     else:
-        markup.add(InlineKeyboardButton('Игра недоступна ❌', callback_data=unavailable_game.new(game_code)))
+        if have_it_user == 0:
+            markup.add(InlineKeyboardButton('Игра недоступна ❌', callback_data=unavailable_game.new(game_code)))
+        else:
+            markup.add(InlineKeyboardButton('Играть 🎮', callback_data=play_game.new(game_code)))
     return markup
