@@ -118,7 +118,6 @@ async def get_text(message: types.Message):
 
 
         case phr.store:
-            print("435425")
             genres = db.return_genres()
             markup = kb.store_kb_genres(genres)
             if not len(markup['inline_keyboard']):
@@ -211,6 +210,19 @@ async def change_frames(call:types.CallbackQuery, callback_data: dict, state:FSM
     data = await state.get_data()
     frame_num = int(callback_data['frame_num'])
     frame = db.return_frame(frame_num=frame_num,game_code=game['game_code'])
+    if frame != 0 and frame['fail_condition_frame'] is not None and frame['check_add_conditions'] is not None:
+        conditions = frame['check_add_conditions'].split('\n')
+        for i in conditions:
+            info = i.split(':')
+            key = info[0]
+            value = info[1]
+            cfg = db.return_game_cfg(call.message.chat.id, game['game_code'])
+            if cfg[key] != value:
+                frame = db.return_frame(frame_num=frame['fail_condition_frame'], game_code=game['game_code'])
+                break
+
+
+
 
     if data.get('achivement') is not None:
         try:
@@ -229,11 +241,11 @@ async def change_frames(call:types.CallbackQuery, callback_data: dict, state:FSM
                 db.update_user_frame_num(user['user_id'], frame_num, game['game_code'])
                 match frame['content_code']:
                     case 1:
-                        content = InputMediaPhoto(media=frame['content'], caption=frame['text']['ru'])
+                        content = InputMediaPhoto(media=frame['content'], caption=frame['text']['ru'], parse_mode='HTML')
                     case 2:
-                        content = InputMediaVideo(media=frame['content'], caption=frame['text']['ru'])
+                        content = InputMediaVideo(media=frame['content'], caption=frame['text']['ru'], parse_mode='HTML')
                     case 3:
-                        content = InputMediaAudio(media=frame['content'], caption=frame['text']['ru'])
+                        content = InputMediaAudio(media=frame['content'], caption=frame['text']['ru'], parse_mode='HTML')
                     case _:
                         content = None
 
@@ -252,13 +264,13 @@ async def change_frames(call:types.CallbackQuery, callback_data: dict, state:FSM
                     async with state.proxy():
                         match frame['content_code']:
                             case 1:
-                               message = await call.message.answer_photo(frame['content'], caption=frame['text']['ru'], reply_markup=markup)
+                               message = await call.message.answer_photo(frame['content'], caption=frame['text']['ru'], reply_markup=markup, parse_mode='HTML')
                             case 2:
-                                message = await call.message.answer_video(frame['content'], caption=frame['text']['ru'], reply_markup=markup)
+                                message = await call.message.answer_video(frame['content'], caption=frame['text']['ru'], reply_markup=markup, parse_mode='HTML')
                             case 3:
-                                message = await call.message.answer_audio(frame['content'], caption=frame['text']['ru'], reply_markup=markup)
+                                message = await call.message.answer_audio(frame['content'], caption=frame['text']['ru'], reply_markup=markup, parse_mode='HTML')
                             case _:
-                                message = await call.message.answer(frame['text']['ru'], reply_markup=markup)
+                                message = await call.message.answer(frame['text']['ru'], reply_markup=markup, parse_mode='HTML')
                         await state.update_data(game_text=message)
             else:
                 await call.message.delete()
@@ -281,6 +293,16 @@ async def change_frames(call:types.CallbackQuery, callback_data: dict, state:FSM
                         achivement = db.return_achivement(game_code=game['game_code'], achivement_code=frame['achivement'])
                         ok = await call.message.answer(text=f'Получено достижение ✅ {achivement["name"]}\nЧтобы посмотреть все достижения перейдите к меню достижений  📂')
                         await state.update_data(achivement=ok)
+
+
+            if frame['change_add_conditions']:
+                conditions = frame['change_add_conditions'].split('\n')
+                for i in conditions:
+                    info = i.split(':')
+                    key = info[0]
+                    value = info[1]
+                    db.update_user_game_config(call.message.chat.id,value,key,game['game_code'])
+
         else:
            try:
                 await call.message.edit_text('На этом игра заканчивается 🎉'

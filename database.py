@@ -77,7 +77,7 @@ class Mongo:
                 'change_add_conditions': change_add_conditions, # Доп. условия, которые нужно изменить в условиях игры
                 'check_add_conditions' : check_add_conditions, # Проверка на доп. условия из конфига игры
                 'fail_condition_frame': fail_condition_frame, # кадр, который наступит, если проверка будет провалена
-                'achivement': achivement # Код достижения, которое дадут при достижение этого уровня
+                'achivement': achivement # Код достижения, которое дадут при достижении этого уровня
             }
             self.frame.insert_one(frame)
         else:
@@ -174,7 +174,13 @@ class Mongo:
                                   {'$set': {f'games_config.$.{game_code}.frame_num' : int(frame_num)}})
         else:
             return 0
-
+    def update_user_game_config(self,user_id,config_value,config_key, game_code):
+        user = self.return_user_info(user_id)
+        if user:
+            self.user.update_one({'user_id':user_id, f'games_config.{game_code}': {'$exists':True}},
+                                  {'$set': {f'games_config.$.{game_code}.{config_key}' : config_value}})
+        else:
+            return 0
     def update_now_user_game(self, user_id, game_code):
         user = self.return_user_info(user_id)
         if user:
@@ -222,8 +228,11 @@ if __name__ == '__main__':
     check = Mongo()
     check.__init__()
 
-    b = check.return_user_achivement_by_game_code(483058216, 'guide_store')
-    print(b)
+    # check.add_frame(game_code='guide_store',frame_num=10,is_demo=0,content_code=0,text={'ru':'1 вопрос и ты поддался сомнению, никакой из вариантов не был уникальным. Так бывает друг\nНаше обучение подошло к концу.\nПрощай'},achivement='store_guide_complete', variants='Пока', variants_frame='-1')
+
+
+
+
     # check.add_achivement(game_code='guide_store', name='Рождён читать',achivement_code='store_guide_complete',cover='AgACAgIAAxkBAAILZGSGfvFFhTQ44UkQGYPpwbZGacbtAALwzzEbFMExSICqx1N_4NAyAQADAgADeQADLwQ', description='Вы прошли курс молодого бойца.\nВы узнали тонкости работы магазина и его особености, теперь настало время узнать остальные игры.')
 
     # check.return_genres()
@@ -260,7 +269,6 @@ if __name__ == '__main__':
 
     # check.add_game(code='guide_store',can_buy=0, name='Обучение правилам магазина', description='Это обучающий продукт, что расскажет вам о нашем магазине.', cover='AgACAgIAAxkBAAIDkWSFX-SFGTYUga7qaew-QGHuGya1AAKUxzEbW04xSFGbj_VtXqsJAQADAgADeAADLwQ', genre_code='off_guides',genre='Официальные инструкции',creator='Borch Store',price=0,config={}, publisher='Borch Store',discount=0)
 
-    # check.add_game(code='silent',can_buy=0, name='Помолчим', description='Молчание', cover='AgACAgIAAxkBAAIDkWSFX-SFGTYUga7qaew-QGHuGya1AAKUxzEbW04xSFGbj_VtXqsJAQADAgADeAADLwQ', genre_code='test',genre='Проверка',creator='Test',price=0,config={}, publisher='Test',discount=0)
 
     #check.add_game(code='cool', name='Cool game', description='Игра, что вернула мне жизнь', cover='BAACAgIAAxkBAANgZIQNvW-Wqtz3-7B3_Aa_EfVBHfwAAowrAAJtuCFI_K_v-jdfKlQvBA\nAgACAgIAAxkBAANkZIQN0TZFoDrorfr9EumGuN_FPs0AAhnHMRttuCFIjwbJJG8er1wBAAMCAAN4AAMvBA', genre_code='kok',genre='Для любителей покрепче',creator='Ваша жизнь',price=0,config=game_config, publisher='Ваш дом',discount=0)
     # check.add_game(code='pim_pam', name='Jojo sim', description='Крутая игра для всех', cover='AgACAgIAAxkBAAMHZIOzWevS-gGso07A2fbOQtcLmEMAAkvIMRso9iFIjTr7ebImDK4BAAMCAAN5AAMvBA', genre_code='hohma',genre='Хохма',creator='Me',price=0,config=game_config, publisher='Me',discount=0)
