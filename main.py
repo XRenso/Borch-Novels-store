@@ -46,7 +46,7 @@ class Cache(StatesGroup):
 async def start(message: types.Message):
     db.add_user(message.from_user.id)
     await message.answer(f'Здравствуй, {message.from_user.first_name}!'
-                            f'\nДобро пожаловать в магазин Borch Novels.'
+                            f'\nДобро пожаловать в магазин Borch Store.'
                          f'\nУдачного времяпрепровождения!!', reply_markup=kb.main_kb)
 
 
