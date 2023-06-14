@@ -50,7 +50,11 @@ async def start(message: types.Message):
     await message.answer(f'Здравствуй, {message.from_user.first_name}!'
                             f'\nДобро пожаловать в магазин Borch Store.'
                          f'\nУдачного времяпрепровождения!!', reply_markup=kb.main_kb)
-
+@dp.message_handler(content_types=['animation'])
+async def handle_photo(message: types.Message):
+    if db.return_user_info(message.from_user.id)['is_admin'] == 1:
+        id_gif = message.animation.file_id
+        await message.answer_video(id_gif,caption=id_gif)
 
 @dp.message_handler(content_types=['photo'])
 async def handle_photo(message: types.Message):
