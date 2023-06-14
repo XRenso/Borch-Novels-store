@@ -13,7 +13,7 @@ play_game = CallbackData('playing_game', 'game_code')
 show_by_genre = CallbackData('gen', 'genre_code')
 show_more_info_game = CallbackData('game', 'game_code')
 show_more_game_genre = CallbackData('genre','genre_code')
-
+get_game_info = CallbackData('info_game', 'game_code')
 buy_game = CallbackData('game_buying', 'game_code')
 get_demo = CallbackData('demo_game', 'game_code')
 

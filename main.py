@@ -144,12 +144,35 @@ async def search_game_by_name(message: types.Message, state: FSMContext):
         await message.answer('Успешная отмена ❌')
     await state.finish()
 
+@dp.callback_query_handler(kb.get_game_info.filter())
+async def show_game_info(call:types.CallbackQuery, callback_data:dict):
+    game = db.return_game_info(callback_data['game_code'])
+    markup = kb.get_game(game['game_code'], db.check_is_game_in_user_library(call.message.chat.id, game['game_code']),
+                         game['price'], user_id=call.message.chat.id)
+    if game['price'] > 0:
+        game_info_text = f'{game["game_name"]}' \
+                         f'\nИздатель - {game["publisher"]}' \
+                         f'\nРазработчик - {game["creator"]}' \
+                         f'\nЖанр - {game["genre"]}' \
+                         f'\nОписание:' \
+                         f'\n{game["game_description"]}' \
+                         f'\nЦена - {game["price"]} руб'
+    else:
+        game_info_text = f'{game["game_name"]}' \
+                         f'\nИздатель - {game["publisher"]}' \
+                         f'\nРазработчик - {game["creator"]}' \
+                         f'\nЖанр - {game["genre"]}' \
+                         f'\nОписание:' \
+                         f'\n{game["game_description"]}' \
+                         f'\nЦена - Бесплатно'
 
+
+    await call.message.edit_text(game_info_text, reply_markup=markup)
 
 @dp.callback_query_handler(kb.game_statistic.filter())
 async def show_game_statistic(call:types.CallbackQuery, callback_data:dict):
     statistic_text = db.return_game_satistic(callback_data['game_code'])
-    markup = InlineKeyboardMarkup().add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.show_more_info_game.new(callback_data['game_code'])))
+    markup = InlineKeyboardMarkup().add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.get_game_info.new(callback_data['game_code'])))
     await call.message.edit_text(statistic_text,reply_markup=markup)
 
 @dp.callback_query_handler(kb.profile_achivement_code.filter())
