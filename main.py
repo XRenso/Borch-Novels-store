@@ -339,7 +339,7 @@ async def change_frames(call, frame_num, state:FSMContext):
                     value = info[1]
                     db.update_user_game_config(call.message.chat.id, value, key, game['game_code'])
 
-        elif frame == 0 and not can_next:
+        elif frame == 0 and can_next == True:
             try:
                 await call.message.edit_text('На этом игра заканчивается 🎉'
                                              '\nБлагодарим за прохождение 🤝')
