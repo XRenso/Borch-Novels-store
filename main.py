@@ -146,6 +146,11 @@ async def search_game_by_name(message: types.Message, state: FSMContext):
 
 
 
+@dp.callback_query_handler(kb.game_statistic.filter())
+async def show_game_statistic(call:types.CallbackQuery, callback_data:dict):
+    statistic_text = db.return_game_satistic(callback_data['game_code'])
+    markup = InlineKeyboardMarkup().add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.show_more_info_game.new(callback_data['game_code'])))
+    await call.message.edit_text(statistic_text,reply_markup=markup)
 
 @dp.callback_query_handler(kb.profile_achivement_code.filter())
 async def achivement_info(call:types.CallbackQuery, callback_data: dict):

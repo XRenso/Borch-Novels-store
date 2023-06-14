@@ -223,11 +223,27 @@ class Mongo:
     def return_game_by_genre(self, genre_code):
         return self.game.find({'genre_code':genre_code})
 
+    def return_game_satistic(self, game_code):
+        achivments = self.achivement.distinct('achivement_code', {'game_code':game_code})
+        game = self.return_game_info(game_code)
+        statistic_text = f'Статистика для игры {game["game_name"]}\n' \
+                         f'Количество продаж - {self.user.count_documents({f"games_config.{game_code}.is_demo":0})}\n'
+        if game['price'] > 0:
+            statistic_text = f'{statistic_text}' \
+                             f'Количество демо - {self.user.count_documents({f"games_config.{game_code}.is_demo":1})}\n'
+
+        for achivment_code in achivments:
+            achivement = self.return_achivement(game_code, achivment_code)
+
+            statistic_text = f'{statistic_text}' \
+                             f'{achivement["name"]} - получило {self.user.count_documents({f"achivements.game_code": achivement["game_code"], f"achivements.achivement_code":achivement["achivement_code"]})}\n'
+        return statistic_text
+
 if __name__ == '__main__':
     print('Тест')
     check = Mongo()
     check.__init__()
-
+    print(check.return_game_satistic('zeleria_new_year'))
     # check.add_frame(game_code='guide_store',frame_num=10,is_demo=0,content_code=0,text={'ru':'1 вопрос и ты поддался сомнению, никакой из вариантов не был уникальным. Так бывает друг\nНаше обучение подошло к концу.\nПрощай'},achivement='store_guide_complete', variants='Пока', variants_frame='-1')
 
 
