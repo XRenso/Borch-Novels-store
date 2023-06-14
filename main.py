@@ -481,6 +481,7 @@ async def give_paid_game_to_user(pre_checkout_query:PreCheckoutQuery):
 async def uspeh_buy(message:types.Message):
     game = db.return_game_info(message.successful_payment.invoice_payload)
     db.give_game_to_user(game['game_code'], message.from_user.id, 0)
+    db.update_month_game_sales(game['game_code'])
     await message.answer(f'Благодарим вас за покупку на сумму {message.successful_payment.total_amount//100} руб.'
                          f'\n Игра - {game["game_name"]}  - успешно добавлена в вашу библиотеку ✅')
 

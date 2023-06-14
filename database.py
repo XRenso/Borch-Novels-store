@@ -102,8 +102,8 @@ class Mongo:
             'discount':discount, # Скидка
             'genre_code': genre_code, # Код жанра
             'genre': genre, #Жанр
-            'game_config': cfg # Конфиг игры
-
+            'game_config': cfg, # Конфиг игры
+            'month_sales' : 0 # Продажи в месяц
             }
             self.game.insert_one(game)
         else:
@@ -181,6 +181,18 @@ class Mongo:
                                   {'$set': {f'games_config.$.{game_code}.{config_key}' : config_value}})
         else:
             return 0
+
+    def update_month_game_sales(self, game_code):
+        game = self.return_game_info(game_code)
+        try:
+            self.game.update_one({'game_code':game_code, 'month_sales':{"$exists":True}}, {'$set':{'month_sales':game['month_sales']+1}})
+        except:
+            self.game.update_one({'game_code': game_code, 'month_sales': {"$exists": False}},
+                                 {'$set': {'month_sales': 1}})
+
+    def clear_month_sale(self):
+        self.game.update_one({'month_sales':{'$exists':True}}, {'$set':{'month_sales':0}})
+
     def update_now_user_game(self, user_id, game_code):
         user = self.return_user_info(user_id)
         if user:
@@ -243,7 +255,7 @@ if __name__ == '__main__':
     print('Тест')
     check = Mongo()
     check.__init__()
-    print(check.return_game_satistic('zeleria_new_year'))
+    check.clear_month_sale()
     # check.add_frame(game_code='guide_store',frame_num=10,is_demo=0,content_code=0,text={'ru':'1 вопрос и ты поддался сомнению, никакой из вариантов не был уникальным. Так бывает друг\nНаше обучение подошло к концу.\nПрощай'},achivement='store_guide_complete', variants='Пока', variants_frame='-1')
 
 
