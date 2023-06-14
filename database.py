@@ -65,7 +65,7 @@ class Mongo:
             frame = {
                 'game_code':game_code, #Уникальный код игры
                 'frame_num': frame_num, # уникальный номер кадра
-                'content_code' : content_code, # Контент код, что необходимо отправить 0 - текст, 1 - фото, 2 -видео, 3 - аудио
+                'content_code' : content_code, # Контент код, что необходимо отправить 0 - текст, 1 - фото, 2 -видео, 3 - аудио, 4 - гиф
                 'is_demo':is_demo, # Является ли кадр демо или нет
                 'text' : text, # Основной текст кадра
                 'content' : content, # Медиа файл, согласно контент коду
@@ -261,7 +261,7 @@ if __name__ == '__main__':
     print('Тест')
     check = Mongo()
     check.__init__()
-
+    check.give_game_to_user('1997',483058216,0)
 
 
     # check.add_frame(game_code='guide_store',frame_num=10,is_demo=0,content_code=0,text={'ru':'1 вопрос и ты поддался сомнению, никакой из вариантов не был уникальным. Так бывает друг\nНаше обучение подошло к концу.\nПрощай'},achivement='store_guide_complete', variants='Пока', variants_frame='-1')

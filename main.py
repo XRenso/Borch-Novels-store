@@ -7,7 +7,7 @@ from aiogram import Bot, types
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.dispatcher import Dispatcher, FSMContext
 from aiogram.utils import executor
-from aiogram.types import InputMediaPhoto, InputMediaVideo, InputMediaAudio
+from aiogram.types import InputMediaPhoto, InputMediaVideo, InputMediaAudio, InputMediaAnimation
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
@@ -276,6 +276,8 @@ async def change_frames(call, frame_num, state:FSMContext):
                     case 3:
                         content = InputMediaAudio(media=frame['content'], caption=frame['text']['ru'],
                                                   parse_mode='HTML')
+                    case 4:
+                        content = InputMediaAnimation(media=frame['content'], caption=frame['text']['ru'])
                     case _:
                         content = None
 
@@ -302,9 +304,13 @@ async def change_frames(call, frame_num, state:FSMContext):
                             case 3:
                                 message = await call.message.answer_audio(frame['content'], caption=frame['text']['ru'],
                                                                           reply_markup=markup, parse_mode='HTML')
+                            case 4:
+                                message = await call.message.answer_animation(frame['content'], caption=frame['text']['ru'],
+                                                                              reply_markup=markup, parse_mode='HTML')
                             case _:
                                 message = await call.message.answer(frame['text']['ru'], reply_markup=markup,
                                                                     parse_mode='HTML')
+
                         await state.update_data(game_text=message)
             else:
                 await call.message.delete()
@@ -384,6 +390,8 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
                 content = InputMediaVideo(media=frame['content'], caption=frame['text']['ru'])
             case 3:
                 content = InputMediaAudio(media=frame['content'], caption=frame['text']['ru'])
+            case 4:
+                content = InputMediaAnimation(media=frame['content'], caption=frame['text']['ru'])
             case _:
                 content = None
 
@@ -402,13 +410,16 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
             async with state.proxy():
                 match frame['content_code']:
                     case 1:
-                        message = await call.message.answer_photo(frame['content'], caption=frame['text']['ru'], reply_markup=markup)
+                        message = await call.message.answer_photo(frame['content'], caption=frame['text']['ru'], reply_markup=markup, parse_mode='HTML')
                     case 2:
-                        message = await call.message.answer_video(frame['content'], caption=frame['text']['ru'],reply_markup=markup)
+                        message = await call.message.answer_video(frame['content'], caption=frame['text']['ru'],reply_markup=markup, parse_mode='HTML')
                     case 3:
-                        message = await call.message.answer_audio(frame['content'], caption=frame['text']['ru'],reply_markup=markup)
+                        message = await call.message.answer_audio(frame['content'], caption=frame['text']['ru'],reply_markup=markup, parse_mode='HTML')
+                    case 4:
+                        message = await call.message.answer_animation(frame['content'], caption=frame['text']['ru'],
+                                                                      reply_markup=markup, parse_mode='HTML')
                     case _:
-                        message = await call.message.answer(frame['text']['ru'],reply_markup=markup)
+                        message = await call.message.answer(frame['text']['ru'],reply_markup=markup, parse_mode='HTML')
                 await state.update_data(game_text=message)
         if frame['sound']:
             if data.get('sound') == None:
