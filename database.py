@@ -240,7 +240,7 @@ class Mongo:
         game = self.return_game_info(game_code)
         statistic_text = f'Статистика для игры {game["game_name"]}\n' \
                          f'Количество продаж - {self.user.count_documents({f"games_config.{game_code}.is_demo":0})}\n' \
-                         f'Продажи в этом месяце - {self.game.find_one({"game_code":game_code})["month_sales"]}'
+                         f'Продажи в этом месяце - {self.game.find_one({"game_code":game_code})["month_sales"]}\n'
         if game['price'] > 0:
             statistic_text = f'{statistic_text}' \
                              f'Количество демо - {self.user.count_documents({f"games_config.{game_code}.is_demo":1})}\n'
@@ -256,7 +256,6 @@ if __name__ == '__main__':
     print('Тест')
     check = Mongo()
     check.__init__()
-    check.clear_month_sale()
     # check.add_frame(game_code='guide_store',frame_num=10,is_demo=0,content_code=0,text={'ru':'1 вопрос и ты поддался сомнению, никакой из вариантов не был уникальным. Так бывает друг\nНаше обучение подошло к концу.\nПрощай'},achivement='store_guide_complete', variants='Пока', variants_frame='-1')
 
 
