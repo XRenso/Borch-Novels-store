@@ -9,7 +9,7 @@ from aiogram.dispatcher import Dispatcher, FSMContext
 from aiogram.utils import executor
 from aiogram.types import InputMediaPhoto, InputMediaVideo, InputMediaAudio
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 
 from database import Mongo as mg
@@ -31,7 +31,9 @@ db.__init__()
 
 
 
+async def clear_month_sales():
 
+    db.clear_month_sale()
 
 
 class Store(StatesGroup):
@@ -427,6 +429,7 @@ async def buy_game(call:types.CallbackQuery, callback_data: dict):
     match game['price']:
         case 0:
             db.give_game_to_user(game_code,call.message.chat.id, 0)
+            db.update_month_game_sales(game['game_code'])
             await call.message.edit_text(f'{game["game_name"]} успешно добавлена в библиотеку ✅')
         case _:
             await call.message.delete()
@@ -534,7 +537,11 @@ async def show_game_info(call:types.CallbackQuery, callback_data: dict):
 async def on_startup(_):
     print('Бот вышел в онлайн')
 if __name__== '__main__':
+    scheduler = AsyncIOScheduler()
+    scheduler.add_job(clear_month_sales, 'cron', month='1-12')
+    scheduler.start()
     executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
+
 
 
 
