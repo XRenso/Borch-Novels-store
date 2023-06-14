@@ -22,6 +22,9 @@ unavailable_game = CallbackData('unavailable', 'game_code')
 store_action = CallbackData('store', 'action')
 
 
+
+game_statistic = CallbackData('analytic', 'game_code')
+
 profile_achivement_games = CallbackData('games', 'game_code')
 profile_achivement_code = CallbackData('achivements','achivement_code')
 profile_action = CallbackData('profile', 'action')
@@ -56,7 +59,7 @@ library = KeyboardButton(phr.library)
 shop = KeyboardButton(phr.shop)
 main_kb.add(shop).row(library,about_me)
 
-##Shop kz
+##Shop kb
 store = KeyboardButton(phr.store)
 find_game = KeyboardButton(phr.search_game)
 main_menu = KeyboardButton(phr.main_menu)
@@ -114,6 +117,7 @@ def get_game(game_code:str, have_it_user:int, price:int, user_id:int) -> InlineK
     game = db.return_game_info(game_code)
     markup = InlineKeyboardMarkup()
     game_cfg = db.return_game_cfg(user_id, game_code)
+    user = db.return_user_info(user_id)
     if check_frame != 0 and game['can_buy'] != 0:
         match have_it_user:
             case 1 if not game_cfg or game_cfg['is_demo'] == 0:
@@ -136,4 +140,7 @@ def get_game(game_code:str, have_it_user:int, price:int, user_id:int) -> InlineK
             markup.add(InlineKeyboardButton('Игра недоступна ❌', callback_data=unavailable_game.new(game_code)))
         else:
             markup.add(InlineKeyboardButton('Играть 🎮', callback_data=play_game.new(game_code)))
+
+    if user['is_admin'] == 1:
+        markup.add(InlineKeyboardButton(phr.statistic,callback_data=game_statistic.new(game_code)))
     return markup
