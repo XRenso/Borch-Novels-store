@@ -239,7 +239,8 @@ class Mongo:
         achivments = self.achivement.distinct('achivement_code', {'game_code':game_code})
         game = self.return_game_info(game_code)
         statistic_text = f'Статистика для игры {game["game_name"]}\n' \
-                         f'Количество продаж - {self.user.count_documents({f"games_config.{game_code}.is_demo":0})}\n'
+                         f'Количество продаж - {self.user.count_documents({f"games_config.{game_code}.is_demo":0})}\n' \
+                         f'Продажи в этом месяце - {self.game.find_one({"game_code":game_code})["month_sales"]}'
         if game['price'] > 0:
             statistic_text = f'{statistic_text}' \
                              f'Количество демо - {self.user.count_documents({f"games_config.{game_code}.is_demo":1})}\n'
