@@ -231,15 +231,13 @@ async def get_games_by_genre(call:types.CallbackQuery, callback_data: dict):
     await call.message.edit_text(f'Игры жанра {db.return_genre_name_by_code(callback_data["genre_code"])}:',reply_markup=markup)
 
 
-
-@dp.callback_query_handler(kb.frame_change.filter())
-async def change_frames(call:types.CallbackQuery, callback_data: dict, state:FSMContext):
+async def change_frames(call, frame_num, state:FSMContext):
     user = db.return_user_info(call.message.chat.id)
     game = db.return_game_info(user['curr_game_code'])
     game_cfg = db.return_game_cfg(user['user_id'], game['game_code'])
     data = await state.get_data()
-    frame_num = int(callback_data['frame_num'])
-    frame = db.return_frame(frame_num=frame_num,game_code=game['game_code'])
+    frame = db.return_frame(frame_num=frame_num, game_code=game['game_code'])
+    can_next = True
     if frame != 0 and frame['fail_condition_frame'] is not None and frame['check_add_conditions'] is not None:
         conditions = frame['check_add_conditions'].split('\n')
         for i in conditions:
@@ -248,15 +246,14 @@ async def change_frames(call:types.CallbackQuery, callback_data: dict, state:FSM
             value = info[1]
             cfg = db.return_game_cfg(call.message.chat.id, game['game_code'])
             if cfg[key] != value:
-                frame = db.return_frame(frame_num=frame['fail_condition_frame'], game_code=game['game_code'])
+                # frame = db.return_frame(frame_num=frame['fail_condition_frame'], game_code=game['game_code'])
+                await change_frames(call, frame['fail_condition_frame'], state)
+                can_next = False
                 break
-
-
-
 
     if data.get('achivement') is not None:
         try:
-            await call.bot.delete_message(message_id=data.get('achivement').message_id,chat_id=call.message.chat.id)
+            await call.bot.delete_message(message_id=data.get('achivement').message_id, chat_id=call.message.chat.id)
         except:
             pass
     if data.get('game_text') is not None and data.get('game_text').message_id != call.message.message_id:
@@ -266,16 +263,19 @@ async def change_frames(call:types.CallbackQuery, callback_data: dict, state:FSM
             await call.message.delete()
             await call.message.answer('Сессия устарела \nЗапустите игру заново 🔁.')
     else:
-        if frame != 0:
+        if frame != 0 and can_next:
             if game_cfg['is_demo'] <= frame['is_demo']:
                 db.update_user_frame_num(user['user_id'], frame_num, game['game_code'])
                 match frame['content_code']:
                     case 1:
-                        content = InputMediaPhoto(media=frame['content'], caption=frame['text']['ru'], parse_mode='HTML')
+                        content = InputMediaPhoto(media=frame['content'], caption=frame['text']['ru'],
+                                                  parse_mode='HTML')
                     case 2:
-                        content = InputMediaVideo(media=frame['content'], caption=frame['text']['ru'], parse_mode='HTML')
+                        content = InputMediaVideo(media=frame['content'], caption=frame['text']['ru'],
+                                                  parse_mode='HTML')
                     case 3:
-                        content = InputMediaAudio(media=frame['content'], caption=frame['text']['ru'], parse_mode='HTML')
+                        content = InputMediaAudio(media=frame['content'], caption=frame['text']['ru'],
+                                                  parse_mode='HTML')
                     case _:
                         content = None
 
@@ -294,13 +294,17 @@ async def change_frames(call:types.CallbackQuery, callback_data: dict, state:FSM
                     async with state.proxy():
                         match frame['content_code']:
                             case 1:
-                               message = await call.message.answer_photo(frame['content'], caption=frame['text']['ru'], reply_markup=markup, parse_mode='HTML')
+                                message = await call.message.answer_photo(frame['content'], caption=frame['text']['ru'],
+                                                                          reply_markup=markup, parse_mode='HTML')
                             case 2:
-                                message = await call.message.answer_video(frame['content'], caption=frame['text']['ru'], reply_markup=markup, parse_mode='HTML')
+                                message = await call.message.answer_video(frame['content'], caption=frame['text']['ru'],
+                                                                          reply_markup=markup, parse_mode='HTML')
                             case 3:
-                                message = await call.message.answer_audio(frame['content'], caption=frame['text']['ru'], reply_markup=markup, parse_mode='HTML')
+                                message = await call.message.answer_audio(frame['content'], caption=frame['text']['ru'],
+                                                                          reply_markup=markup, parse_mode='HTML')
                             case _:
-                                message = await call.message.answer(frame['text']['ru'], reply_markup=markup, parse_mode='HTML')
+                                message = await call.message.answer(frame['text']['ru'], reply_markup=markup,
+                                                                    parse_mode='HTML')
                         await state.update_data(game_text=message)
             else:
                 await call.message.delete()
@@ -317,13 +321,15 @@ async def change_frames(call:types.CallbackQuery, callback_data: dict, state:FSM
                         await state.update_data(sound=sound)
 
             if frame['achivement']:
-                achiv = db.give_achivement_to_user(game_code=game['game_code'],achivement_code=frame['achivement'], user_id=call.message.chat.id)
+                achiv = db.give_achivement_to_user(game_code=game['game_code'], achivement_code=frame['achivement'],
+                                                   user_id=call.message.chat.id)
                 if achiv != 0:
                     async with state.proxy():
-                        achivement = db.return_achivement(game_code=game['game_code'], achivement_code=frame['achivement'])
-                        ok = await call.message.answer(text=f'Получено достижение ✅ {achivement["name"]}\nЧтобы посмотреть все достижения перейдите к меню достижений  📂')
+                        achivement = db.return_achivement(game_code=game['game_code'],
+                                                          achivement_code=frame['achivement'])
+                        ok = await call.message.answer(
+                            text=f'Получено достижение ✅ {achivement["name"]}\nЧтобы посмотреть все достижения перейдите к меню достижений  📂')
                         await state.update_data(achivement=ok)
-
 
             if frame['change_add_conditions']:
                 conditions = frame['change_add_conditions'].split('\n')
@@ -331,16 +337,24 @@ async def change_frames(call:types.CallbackQuery, callback_data: dict, state:FSM
                     info = i.split(':')
                     key = info[0]
                     value = info[1]
-                    db.update_user_game_config(call.message.chat.id,value,key,game['game_code'])
+                    db.update_user_game_config(call.message.chat.id, value, key, game['game_code'])
 
-        else:
-           try:
+        elif frame == 0 and not can_next:
+            try:
                 await call.message.edit_text('На этом игра заканчивается 🎉'
                                              '\nБлагодарим за прохождение 🤝')
-           except:
-               await call.message.delete()
-               await call.message.answer('На этом игра заканчивается 🎉'
-                                         '\nБлагодарим за прохождение 🤝')
+            except:
+                try:
+                    await call.message.delete()
+                except:
+                    pass
+                await call.message.answer('На этом игра заканчивается 🎉'
+                                          '\nБлагодарим за прохождение 🤝')
+
+
+@dp.callback_query_handler(kb.frame_change.filter())
+async def change_frame_cb(call:types.CallbackQuery, callback_data: dict, state:FSMContext):
+    await change_frames(call, int(callback_data['frame_num']), state)
 
 
 @dp.callback_query_handler(kb.get_demo.filter())

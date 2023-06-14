@@ -255,10 +255,27 @@ class Mongo:
                              f'{achivement["name"]} - получило {self.user.count_documents({f"achivements.game_code": achivement["game_code"], f"achivements.achivement_code":achivement["achivement_code"]})}\n'
         return statistic_text
 
+    def update_cfg_1997(self):
+        cfg = {
+            'frame_num': 1,
+            'is_demo': 1
+        }
+        config = {
+            'dn':0,
+            'ds':0,
+            'da':0,
+            'df':0
+        }
+        self.game.update_one()
+
 if __name__ == '__main__':
     print('Тест')
     check = Mongo()
     check.__init__()
+
+    check.add_frame(game_code='guide_store',frame_num=11,is_demo=0,content_code=0,text={'ru':'Вот и подошло к концу наше обучение\nБлагодарим вас за прохождение. Чтож можете теперь идти в магазин и играть. \nВозвращайтесь, когда выйдут ещё обучающие материалы'}, variants='Тук тук', variants_frame='-1')
+
+
     # check.add_frame(game_code='guide_store',frame_num=10,is_demo=0,content_code=0,text={'ru':'1 вопрос и ты поддался сомнению, никакой из вариантов не был уникальным. Так бывает друг\nНаше обучение подошло к концу.\nПрощай'},achivement='store_guide_complete', variants='Пока', variants_frame='-1')
 
 
