@@ -189,7 +189,11 @@ async def show_game_info(call:types.CallbackQuery, callback_data:dict):
 async def show_game_statistic(call:types.CallbackQuery, callback_data:dict):
     statistic_text = db.return_game_satistic(callback_data['game_code'])
     markup = InlineKeyboardMarkup().add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.get_game_info.new(callback_data['game_code'])))
-    await call.message.edit_text(statistic_text,reply_markup=markup)
+    try:
+        await call.message.edit_text(statistic_text,reply_markup=markup)
+    except:
+        await call.message.delete()
+        await call.message.answer(statistic_text, reply_markup=markup)
 
 @dp.callback_query_handler(kb.profile_achivement_code.filter())
 async def achivement_info(call:types.CallbackQuery, callback_data: dict):
@@ -197,13 +201,18 @@ async def achivement_info(call:types.CallbackQuery, callback_data: dict):
     game_code = info[0]
     achivement_code = info[1]
     achivement  = db.return_achivement(game_code,achivement_code)
+    markup = InlineKeyboardMarkup().add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.profile_achivement_games.new(achivement['game_code'])))
     await call.message.delete()
-    await call.message.answer_photo(photo=achivement['cover'], caption=f'Достижение ✅ - {achivement["name"]}\nОписание:\n{achivement["description"]}')
+    await call.message.answer_photo(photo=achivement['cover'], caption=f'Достижение ✅ - {achivement["name"]}\nОписание:\n{achivement["description"]}', reply_markup=markup)
 
 @dp.callback_query_handler(kb.profile_achivement_games.filter())
 async def achivments_games(call:types.CallbackQuery, callback_data: dict):
     markup = kb.return_achivements(db.return_user_achivement_by_game_code(call.message.chat.id,callback_data['game_code']), game_code=callback_data['game_code']).add(kb.back_to_games)
-    await call.message.edit_text('Выберите интересующее вас достижение 🤔', reply_markup=markup)
+    try:
+        await call.message.edit_text('Выберите интересующее вас достижение 🤔', reply_markup=markup)
+    except:
+        await call.message.delete()
+        await call.message.answer('Выберите интересующее вас достижение 🤔', reply_markup=markup)
 
 @dp.callback_query_handler(kb.profile_action.filter())
 async def profile_menu(call:types.CallbackQuery, callback_data: dict):
