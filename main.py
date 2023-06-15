@@ -478,7 +478,11 @@ async def buy_game(call:types.CallbackQuery, callback_data: dict):
         case 0:
             db.give_game_to_user(game_code,call.message.chat.id, 0)
             db.update_month_game_sales(game['game_code'])
-            await call.message.edit_text(f'{game["game_name"]} успешно добавлена в библиотеку ✅')
+            try:
+                await call.message.edit_text(f'{game["game_name"]} успешно добавлена в библиотеку ✅')
+            except:
+                await call.message.delete()
+                await call.message.answer(f'{game["game_name"]} успешно добавлена в библиотеку ✅')
         case _:
             await call.message.delete()
             await call.bot.send_invoice(
