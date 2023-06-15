@@ -2,7 +2,7 @@ import aiogram.utils.exceptions
 from aiogram.types import ReplyKeyboardRemove, \
     ReplyKeyboardMarkup, KeyboardButton, \
     InlineKeyboardMarkup, InlineKeyboardButton, \
-    LabeledPrice, PreCheckoutQuery
+    LabeledPrice, PreCheckoutQuery, InlineQuery, InlineQueryResultArticle, InlineQueryResultCachedPhoto
 from aiogram import Bot, types
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.dispatcher import Dispatcher, FSMContext
@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 import os
 import logging
 import phrase as phr
-
+import hashlib
 
 storage=MemoryStorage()
 load_dotenv()
@@ -560,6 +560,39 @@ async def show_game_info(call:types.CallbackQuery, callback_data: dict):
 
     await call.message.answer_media_group(media)
     await call.message.answer(game_info_text, reply_markup=markup)
+
+
+@dp.inline_handler()
+async def send_game_info_inline(inline_query:types.InlineQuery):
+    text = inline_query.query or ''
+    games  = db.search_game_by_name(text)
+    markup = InlineKeyboardMarkup().add(InlineKeyboardButton('Перейти к боту', url='https://t.me/BorchStoreBot'))
+    results = []
+    if games != 0:
+        results = []
+        for i in games:
+            caption = f'Информация об игре {i["game_name"]}\n' \
+                      f'Издатель - {i["publisher"]}\n' \
+                      f'Разработчик - {i["creator"]}\n' \
+                      f'Жанр - {i["genre"]}\n' \
+                      f'Описание:\n' \
+                      f'{i["game_description"]}\n'
+            if i['price'] > 0:
+                caption = f'{caption}' \
+                          f'Цена - {i["price"]} руб'
+            else:
+                caption = f'{caption}' \
+                          f'Цена - Бесплатно'
+            item = InlineQueryResultCachedPhoto(
+                id = hashlib.md5(i['game_cover'].split('\n')[0].encode()).hexdigest(),
+                title=i['game_name'],
+                description=i['game_name'],
+                photo_file_id=i['game_cover'].split('\n')[0],
+                caption=caption,
+                reply_markup=markup
+            )
+            results.append(item)
+    await bot.answer_inline_query(inline_query.id,results,cache_time=1)
 
 
 
