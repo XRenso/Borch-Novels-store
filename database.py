@@ -262,8 +262,8 @@ class Mongo:
         number_of_games = self.game.count_documents({'game_code':{'$exists':True}})
         number_of_paid_games = self.game.count_documents({'price':{'$gt':0}})
         number_of_free_games = self.game.count_documents({'price':{'$lte':0}})
-        percent_of_paid = number_of_paid_games//number_of_games * 100
-        percent_of_free = number_of_free_games//number_of_games * 100
+        percent_of_paid = int(number_of_paid_games/number_of_games * 100)
+        percent_of_free = int(number_of_free_games/number_of_games * 100)
 
         text = f'Про нас\n' \
                f'Написать информацию\n' \
