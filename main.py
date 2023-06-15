@@ -580,16 +580,44 @@ async def show_game_info(call:types.CallbackQuery, callback_data: dict):
     await call.message.answer_media_group(media)
     await call.message.answer(game_info_text, reply_markup=markup)
 
+@dp.callback_query_handler(kb.inline_show_game_info.filter())
+async def send_game_info_by_inline_mode(call:types.CallbackQuery, callback_data: dict):
+    game = db.return_game_info(callback_data['game_code'])
+    if db.return_user_info(call['from']['id']) != 0:
+        markup = kb.get_game(game['game_code'], db.check_is_game_in_user_library(call['from']['id'],game['game_code']), game['price'], user_id=call['from']['id'])
+        if game['price'] > 0:
+            game_info_text = f'{game["game_name"]}' \
+                             f'\nИздатель - {game["publisher"]}' \
+                             f'\nРазработчик - {game["creator"]}' \
+                             f'\nЖанр - {game["genre"]}' \
+                             f'\nОписание:' \
+                             f'\n{game["game_description"]}' \
+                             f'\nЦена - {game["price"]} руб'
+        else:
+            game_info_text = f'{game["game_name"]}' \
+                             f'\nИздатель - {game["publisher"]}' \
+                             f'\nРазработчик - {game["creator"]}' \
+                             f'\nЖанр - {game["genre"]}' \
+                             f'\nОписание:' \
+                             f'\n{game["game_description"]}' \
+                             f'\nЦена - Бесплатно'
+
+        await call.bot.send_photo(chat_id=call['from']['id'], photo=game['game_cover'].split('\n')[0],caption=game_info_text, reply_markup=markup)
+    else:
+        await call.answer(text='Сначало пройдите регистрацию', show_alert=True)
+        await bot.answer_callback_query(call.id, 'Сначало пройдите регистрацию', True)
+    await bot.answer_callback_query(call.id)
 
 @dp.inline_handler()
 async def send_game_info_inline(inline_query:types.InlineQuery):
     text = inline_query.query or ''
     games  = db.search_game_by_name(text)
-    markup = InlineKeyboardMarkup().add(InlineKeyboardButton('Перейти к боту', url='https://t.me/BorchStoreBot'))
     results = []
     if games != 0:
         results = []
         for i in games:
+            markup = InlineKeyboardMarkup().add(InlineKeyboardButton('Перейти к боту', url='https://t.me/BorchStoreBot'))
+
             caption = f'Информация об игре {i["game_name"]}\n' \
                       f'Издатель - {i["publisher"]}\n' \
                       f'Разработчик - {i["creator"]}\n' \
@@ -608,7 +636,7 @@ async def send_game_info_inline(inline_query:types.InlineQuery):
                 description=i['game_name'],
                 photo_file_id=i['game_cover'].split('\n')[0],
                 caption=caption,
-                reply_markup=markup
+                reply_markup=markup.add(InlineKeyboardButton('Получить информацию об игре', callback_data=kb.inline_show_game_info.new(i['game_code']))) # {"id": "2074719242475204628", "from": {"id": 483058216, "is_bot": false, "first_name": "Товарищ", "last_name": "Рабочий", "username": "XRenso", "language_code": "ru"}, "inline_message_id": "AgAAAC93AgAo4socCpCtTODotO8", "chat_instance": "2634033057511433901", "data": "game:guide_store"}
             )
             results.append(item)
     await bot.answer_inline_query(inline_query.id,results,cache_time=1)
