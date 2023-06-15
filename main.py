@@ -587,8 +587,18 @@ async def show_game_info(call:types.CallbackQuery, callback_data: dict):
 @dp.callback_query_handler(kb.inline_show_game_info.filter())
 async def send_game_info_by_inline_mode(call:types.CallbackQuery, callback_data: dict):
     game = db.return_game_info(callback_data['game_code'])
+    media = types.MediaGroup()
     if db.return_user_info(call['from']['id']) != 0:
         markup = kb.get_game(game['game_code'], db.check_is_game_in_user_library(call['from']['id'],game['game_code']), game['price'], user_id=call['from']['id'])
+        for index, file_id in enumerate(game['game_cover'].split('\n')):
+            match index:
+                case _:
+                    match file_id.lower()[0]:
+                        case 'b':
+                            media.attach_video(video=file_id)
+                        case 'a':
+                            media.attach_photo(photo=file_id)
+
         if game['price'] > 0:
             game_info_text = f'{game["game_name"]}' \
                              f'\nИздатель - {game["publisher"]}' \
@@ -606,7 +616,8 @@ async def send_game_info_by_inline_mode(call:types.CallbackQuery, callback_data:
                              f'\n{game["game_description"]}' \
                              f'\nЦена - Бесплатно'
 
-        await call.bot.send_photo(chat_id=call['from']['id'], photo=game['game_cover'].split('\n')[0],caption=game_info_text, reply_markup=markup)
+        await call.bot.send_media_group(chat_id=call['from']['id'],media=media)
+        await call.bot.send_message(chat_id=call['from']['id'],text=game_info_text, reply_markup=markup)
     else:
         await call.answer(text='Сначало пройдите регистрацию', show_alert=True)
         await bot.answer_callback_query(call.id, 'Сначало пройдите регистрацию', True)
