@@ -257,6 +257,24 @@ class Mongo:
 
 
 
+    def bot_statistic(self):
+        users_of_bot = self.user.count_documents({'user_id':{'$exists':True}})
+        number_of_games = self.game.count_documents({'game_code':{'$exists':True}})
+        number_of_paid_games = self.game.count_documents({'price':{'$gt':0}})
+        number_of_free_games = self.game.count_documents({'price':{'$lte':0}})
+        percent_of_paid = number_of_paid_games//number_of_games * 100
+        percent_of_free = number_of_free_games//number_of_games * 100
+
+        text = f'Про нас\n' \
+               f'Написать информацию\n' \
+               f'Количество пользователей - {users_of_bot}\n' \
+               f'Количество игр - {number_of_games}\n' \
+               f'Количество платных игр - {number_of_paid_games}\n({percent_of_paid}%)\n' \
+               f'Количество бесплатных игр - {number_of_free_games}({percent_of_free}%)'
+        return text
+
+
+
 if __name__ == '__main__':
     print('Тест')
     check = Mongo()

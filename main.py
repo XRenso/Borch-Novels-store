@@ -135,6 +135,16 @@ async def get_text(message: types.Message):
         case phr.main_menu:
             await message.answer('Добро пожаловать на главное меню ✨', reply_markup=kb.main_kb)
 
+        case phr.about_us:
+            markup = InlineKeyboardMarkup()
+            tg_chanel = InlineKeyboardButton('Телеграм-канал', url='https://t.me/BorchStore')
+            designer = InlineKeyboardButton('Дизайнер', url='https://t.me/cuddies19')
+            programmist = InlineKeyboardButton('Программист', url='https://t.me/XRenso')
+            markup.row(designer,programmist)
+            markup.add(tg_chanel)
+            statistic = db.bot_statistic()
+            await message.answer(statistic, reply_markup=markup)
+
 
 @dp.message_handler(state=Store.search_game)
 async def search_game_by_name(message: types.Message, state: FSMContext):

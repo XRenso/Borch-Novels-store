@@ -31,11 +31,6 @@ profile_action = CallbackData('profile', 'action')
 
 
 
-vpered = InlineKeyboardMarkup(row_width=1)
-vpered.add(InlineKeyboardButton(text='️Продолжить повествование ▶️',callback_data='vpered'))
-
-nachat_start = InlineKeyboardMarkup(row_width=1)
-nachat_start.add(InlineKeyboardButton(text='Начать игру  ▶️',callback_data='nachat'))
 
 
 
@@ -43,21 +38,18 @@ nachat_start.add(InlineKeyboardButton(text='Начать игру  ▶️',callb
 start_btn = InlineKeyboardButton('Начать', callback_data='start_play_game')
 start_game = InlineKeyboardMarkup().add(start_btn)
 
-next_btn = InlineKeyboardButton('➤', callback_data='next_frame')
-read_kb = InlineKeyboardMarkup().add(next_btn)
 
 
-##batle
-fight_btn = InlineKeyboardButton('Бить', callback_data='punch_battle')
-heal_btn = InlineKeyboardButton('Лечиться', callback_data='heal_battle')
-battle_kb = InlineKeyboardMarkup().add(fight_btn,heal_btn)
+
+
 
 ##Main kb
 main_kb = ReplyKeyboardMarkup(resize_keyboard=True)
 about_me = KeyboardButton(phr.profile)
 library = KeyboardButton(phr.library)
 shop = KeyboardButton(phr.shop)
-main_kb.add(shop).row(library,about_me)
+about_us = KeyboardButton(phr.about_us)
+main_kb.row(library,shop).row(about_us,about_me)
 
 ##Shop kb
 store = KeyboardButton(phr.store)
@@ -107,9 +99,9 @@ def return_library(games):
     return markup
 
 def store_kb_genres(genre):
-    markup = InlineKeyboardMarkup()
+    markup = InlineKeyboardMarkup(row_width=2)
     for i in genre:
-        markup.add(InlineKeyboardButton(db.return_genre_name_by_code(i),callback_data=show_more_game_genre.new(i)))
+        markup.insert(InlineKeyboardButton(db.return_genre_name_by_code(i),callback_data=show_more_game_genre.new(i)))
     return markup
 
 def get_game(game_code:str, have_it_user:int, price:int, user_id:int) -> InlineKeyboardMarkup:
