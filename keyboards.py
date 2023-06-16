@@ -136,4 +136,4 @@ def get_game(game_code:str, have_it_user:int, price:int, user_id:int) -> InlineK
 
     if user['is_admin'] == 1:
         markup.add(InlineKeyboardButton(phr.statistic,callback_data=game_statistic.new(game_code)))
-    return markup
+    return markup.add(InlineKeyboardButton(text='Поделиться игрой', switch_inline_query=game['game_name']))
