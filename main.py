@@ -615,9 +615,11 @@ async def send_game_info_by_inline_mode(call:types.CallbackQuery, callback_data:
                              f'\nОписание:' \
                              f'\n{game["game_description"]}' \
                              f'\nЦена - Бесплатно'
-
-        await call.bot.send_media_group(chat_id=call['from']['id'],media=media)
-        await call.bot.send_message(chat_id=call['from']['id'],text=game_info_text, reply_markup=markup)
+        try:
+            await call.bot.send_media_group(chat_id=call['from']['id'],media=media)
+            await call.bot.send_message(chat_id=call['from']['id'],text=game_info_text, reply_markup=markup)
+        except aiogram.utils.exceptions.BotBlocked:
+            pass
     else:
         await call.answer(text='Сначало пройдите регистрацию', show_alert=True)
         await bot.answer_callback_query(call.id, 'Сначало пройдите регистрацию', True)
