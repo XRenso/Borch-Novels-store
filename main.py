@@ -41,6 +41,7 @@ class Store(StatesGroup):
 
 class Cache(StatesGroup):
     sound = State()
+    sound_id = State()
     game_text = State()
     achivement = State()
 
@@ -343,11 +344,16 @@ async def change_frames(call, frame_num, state:FSMContext):
                     async with state.proxy():
                         sound = await call.message.answer_audio(frame['sound'])
                         await state.update_data(sound=sound)
+                        await state.update_data(sound_id=frame['sound'])
                 else:
-                    await call.bot.delete_message(message_id=data.get('sound').message_id, chat_id=call.message.chat.id)
-                    async with state.proxy():
-                        sound = await call.message.answer_audio(frame['sound'])
-                        await state.update_data(sound=sound)
+                    old_id = data.get('sound_id')
+                    if old_id != frame['sound']:
+                        await call.bot.delete_message(message_id=data.get('sound').message_id, chat_id=call.message.chat.id)
+                        async with state.proxy():
+                            sound = await call.message.answer_audio(frame['sound'])
+                            await state.update_data(sound=sound)
+                            await state.update_data(sound_id=frame['sound'])
+
 
             if frame['achivement']:
                 achiv = db.give_achivement_to_user(game_code=game['game_code'], achivement_code=frame['achivement'],
@@ -449,12 +455,18 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
                 async with state.proxy():
                     sound = await call.message.answer_audio(frame['sound'])
                     await state.update_data(sound=sound)
-            else:
-                await call.bot.delete_message(message_id=data.get('sound').message_id, chat_id=call.message.chat.id)
-                async with state.proxy():
-                    sound = await call.message.answer_audio(frame['sound'])
+                    await state.update_data(sound_id=frame['sound'])
 
-                    await state.update_data(sound=sound)
+            else:
+                    old_id = data.get('sound_id')
+
+                    if old_id != frame['sound']:
+                        await call.bot.delete_message(message_id=data.get('sound').message_id,
+                                                      chat_id=call.message.chat.id)
+                        async with state.proxy():
+                            sound = await call.message.answer_audio(frame['sound'])
+                            await state.update_data(sound=sound)
+                            await state.update_data(sound_id=frame['sound'])
     else:
         await call.message.answer('У игры пока нет кадров. Но скоро это будет исправлено')
 
