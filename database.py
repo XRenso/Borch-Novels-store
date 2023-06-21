@@ -54,12 +54,14 @@ class Mongo:
                 'curr_game_code': None, # Текущая игра
                 'games_config': [], # Игровой конфиг
                 'achivements' : [], # Ачивки
-                'is_admin': 0 #Проверка на админа
+                'is_admin': 0, #Проверка на админа
+                'accept_paper':1 #Проверка на соглашение
             }
             self.user.insert_one(user)
         else:
             return 0
-
+    def accepted_paper(self,user_id):
+        self.user.update_one({'user_id':user_id},{'$set':{'accept_paper':1}})
     def add_frame(self,game_code:str, frame_num:int, is_demo:int, content_code:int, text:dict,variants:str, variants_frame:str, sound:str = None, content:str=None,  modificators:str=None, sticker:str=None, change_add_conditions:str=None,check_add_conditions:str=None, fail_condition_frame:int=None, achivement:str=None) -> 0:
         if self.frame.count_documents({'frame_num':frame_num, 'game_code':game_code}) == 0 and self.game.count_documents({'game_code':game_code}) == 1:
             frame = {
@@ -279,58 +281,5 @@ if __name__ == '__main__':
     print('Тест')
     check = Mongo()
     check.__init__()
-    check.give_game_to_user('1997',483058216,0)
 
 
-    # check.add_frame(game_code='guide_store',frame_num=10,is_demo=0,content_code=0,text={'ru':'1 вопрос и ты поддался сомнению, никакой из вариантов не был уникальным. Так бывает друг\nНаше обучение подошло к концу.\nПрощай'},achivement='store_guide_complete', variants='Пока', variants_frame='-1')
-
-
-    # check.add_game(code='orange_world',can_buy=0, name='Мир, который никогда не оранжевый', description='Когда-то все мы были оранжевыми, а может красными, к сожалению уже не помню. Я возвёл столько строений, что забыл совсем другие науки. Однако играет ли роли? Наше общество требует худших решений. Только я задаю один и тот же вопрос: "Куда пропали все те, кого я знал и видел"', cover='AgACAgIAAxkBAAIQMmSIAAEI4HfIPAbSv-fOEoeNKTiOrwACyMwxG1xtQUjUfncYWxr8NQEAAwIAA3kAAy8E', genre_code='antiutopia',genre='Антиутопия👁',creator='Borch Store',price=0,config={}, publisher='BORCH Studio',discount=0)
-
-
-    # check.add_achivement(game_code='guide_store', name='Рождён читать',achivement_code='store_guide_complete',cover='AgACAgIAAxkBAAILZGSGfvFFhTQ44UkQGYPpwbZGacbtAALwzzEbFMExSICqx1N_4NAyAQADAgADeQADLwQ', description='Вы прошли курс молодого бойца.\nВы узнали тонкости работы магазина и его особености, теперь настало время узнать остальные игры.')
-
-    # check.return_genres()
-    # check.add_frame(game_code='param_pam',frame_num=1,is_demo=1,content_code=0,text={'ru':'Просто проверочка'}, variants='Я\nТы', variants_frame='2\n3')
-    # check.add_frame(game_code='param_pam',frame_num=2,is_demo=0,content_code=0,text={'ru':'Ты эгоист. \nБудем это знать'}, variants='Боль', variants_frame='5')
-    # check.add_frame(game_code='guide_store',frame_num=1,is_demo=0,content_code=1,content='AgACAgIAAxkBAAIEvWSFebpYNLrGz9dHr0jqreUIh95KAAJuxTEb4e4xSFOwt15_U3lYAQADAgADeQADLwQ',text={'ru':'Добро пожаловать в наш магазин\nТелеграм позволяет делать удивительные вещи. Потому мы познакомим вас с нашим магазином\nНажми кнопку под текстом'}, variants='->Прямо сюда<-', variants_frame='2')
-    # check.add_frame(game_code='guide_store',frame_num=2,is_demo=0,content_code=0,text={'ru':'Теперь ты понял как использовать кнопки. Поздравляем, но как насчёт научиться вариативности?\nОго сколько вариантов. Нажми на любой из них'}, variants='Я самый уникальный вариант\nА может это более уникальный?', variants_frame='3\n4')
-    # check.add_frame(game_code='guide_store',frame_num=3,is_demo=0,content_code=0,text={'ru':'Ты нажал на самую уникальную кнопку. Молодец, теперь ты не узнаешь, что было за другой кнопкой.\nЛадно не буду тебя расстраивать, у тебя есть команда /reset_now_game . Она полностью сотрёт твоё сохранение в последней игре, которую ты играл'}, variants='Продолжим', variants_frame='5')
-    # check.add_frame(game_code='guide_store',frame_num=4,is_demo=0,content_code=0,text={'ru':'Вот ты и потерял возможность узнать, что было за второй кнопкой.\nНе бойся есть команда /reset_now_game что полностью уничтожит сохранение игры, которую ты запустил последней.'}, variants='Продолжим', variants_frame='5')
-    # check.add_frame(game_code='guide_store',frame_num=5,is_demo=0,content_code=1,content='AgACAgIAAxkBAAIFBmSFfZh6c-Mt6y8FNWMTxYgP4xWqAAL_xzEbW04xSKO-dJo3cTBQAQADAgADeAADLwQ',text={'ru':'Теперь же перейдём к самому магазину.\nНажав кнопку профиль вы увидите множество интересных для себя вещей.\nНу же попробуйте нажать кнопку "Профиль" в главом меню'}, variants='Далее', variants_frame='6')
-    # check.add_frame(game_code='guide_store',frame_num=6,is_demo=0,content_code=1,content='AgACAgIAAxkBAAIFCmSFf4w3F2sS61_mfz0QbxpofHpNAAIEyDEbW04xSG2jVMt-KQnNAQADAgADbQADLwQ',text={'ru':'Однако самое интересное, что у тебя есть конечно же БИБЛИОТЕКА\nСколько предстоит ещё добавить нам игр в наш прекрасный магазин.\nМожешь нажать кнопку "Библиотека" и увидеть там как минимум 1 игру.\nЭтот гайд'}, variants='Вау как круто', variants_frame='7')
-    # check.add_frame(game_code='guide_store',frame_num=7,is_demo=0,content_code=1,content='AgACAgIAAxkBAAIFEGSFgMNtXThxP1byv6sM7RaSDM2OAAIGyDEbW04xSPtXTEV6qsPhAQADAgADeAADLwQ',text={'ru':'Познакомимся с разделами магазина.\nНажав кнопку "Подборка" вы сможете увидеть все разделы, что есть на данный момент'}, variants='Ясно', variants_frame='8')
-    # check.add_frame(game_code='guide_store',frame_num=8,is_demo=0,content_code=1,content='AgACAgIAAxkBAAIFFmSFgYea_LJKyJwAAetVLmSZz7K3XAACCMgxG1tOMUhopYwK68p9EAEAAwIAA3gAAy8E',text={'ru':'Ну и на последок - Поиск. \nКонечно найти игры вручную будет проблематично, потому существует замечательный поиск. \nСтоит только ввести начало и отправить, как бот предложит вам все подходящие варианты\nИспытайте же скорее, нажав на кнопку "Поиск"'}, variants='Борщ?Вкусно', variants_frame='9')
-    # check.add_frame(game_code='guide_store',frame_num=9,is_demo=0,content_code=0,text={'ru':'Вот и подошло к концу наше обучение\nБлагодарим вас за прохождение. Чтож можете теперь идти в магазин и играть. \nВозвращайтесь, когда выйдут ещё обучающие материалы'}, variants='Пока Пока', variants_frame='10')
-    #
-
-
-
-
-    # for i in check.return_user_library_games(483058216):
-    #     print(i['game_name'])
-
-    #
-    # game_name = input('Game: ')
-    # for i in check.search_game_by_name(game_name):
-    #     print(i['game_name'])
-    #
-
-
-    # check.add_game(code='zeleria_new_year',can_buy=0, name='С новым годом зелирия', description='«С Новым годом, Зелирия!» – это новогодняя сказка и в то же время небольшой спин-офф первой части игры Zeliria Sactuary.', cover='AgACAgIAAxkBAAIEN2SFckcHPQhyoyG0wtesNe9YQDa0AALLxzEbW04xSMJeXS9r4p5pAQADAgADeAADLwQ\nAgACAgIAAxkBAAIEOWSFclnQZcYMchS4xkKqNAXWmJ75AALOxzEbW04xSM23JpSY2qdYAQADAgADeAADLwQ\nAgACAgIAAxkBAAIEO2SFcmU8qQNx24dK4DyPILWMMIOKAALPxzEbW04xSFS1YbTMyYogAQADAgADeAADLwQ\nAgACAgIAAxkBAAIEPWSFcnWR3dhJbmDBqURb9jtniCrqAALQxzEbW04xSJqkJwHCRyfkAQADAgADeAADLwQ', genre_code='adventures',genre='Приключения',creator='Salangan Games',price=0,config={}, publisher='Phoenix_co',discount=0)
-    # check.add_game(code='zapovednik_zalerii',can_buy=0, name='Заповедник Зелирии', description='Осознание реальности еще не вернулось после эксперимента по телепортации. Фиолетовые хомяки, девушки с хвостами, средневековые рыцари - фантастический мир чужой планеты, по которой вы поведете спецназовца Макса', cover='AgACAgIAAxkBAAIEP2SFct88eoJDQVUCuHuj5zEo5VcfAALRxzEbW04xSO-CDVxXPZVEAQADAgADeAADLwQ\nAgACAgIAAxkBAAIEQWSFcutr8PrgkHU-s7OWSy82rKwjAALSxzEbW04xSCn7fYrwUAbzAQADAgADeQADLwQ\nAgACAgIAAxkBAAIEQ2SFcvVgjxgwObIf0ZhNdXowfI3vAALTxzEbW04xSFcy5Hmv1bVdAQADAgADeAADLwQ\nAgACAgIAAxkBAAIERWSFcv7Jm7pHAodc4HKlUT_0S4tDAALUxzEbW04xSMMyQiAbfqpaAQADAgADeAADLwQ', genre_code='adventures',genre='Приключения',creator='Salangan Games',price=339,config={}, publisher='Phoenix_co',discount=0)
-    # check.add_game(code='shadows_of_lost_world',can_buy=0, name='Тени затерянного мира', description='"Тени затерянного мира"—игра в жанре пост-апокалипсис. Разгадайте тайну машины, которая предсказала дату, начала конца.', cover='AgACAgIAAxkBAAIET2SFdCIpqm01cTQpLRd39ObTluzhAALaxzEbW04xSIjUExZ6vpYeAQADAgADeQADLwQ\nAgACAgIAAxkBAAIEUWSFdC1dktH3PXxooE3juIFwjqw9AALbxzEbW04xSHyH50c51RkLAQADAgADeQADLwQ\nAgACAgIAAxkBAAIEU2SFdDtoM8Rgjg8ypPBnmT29Y_KQAALdxzEbW04xSCDncVWIf42QAQADAgADeQADLwQ\nAgACAgIAAxkBAAIEVWSFdEuiBFaxPsueJZ63If3W2OPZAALexzEbW04xSIZngn4gjazNAQADAgADeQADLwQ', genre_code='post_apocalypses',genre='Пост-Апокалипсис',creator=' BORCH Studio',price=149,config={}, publisher=' BORCH Studio ',discount=0)
-    # check.add_game(code='1997',can_buy=0, name='1997', description='Визуальная новелла-детектив про тайны городка в России 90-х в стиле аниме.', cover='AgACAgIAAxkBAAIER2SFc18AAZgX9PH34LlCRLCX-Sr-agAC1scxG1tOMUglO_p9fHf1EQEAAwIAA3gAAy8E\nAgACAgIAAxkBAAIESWSFc3BrdrFcHqOe_XDAAqbZmn1qAALXxzEbW04xSMDg42E7-pr_AQADAgADeQADLwQ\nAgACAgIAAxkBAAIES2SFc34O8tePixY_kz01ZczbgDy3AALYxzEbW04xSEzHN7ZhkRlpAQADAgADeQADLwQ\nAgACAgIAAxkBAAIETWSFc43cZxrBGYgKDDUj4dysPomSAALZxzEbW04xSGxF5vAw78pRAQADAgADeQADLwQ', genre_code='detective',genre='Детектив',creator='Hit\'n\'Run Digital Studio, RUZURA Interactive',price=259,config={}, publisher='Hit\'n\'Run Digital Studio',discount=0)
-
-    # check.add_game(code='guide_store',can_buy=0, name='Обучение правилам магазина', description='Это обучающий продукт, что расскажет вам о нашем магазине.', cover='AgACAgIAAxkBAAIDkWSFX-SFGTYUga7qaew-QGHuGya1AAKUxzEbW04xSFGbj_VtXqsJAQADAgADeAADLwQ', genre_code='off_guides',genre='Официальные инструкции',creator='Borch Store',price=0,config={}, publisher='Borch Store',discount=0)
-
-
-    #check.add_game(code='cool', name='Cool game', description='Игра, что вернула мне жизнь', cover='BAACAgIAAxkBAANgZIQNvW-Wqtz3-7B3_Aa_EfVBHfwAAowrAAJtuCFI_K_v-jdfKlQvBA\nAgACAgIAAxkBAANkZIQN0TZFoDrorfr9EumGuN_FPs0AAhnHMRttuCFIjwbJJG8er1wBAAMCAAN4AAMvBA', genre_code='kok',genre='Для любителей покрепче',creator='Ваша жизнь',price=0,config=game_config, publisher='Ваш дом',discount=0)
-    # check.add_game(code='pim_pam', name='Jojo sim', description='Крутая игра для всех', cover='AgACAgIAAxkBAAMHZIOzWevS-gGso07A2fbOQtcLmEMAAkvIMRso9iFIjTr7ebImDK4BAAMCAAN5AAMvBA', genre_code='hohma',genre='Хохма',creator='Me',price=0,config=game_config, publisher='Me',discount=0)
-    # check.add_game(code='param_pam', name='Bus simulator', description='Здесь просят деньги, просто уйдите', can_buy=1,cover='AgACAgIAAxkBAAIDzGSFZkltqub9IJ9up44fBZJflti4AAKgyjEbW04pSMaXeCFs5lfJAQADAgADeQADLwQ', genre_code='paid',genre='Донатный мусор',creator='Доллар',price=100,config={}, publisher='ЦБ Мира', discount=0)
-
-    #
-    # check.give_game_to_user(game_code='param_pam', user_id=483058216, is_demo=1)
-    # check.give_game_to_user(game_code='pim_pam', user_id=483058216, is_demo=1)
-    # check.give_game_to_user(game_code='f', user_id=483058216, is_demo=0)
-    # print(check.return_user_info(483058216)['games_config'])

@@ -31,7 +31,7 @@ profile_achivement_code = CallbackData('achivements','achivement_code')
 profile_action = CallbackData('profile', 'action')
 
 
-
+paper_cb = CallbackData('paper', 'agree')
 
 
 
@@ -40,9 +40,11 @@ start_btn = InlineKeyboardButton('Начать', callback_data='start_play_game'
 start_game = InlineKeyboardMarkup().add(start_btn)
 
 
+##Agreement
+paper = InlineKeyboardButton('Пользовательское соглашение', url='https://telegra.ph/Polzovatelskoe-soglashenie-06-21-6')
+agree = InlineKeyboardButton('Принять', callback_data=paper_cb.new('ye'))
 
-
-
+agreement_ikb = InlineKeyboardMarkup().add(paper).add(agree)
 
 ##Main kb
 main_kb = ReplyKeyboardMarkup(resize_keyboard=True)
@@ -55,9 +57,10 @@ main_kb.row(library,shop).row(about_us,about_me)
 ##Shop kb
 store = KeyboardButton(phr.store)
 find_game = KeyboardButton(phr.search_game)
+shop_statistic = KeyboardButton(phr.shop_statistic)
 main_menu = KeyboardButton(phr.main_menu)
 shop_kb = ReplyKeyboardMarkup(resize_keyboard=True)
-shop_kb.add(store,find_game).add(main_menu)
+shop_kb.add(store,find_game).row(shop_statistic,main_menu)
 
 
 
