@@ -42,7 +42,7 @@ start_game = InlineKeyboardMarkup().add(start_btn)
 
 ##Agreement
 paper = InlineKeyboardButton('Пользовательское соглашение', url='https://telegra.ph/Polzovatelskoe-soglashenie-06-21-6')
-agree = InlineKeyboardButton('Принять', callback_data=paper_cb.new('ye'))
+agree = InlineKeyboardButton('Принять ✅', callback_data=paper_cb.new('ye'))
 
 agreement_ikb = InlineKeyboardMarkup().add(paper).add(agree)
 
