@@ -100,65 +100,70 @@ async def reset_cur_game(message:types.Message):
 
 @dp.message_handler(content_types=['text'])
 async def get_text(message: types.Message):
-    match message.text:
-        case phr.library:
-            markup = kb.return_library(db.return_user_library_games(message.from_user.id))
-            if not len(markup['inline_keyboard']):
-                await message.answer('У вас нет игр ❌')
-            else:
-                await message.answer('Ваша библиотека 📂', reply_markup=markup)
-        case phr.profile:
-            user_info = db.return_user_info(message.from_user.id)
-            if user_info != 0:
-                curr_game = db.return_game_info(user_info['curr_game_code'])
-                if curr_game == 0:
-                    curr_game = 'К сожалению вы не проходите сейчас какую-либо игру ❌'
+    user = db.return_user_info(message.from_user.id)
+    if user != 0 and user['accept_paper'] == 1:
+        match message.text:
+            case phr.library:
+                markup = kb.return_library(db.return_user_library_games(message.from_user.id))
+                if not len(markup['inline_keyboard']):
+                    await message.answer('У вас нет игр ❌')
                 else:
-                    curr_game = curr_game['game_name']
+                    await message.answer('Ваша библиотека 📂', reply_markup=markup)
+            case phr.profile:
+                user_info = db.return_user_info(message.from_user.id)
+                if user_info != 0:
+                    curr_game = db.return_game_info(user_info['curr_game_code'])
+                    if curr_game == 0:
+                        curr_game = 'К сожалению вы не проходите сейчас какую-либо игру ❌'
+                    else:
+                        curr_game = curr_game['game_name']
 
-                achivments = user_info['achivements']
-                markup = kb.profile_kb_have_achivements
-                if len(achivments) < 1:
-                    achivments = 'У вас нет достижений ❌'
-                    markup = kb.profile_kb_not_have_achivements
-                await message.answer(f'Ваш id - {user_info["user_id"]}'
-                                     f'\nКоличество игр в библиотеке 📂- {len(db.return_user_library_games(message.from_user.id))}'
-                                     f'\nВы проходите 🎮 - {curr_game}'
-                                     f'\nКоличество ваших достижений 🌟 - '
-                                     f'{len(achivments)}', reply_markup=markup)
-            else:
-                await message.answer('Пройдите регистрацию. Отправив сообщение /start')
+                    achivments = user_info['achivements']
+                    markup = kb.profile_kb_have_achivements
+                    if len(achivments) < 1:
+                        achivments = 'У вас нет достижений ❌'
+                        markup = kb.profile_kb_not_have_achivements
+                    await message.answer(f'Ваш id - {user_info["user_id"]}'
+                                         f'\nКоличество игр в библиотеке 📂- {len(db.return_user_library_games(message.from_user.id))}'
+                                         f'\nВы проходите 🎮 - {curr_game}'
+                                         f'\nКоличество ваших достижений 🌟 - '
+                                         f'{len(achivments)}', reply_markup=markup)
+                else:
+                    await message.answer('Пройдите регистрацию. Отправив сообщение /start')
 
 
-        case phr.search_game:
-            await message.answer('Отправьте название игры, которую хотите найти. \nОтправьте 0 для отмены')
-            await Store.search_game.set()
+            case phr.search_game:
+                await message.answer('Отправьте название игры, которую хотите найти. \nОтправьте 0 для отмены')
+                await Store.search_game.set()
 
 
-        case phr.store:
-            genres = db.return_genres()
-            markup = kb.store_kb_genres(genres)
-            if not len(markup['inline_keyboard']):
-                await message.answer(f'Игры отсутсвуют в магазине ❌')
-            else:
-                await message.answer(f'Выберите интересующую вас категорию 👇', reply_markup=markup)
-        case phr.shop:
-            await message.answer('Выберите интересующую вас функцию 👇 ', reply_markup=kb.shop_kb)
-        case phr.main_menu:
-            await message.answer('Добро пожаловать на главное меню ✨', reply_markup=kb.main_kb)
-        case phr.shop_statistic:
-            await message.answer(db.bot_statistic())
-        case phr.about_us:
-            markup = InlineKeyboardMarkup()
-            tg_chanel = InlineKeyboardButton('Телеграм-канал', url='https://t.me/BorchStore')
-            designer = InlineKeyboardButton('Дизайнер', url='https://t.me/cuddies19')
-            programmist = InlineKeyboardButton('Программист', url='https://t.me/XRenso')
-            user_paper = InlineKeyboardButton('Пользовательское соглашение', url='https://telegra.ph/Polzovatelskoe-soglashenie-06-21-6')
-            markup.add(user_paper)
-            markup.row(designer,programmist)
-            markup.add(tg_chanel)
+            case phr.store:
+                genres = db.return_genres()
+                markup = kb.store_kb_genres(genres)
+                if not len(markup['inline_keyboard']):
+                    await message.answer(f'Игры отсутсвуют в магазине ❌')
+                else:
+                    await message.answer(f'Выберите интересующую вас категорию 👇', reply_markup=markup)
+            case phr.shop:
+                await message.answer('Выберите интересующую вас функцию 👇 ', reply_markup=kb.shop_kb)
+            case phr.main_menu:
+                await message.answer('Добро пожаловать на главное меню ✨', reply_markup=kb.main_kb)
+            case phr.shop_statistic:
+                await message.answer(db.bot_statistic())
+            case phr.about_us:
+                markup = InlineKeyboardMarkup()
+                tg_chanel = InlineKeyboardButton('Телеграм-канал', url='https://t.me/BorchStore')
+                designer = InlineKeyboardButton('Дизайнер', url='https://t.me/cuddies19')
+                programmist = InlineKeyboardButton('Программист', url='https://t.me/XRenso')
+                user_paper = InlineKeyboardButton('Пользовательское соглашение', url='https://telegra.ph/Polzovatelskoe-soglashenie-06-21-6')
+                markup.add(user_paper)
+                markup.row(designer,programmist)
+                markup.add(tg_chanel)
 
-            await message.answer(phr.info, reply_markup=markup)
+                await message.answer(phr.info, reply_markup=markup)
+    else:
+        await message.answer('Ознакомиться с правилами можно по кнопке ниже: ', reply_markup=kb.agreement_ikb)
+
 
 
 @dp.message_handler(state=Store.search_game)
