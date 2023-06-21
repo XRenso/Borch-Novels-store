@@ -89,7 +89,8 @@ class Mongo:
         if self.game.count_documents({'game_code':code}) == 0:
             cfg = {
                 'frame_num': 1,
-                'is_demo': 1
+                'is_demo': 1,
+                'played': 0,
             }
             cfg.update(config)
             game = {
@@ -119,6 +120,22 @@ class Mongo:
 
         self.user.update_one({'user_id': user_id, f'games_config.{game_code}': {'$exists': True}},
                              {'$set': {f'games_config.$.{game_code}.is_demo': now_cfg['is_demo']}})
+    def rebase(self, game_code, conf):
+        for game in game_code:
+            print(game)
+            config = conf[0]
+            cfg = {
+                'frame_num':1,
+                'is_demo':0,
+                'played' : 0
+            }
+            cfg.update(config)
+            print(cfg)
+            self.game.update_one({'game_code': game}, {'$set':{'game_config':cfg}})
+            for i in self.user.find({f'games_config.{game}': {'$exists': True}}):
+                self.reset_game_setings(game,i['user_id'])
+            conf.pop(0)
+
     def give_game_to_user(self, game_code:str, user_id:int, is_demo:int):
         if self.user.count_documents({'user_id':user_id}) == 1:
 
@@ -141,7 +158,9 @@ class Mongo:
                 return 0
         else:
             return 0
-
+    def user_played_game(self, user_id, game_code):
+        self.user.update_one({'user_id':user_id, f'games_config{game_code}':{'$exists':True}},
+                             {'$set':{'played':1}})
     def return_game_cfg(self, user_id, game_code):
         user = self.return_user_info(user_id)
         if user:
@@ -281,5 +300,4 @@ if __name__ == '__main__':
     print('Тест')
     check = Mongo()
     check.__init__()
-
 

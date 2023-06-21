@@ -430,6 +430,7 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
     data = await state.get_data()
     await call.message.delete()
     if frame != 0:
+        db.user_played_game(user_id=call.message.chat.id, game_code=callback_data['game_code'])
         if data.get('game_text'):
             try:
                 await call.bot.delete_message(chat_id=call.message.chat.id,message_id=data.get('game_text').message_id)
