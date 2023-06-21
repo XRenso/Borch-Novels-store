@@ -159,8 +159,8 @@ class Mongo:
         else:
             return 0
     def user_played_game(self, user_id, game_code):
-        self.user.update_one({'user_id':user_id, f'games_config{game_code}':{'$exists':True}},
-                             {'$set':{'played':1}})
+        self.user.update_one({'user_id': user_id, f'games_config.{game_code}': {'$exists': True}},
+                             {'$set':{f'games_config.$.{game_code}.played':1}})
     def return_game_cfg(self, user_id, game_code):
         user = self.return_user_info(user_id)
         if user:
