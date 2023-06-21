@@ -59,7 +59,7 @@ async def start(message: types.Message):
 
 @dp.callback_query_handler(kb.paper_cb.filter())
 async def agree_paper(call:types.CallbackQuery, callback_data:dict):
-    await call.message.edit_text('Успешно принято соглашение. \nПриятной эксплуатации магазина')
+    await call.message.edit_text('Успешно принято соглашение ✅. \nПриятной эксплуатации магазина')
     if db.add_user(call.message.chat.id) == 0:
         db.accepted_paper(call.message.chat.id)
     await call.message.answer(f'Здравствуй, {call.message.from_user.first_name}! 🎁 \n'
