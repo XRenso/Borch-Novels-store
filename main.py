@@ -48,9 +48,9 @@ class Cache(StatesGroup):
 @dp.message_handler(commands = ['start'])
 async def start(message: types.Message):
     db.add_user(message.from_user.id)
-    await message.answer(f'Здравствуй, {message.from_user.first_name}!'
+    await message.answer(f'Здравствуй, {message.from_user.first_name}! 🎁 '
                             f'\nДобро пожаловать в магазин Borch Store.'
-                         f'\nУдачного времяпрепровождения!!', reply_markup=kb.main_kb)
+                         f'\n🔱 Используйте меню, для взаимодействия с ботом.', reply_markup=kb.main_kb)
 @dp.message_handler(content_types=['animation'])
 async def handle_gif(message: types.Message):
     if db.return_user_info(message.from_user.id)['is_admin'] == 1:
