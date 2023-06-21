@@ -267,7 +267,7 @@ class Mongo:
         percent_of_paid = int(number_of_paid_games/number_of_games * 100)
         percent_of_free = int(number_of_free_games/number_of_games * 100)
 
-        text = f'Про нас\n' \
+        text = f'О магазине\n' \
                f'Написать информацию\n' \
                f'Количество пользователей - {users_of_bot}\n' \
                f'Количество игр - {number_of_games}\n' \
