@@ -241,7 +241,7 @@ async def show_game_info(call:types.CallbackQuery, callback_data:dict):
     price = 'Бесплатно'
 
     if game['price'] > 0:
-        price = game['price']
+        price = f"{game['price']} руб"
 
     game_info_text = f'{game["game_name"]}' \
                      f'\nИздатель - {game["publisher"]}' \
@@ -250,7 +250,7 @@ async def show_game_info(call:types.CallbackQuery, callback_data:dict):
                      f'\nЖанр - {game["genre"]}' \
                      f'\nОписание:' \
                      f'\n{game["game_description"]}' \
-                     f'\nЦена - {price} руб'
+                     f'\nЦена - {price}'
 
 
 
@@ -644,7 +644,7 @@ async def show_game_info(call:types.CallbackQuery, callback_data: dict):
     price = 'Бесплатно'
 
     if game['price'] > 0:
-        price = game['price']
+        price = f"{game['price']} руб"
 
     game_info_text = f'{game["game_name"]}' \
                      f'\nИздатель - {game["publisher"]}' \
@@ -653,7 +653,7 @@ async def show_game_info(call:types.CallbackQuery, callback_data: dict):
                      f'\nЖанр - {game["genre"]}' \
                      f'\nОписание:' \
                      f'\n{game["game_description"]}' \
-                     f'\nЦена - {price} руб'
+                     f'\nЦена - {price}'
 
     for index, file_id in enumerate(game['game_cover'].split('\n')):
         match index:
@@ -690,7 +690,7 @@ async def send_game_info_by_inline_mode(call:types.CallbackQuery, callback_data:
         price = 'Бесплатно'
 
         if game['price'] > 0:
-            price = game['price']
+            price = f'{game["price"]} руб'
 
         game_info_text = f'{game["game_name"]}' \
                          f'\nИздатель - {game["publisher"]}' \
@@ -699,7 +699,7 @@ async def send_game_info_by_inline_mode(call:types.CallbackQuery, callback_data:
                          f'\nЖанр - {game["genre"]}' \
                          f'\nОписание:' \
                          f'\n{game["game_description"]}' \
-                         f'\nЦена - {price} руб'
+                         f'\nЦена - {price}'
         try:
             await call.bot.send_media_group(chat_id=call['from']['id'],media=media)
             await call.bot.send_message(chat_id=call['from']['id'],text=game_info_text, reply_markup=markup)
