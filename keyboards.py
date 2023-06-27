@@ -34,6 +34,10 @@ profile_action = CallbackData('profile', 'action')
 paper_cb = CallbackData('paper', 'agree')
 
 
+reset_games_cb = CallbackData('res_games','game_code')
+confirm_reset_cb = CallbackData('conf_res','game_code')
+cancel_reset_cb = CallbackData('canc_res','ok')
+back_reset_cb = CallbackData('back_to_res','ok')
 
 
 start_btn = InlineKeyboardButton('Начать', callback_data='start_play_game')
@@ -102,6 +106,12 @@ def return_library(games):
             markup.add(InlineKeyboardButton(i['game_name'], callback_data=show_more_info_game.new(i['game_code'])))
     return markup
 
+def reset_library(games):
+    markup = InlineKeyboardMarkup()
+    if games !=0 :
+        for i in games:
+            markup.add(InlineKeyboardButton(i['game_name'], callback_data=reset_games_cb.new(i['game_code'])))
+    return markup
 def store_kb_genres(genre):
     markup = InlineKeyboardMarkup(row_width=2)
     for i in genre:
