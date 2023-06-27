@@ -91,6 +91,7 @@ class Mongo:
                 'frame_num': 1,
                 'is_demo': 1,
                 'played': 0,
+                'rate':0
             }
             cfg.update(config)
             game = {
@@ -106,7 +107,9 @@ class Mongo:
             'genre_code': genre_code, # Код жанра
             'genre': genre, #Жанр
             'game_config': cfg, # Конфиг игры
-            'month_sales' : 0 # Продажи в месяц
+            'month_sales' : 0, # Продажи в месяц
+            'rating': 0, # Общая оценка
+            'num_of_rates': 0 # Количество оценок
             }
             self.game.insert_one(game)
         else:
@@ -120,21 +123,8 @@ class Mongo:
 
         self.user.update_one({'user_id': user_id, f'games_config.{game_code}': {'$exists': True}},
                              {'$set': {f'games_config.$.{game_code}.is_demo': now_cfg['is_demo']}})
-    def rebase(self, game_code, conf):
-        for game in game_code:
-            print(game)
-            config = conf[0]
-            cfg = {
-                'frame_num':1,
-                'is_demo':0,
-                'played' : 0
-            }
-            cfg.update(config)
-            print(cfg)
-            self.game.update_one({'game_code': game}, {'$set':{'game_config':cfg}})
-            for i in self.user.find({f'games_config.{game}': {'$exists': True}}):
-                self.reset_game_setings(game,i['user_id'])
-            conf.pop(0)
+    def rebase(self):
+        self.game.update_many({'rating':{'$exists':False}}, {'$set':{'rating':0,'num_of_rates':0}})
 
     def give_game_to_user(self, game_code:str, user_id:int, is_demo:int):
         if self.user.count_documents({'user_id':user_id}) == 1:
@@ -187,7 +177,16 @@ class Mongo:
     def return_genre_name_by_code(self,genre_code):
         return self.game.find_one({'genre_code':genre_code})['genre']
 
-
+    def rate_game(self,user_id,game_code, score):
+        game_conf = self.return_game_cfg(user_id, game_code)
+        game = self.return_game_info(game_code)
+        if game_conf['rate'] == 0:
+            self.game.update_one({'game_code':game_code}, {'$set' : {'num_of_rates': game['num_of_rates']+1, 'rating':game['rating']+score}})
+            self.user.update_one({'user_id':user_id}, {'$set':{f'games_config.{game_code}.rate':score}})
+        else:
+            self.game.update_one({'game_code':game_code}, {'$set':{'rating':game['rating']-game_conf['rate']}})
+            self.user.update_one({'user_id':user_id}, {'$set':{f'games_config.{game_code}.rate':score}})
+            self.game.update_one({'game_code':game_code}, {'$set' : {'num_of_rates': game['num_of_rates']+1, 'rating':game['rating']+score}})
     def update_user_frame_num(self,user_id,frame_num, game_code):
         user = self.return_user_info(user_id)
         if user:
@@ -300,4 +299,5 @@ if __name__ == '__main__':
     print('Тест')
     check = Mongo()
     check.__init__()
+
 

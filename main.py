@@ -19,6 +19,7 @@ import os
 import logging
 import phrase as phr
 import hashlib
+import small_logic as s_log
 
 storage=MemoryStorage()
 load_dotenv()
@@ -95,13 +96,6 @@ async def handle_audio(message: types.Message):
     if db.return_user_info(message.from_user.id)['is_admin'] == 1:
         id_audio = message.audio.file_id
         await message.answer_audio(id_audio,caption=id_audio)
-
-
-# @dp.message_handler(commands = ['reset_now_game'])
-# async def reset_cur_game(message:types.Message):
-#     user = db.return_user_info(message.from_user.id)
-#     db.reset_game_setings(user_id=message.from_user.id,game_code=user['curr_game_code'])
-#     await message.answer('Успешно сброшено ✅')
 
 @dp.message_handler(commands = ['reset_game'])
 async def reset_game(message:types.Message):
@@ -219,27 +213,45 @@ async def search_game_by_name(message: types.Message, state: FSMContext):
         await message.answer('Успешная отмена ❌')
     await state.finish()
 
+
+@dp.callback_query_handler(kb.rate_game.filter())
+async def rating_game(call:types.CallbackQuery, callback_data:dict):
+    markup = InlineKeyboardMarkup(row_width=5)
+    for i in range(5):
+        markup.insert(InlineKeyboardButton(f'{i+1}', callback_data=kb.rating.new(f'{callback_data["game_code"]}@{i+1}')))
+    markup.add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.get_game_info.new(callback_data['game_code'])))
+    await call.message.edit_text('Выберите оценку', reply_markup=markup)
+@dp.callback_query_handler(kb.rating.filter())
+async def rate_game(call:types.CallbackQuery, callback_data:dict):
+    info = callback_data['score'].split('@')
+    game_code = info[0]
+    score = info[1]
+    db.rate_game(call.message.chat.id, game_code, score)
+    markup = InlineKeyboardMarkup().add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.get_game_info.new(game_code)))
+    await call.message.edit_text('Успешно поставлена оценка', reply_markup=markup)
 @dp.callback_query_handler(kb.get_game_info.filter())
 async def show_game_info(call:types.CallbackQuery, callback_data:dict):
     game = db.return_game_info(callback_data['game_code'])
     markup = kb.get_game(game['game_code'], db.check_is_game_in_user_library(call.message.chat.id, game['game_code']),
                          game['price'], user_id=call.message.chat.id)
+    rating = 'У игры нет оценок'
+    if game['num_of_rates'] > 0:
+        rating = game['rating']/game['num_of_rates']
+    rating = s_log.rating(rating)
+    price = 'Бесплатно'
+
     if game['price'] > 0:
-        game_info_text = f'{game["game_name"]}' \
-                         f'\nИздатель - {game["publisher"]}' \
-                         f'\nРазработчик - {game["creator"]}' \
-                         f'\nЖанр - {game["genre"]}' \
-                         f'\nОписание:' \
-                         f'\n{game["game_description"]}' \
-                         f'\nЦена - {game["price"]} руб'
-    else:
-        game_info_text = f'{game["game_name"]}' \
-                         f'\nИздатель - {game["publisher"]}' \
-                         f'\nРазработчик - {game["creator"]}' \
-                         f'\nЖанр - {game["genre"]}' \
-                         f'\nОписание:' \
-                         f'\n{game["game_description"]}' \
-                         f'\nЦена - Бесплатно'
+        price = game['price']
+
+    game_info_text = f'{game["game_name"]}' \
+                     f'\nИздатель - {game["publisher"]}' \
+                     f'\nРазработчик - {game["creator"]}' \
+                     f'\nОценка - {rating}' \
+                     f'\nЖанр - {game["genre"]}' \
+                     f'\nОписание:' \
+                     f'\n{game["game_description"]}' \
+                     f'\nЦена - {price} руб'
+
 
 
     await call.message.edit_text(game_info_text, reply_markup=markup)
@@ -625,22 +637,23 @@ async def show_game_info(call:types.CallbackQuery, callback_data: dict):
     await call.message.delete()
     media = types.MediaGroup()
     markup = kb.get_game(game['game_code'], db.check_is_game_in_user_library(call.message.chat.id,game['game_code']), game['price'], user_id=call.message.chat.id)
+    rating = 'У игры нет оценок'
+    if game['num_of_rates'] > 0:
+        rating = game['rating'] / game['num_of_rates']
+    rating = s_log.rating(rating)
+    price = 'Бесплатно'
+
     if game['price'] > 0:
-        game_info_text = f'{game["game_name"]}' \
-                         f'\nИздатель - {game["publisher"]}' \
-                         f'\nРазработчик - {game["creator"]}' \
-                         f'\nЖанр - {game["genre"]}' \
-                         f'\nОписание:' \
-                         f'\n{game["game_description"]}' \
-                         f'\nЦена - {game["price"]} руб'
-    else:
-        game_info_text = f'{game["game_name"]}' \
-                         f'\nИздатель - {game["publisher"]}' \
-                         f'\nРазработчик - {game["creator"]}' \
-                         f'\nЖанр - {game["genre"]}' \
-                         f'\nОписание:' \
-                         f'\n{game["game_description"]}' \
-                         f'\nЦена - Бесплатно'
+        price = game['price']
+
+    game_info_text = f'{game["game_name"]}' \
+                     f'\nИздатель - {game["publisher"]}' \
+                     f'\nРазработчик - {game["creator"]}' \
+                     f'\nОценка - {rating}' \
+                     f'\nЖанр - {game["genre"]}' \
+                     f'\nОписание:' \
+                     f'\n{game["game_description"]}' \
+                     f'\nЦена - {price} руб'
 
     for index, file_id in enumerate(game['game_cover'].split('\n')):
         match index:
@@ -670,22 +683,23 @@ async def send_game_info_by_inline_mode(call:types.CallbackQuery, callback_data:
                         case 'a':
                             media.attach_photo(photo=file_id)
 
+        rating = 'У игры нет оценок'
+        if game['num_of_rates'] > 0:
+            rating = game['rating'] / game['num_of_rates']
+        rating = s_log.rating(rating)
+        price = 'Бесплатно'
+
         if game['price'] > 0:
-            game_info_text = f'{game["game_name"]}' \
-                             f'\nИздатель - {game["publisher"]}' \
-                             f'\nРазработчик - {game["creator"]}' \
-                             f'\nЖанр - {game["genre"]}' \
-                             f'\nОписание:' \
-                             f'\n{game["game_description"]}' \
-                             f'\nЦена - {game["price"]} руб'
-        else:
-            game_info_text = f'{game["game_name"]}' \
-                             f'\nИздатель - {game["publisher"]}' \
-                             f'\nРазработчик - {game["creator"]}' \
-                             f'\nЖанр - {game["genre"]}' \
-                             f'\nОписание:' \
-                             f'\n{game["game_description"]}' \
-                             f'\nЦена - Бесплатно'
+            price = game['price']
+
+        game_info_text = f'{game["game_name"]}' \
+                         f'\nИздатель - {game["publisher"]}' \
+                         f'\nРазработчик - {game["creator"]}' \
+                         f'\nОценка - {rating}' \
+                         f'\nЖанр - {game["genre"]}' \
+                         f'\nОписание:' \
+                         f'\n{game["game_description"]}' \
+                         f'\nЦена - {price} руб'
         try:
             await call.bot.send_media_group(chat_id=call['from']['id'],media=media)
             await call.bot.send_message(chat_id=call['from']['id'],text=game_info_text, reply_markup=markup)
@@ -705,10 +719,14 @@ async def send_game_info_inline(inline_query:types.InlineQuery):
         results = []
         for i in games:
             markup = InlineKeyboardMarkup().add(InlineKeyboardButton('Перейти к боту', url='https://t.me/BorchStoreBot'))
-
+            rating = 'У игры нет оценок'
+            if i['num_of_rates'] > 0:
+                rating = i['rating'] / i['num_of_rates']
+            rating = s_log.rating(rating)
             caption = f'Информация об игре {i["game_name"]}\n' \
                       f'Издатель - {i["publisher"]}\n' \
                       f'Разработчик - {i["creator"]}\n' \
+                      f'Оценка - {rating}\n' \
                       f'Жанр - {i["genre"]}\n' \
                       f'Описание:\n' \
                       f'{i["game_description"]}\n'

@@ -9,6 +9,8 @@ db.__init__()
 #Callback data preset
 frame_change = CallbackData('frame','frame_num')
 play_game = CallbackData('playing_game', 'game_code')
+rate_game = CallbackData('rate', 'game_code')
+rating = CallbackData('rating_score','score')
 
 show_by_genre = CallbackData('gen', 'genre_code')
 show_more_info_game = CallbackData('game', 'game_code')
@@ -127,7 +129,7 @@ def get_game(game_code:str, have_it_user:int, price:int, user_id:int) -> InlineK
     if check_frame != 0 and game['can_buy'] != 0:
         match have_it_user:
             case 1 if not game_cfg or game_cfg['is_demo'] == 0:
-                markup.add(InlineKeyboardButton('Играть 🎮', callback_data=play_game.new(game_code)))
+                markup.row(InlineKeyboardButton('Играть 🎮', callback_data=play_game.new(game_code)), InlineKeyboardButton('Оценить', callback_data=rate_game.new(game_code)))
             case _:
                 match price:
                     case 0:
@@ -145,7 +147,7 @@ def get_game(game_code:str, have_it_user:int, price:int, user_id:int) -> InlineK
         if have_it_user == 0:
             markup.add(InlineKeyboardButton('Игра недоступна ❌', callback_data=unavailable_game.new(game_code)))
         else:
-            markup.add(InlineKeyboardButton('Играть 🎮', callback_data=play_game.new(game_code)))
+            markup.row(InlineKeyboardButton('Играть 🎮', callback_data=play_game.new(game_code)), InlineKeyboardButton('Оценить', callback_data=rate_game.new(game_code)))
 
     if user['is_admin'] == 1:
         markup.add(InlineKeyboardButton(phr.statistic,callback_data=game_statistic.new(game_code)))
