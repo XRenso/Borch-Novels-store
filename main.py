@@ -237,7 +237,7 @@ async def show_game_info(call:types.CallbackQuery, callback_data:dict):
     rating = 'У игры нет оценок'
     if game['num_of_rates'] > 0:
         rating = game['rating']/game['num_of_rates']
-    rating = s_log.rating(rating)
+        rating = s_log.rating(rating)
     price = 'Бесплатно'
 
     if game['price'] > 0:
@@ -639,8 +639,8 @@ async def show_game_info(call:types.CallbackQuery, callback_data: dict):
     markup = kb.get_game(game['game_code'], db.check_is_game_in_user_library(call.message.chat.id,game['game_code']), game['price'], user_id=call.message.chat.id)
     rating = 'У игры нет оценок'
     if game['num_of_rates'] > 0:
-        rating = game['rating'] / game['num_of_rates']
-    rating = s_log.rating(rating)
+        rating = game['rating']/game['num_of_rates']
+        rating = s_log.rating(rating)
     price = 'Бесплатно'
 
     if game['price'] > 0:
@@ -686,7 +686,7 @@ async def send_game_info_by_inline_mode(call:types.CallbackQuery, callback_data:
         rating = 'У игры нет оценок'
         if game['num_of_rates'] > 0:
             rating = game['rating'] / game['num_of_rates']
-        rating = s_log.rating(rating)
+            rating = s_log.rating(rating)
         price = 'Бесплатно'
 
         if game['price'] > 0:
@@ -722,7 +722,7 @@ async def send_game_info_inline(inline_query:types.InlineQuery):
             rating = 'У игры нет оценок'
             if i['num_of_rates'] > 0:
                 rating = i['rating'] / i['num_of_rates']
-            rating = s_log.rating(rating)
+                rating = s_log.rating(rating)
             caption = f'Информация об игре {i["game_name"]}\n' \
                       f'Издатель - {i["publisher"]}\n' \
                       f'Разработчик - {i["creator"]}\n' \
