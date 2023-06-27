@@ -187,7 +187,7 @@ class Mongo:
 
         else:
             self.game.update_one({'game_code':game_code}, {'$set':{'rating':game['rating']-game_conf['rate']}})
-            self.game.update_one({'game_code':game_code}, {'$set' : {'num_of_rates': game['num_of_rates']+1, 'rating':game['rating']+rate}})
+            self.game.update_one({'game_code':game_code}, {'$set' : {'rating':game['rating']+rate}})
         self.user.update_one({'user_id': user_id, f'games_config.{game_code}': {'$exists': True}},
                              {'$set': {f'games_config.$.{game_code}.rate': rate}})
     def update_user_frame_num(self,user_id,frame_num, game_code):
