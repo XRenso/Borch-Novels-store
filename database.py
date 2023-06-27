@@ -183,10 +183,10 @@ class Mongo:
         rate = int(score)
         if game_conf['rate'] == 0:
             self.game.update_one({'game_code':game_code}, {'$set' : {'num_of_rates': game['num_of_rates']+1, 'rating':game['rating']+rate}})
-            self.user.update_one({'user_id':user_id}, {'$set':{f'games_config.{game_code}.rate':rate}})
+            self.user.update_one({'user_id':user_id}, {'$set':{f'games_config.$.{game_code}.rate':rate}})
         else:
             self.game.update_one({'game_code':game_code}, {'$set':{'rating':game['rating']-game_conf['rate']}})
-            self.user.update_one({'user_id':user_id}, {'$set':{f'games_config.{game_code}.rate':rate}})
+            self.user.update_one({'user_id':user_id}, {'$set':{f'games_config.$.{game_code}.rate':rate}})
             self.game.update_one({'game_code':game_code}, {'$set' : {'num_of_rates': game['num_of_rates']+1, 'rating':game['rating']+rate}})
     def update_user_frame_num(self,user_id,frame_num, game_code):
         user = self.return_user_info(user_id)
