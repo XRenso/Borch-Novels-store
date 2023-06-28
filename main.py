@@ -111,7 +111,7 @@ async def confirm_reset(call:types.CallbackQuery, callback_data:dict):
     markup = InlineKeyboardMarkup(row_width=2)
     markup.insert(InlineKeyboardButton('Подтвердить',callback_data=kb.confirm_reset_cb.new(callback_data['game_code'])))
     markup.insert(InlineKeyboardButton('Отменить',callback_data=kb.cancel_reset_cb.new('joj')))
-    markup.add(InlineKeyboardButton('Вернуться', callback_data=kb.back_reset_cb.new('joj')))
+    markup.add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.back_reset_cb.new('joj')))
     await call.message.edit_text(f'Уверены ли вы в сбросе сохранения игры - {game["game_name"]}?', reply_markup=markup)
 
 @dp.callback_query_handler(kb.back_reset_cb.filter())
