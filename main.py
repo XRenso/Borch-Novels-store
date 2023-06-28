@@ -718,7 +718,7 @@ async def send_game_info_inline(inline_query:types.InlineQuery):
     if games != 0:
         results = []
         for i in games:
-            markup = InlineKeyboardMarkup().add(InlineKeyboardButton('Перейти к боту', url='https://t.me/BorchStoreBot'))
+            markup = InlineKeyboardMarkup().add(InlineKeyboardButton('Перейти к боту', url='https://t.me/BorchStoreBot?start=inline'))
             rating = 'У игры нет оценок'
             if i['num_of_rates'] > 0:
                 rating = i['rating'] / i['num_of_rates']
