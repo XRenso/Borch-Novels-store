@@ -339,9 +339,9 @@ async def get_genres_by_type(call:types.CallbackQuery, callback_data: dict):
     genres = db.return_genres(type_code)
     markup = kb.store_kb_genres(genres, type_code)
     if not len(markup['inline_keyboard']):
-        await call.message.answer(f'Игры отсутствуют в магазине ❌')
+        await call.message.edit_text(f'Игры отсутствуют в магазине ❌')
     else:
-        await call.message.answer(f'Выберите интересующий вас жанр 👇', reply_markup=markup)
+        await call.message.edit_text(f'Выберите интересующий вас жанр 👇', reply_markup=markup)
 
 
 async def change_frames(call, frame_num, state:FSMContext):
