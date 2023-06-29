@@ -11,6 +11,7 @@ def rating(rating_as_num):
     return final_score
 
 def integer_modificator(expresion):
+    print(eval(expresion))
     return eval(expresion)
 
 

@@ -471,6 +471,7 @@ async def change_frames(call, frame_num, state:FSMContext):
                             original_value = cfg[key]
                             expresion = f'{original_value}{value}'
                             res = s_log.integer_modificator(expresion)
+                            print(res)
                             db.update_user_game_config(call.message.chat.id, res, key, game['game_code'])
 
         elif frame == 0 and can_next == True:
