@@ -15,6 +15,7 @@ rating = CallbackData('rating_score','score')
 show_by_genre = CallbackData('gen', 'genre_code')
 show_more_info_game = CallbackData('game', 'game_code')
 show_more_game_genre = CallbackData('genre','genre_code')
+show_genres_by_type = CallbackData('type', 'type_code')
 inline_show_game_info = CallbackData('inline_game','game_code')
 get_game_info = CallbackData('info_game', 'game_code')
 buy_game = CallbackData('game_buying', 'game_code')
@@ -114,12 +115,17 @@ def reset_library(games):
         for i in games:
             markup.add(InlineKeyboardButton(i['game_name'], callback_data=reset_games_cb.new(i['game_code'])))
     return markup
-def store_kb_genres(genre):
+def store_kb_genres(genre, type_code):
     markup = InlineKeyboardMarkup(row_width=2)
     for i in genre:
-        markup.insert(InlineKeyboardButton(db.return_genre_name_by_code(i),callback_data=show_more_game_genre.new(i)))
+        markup.insert(InlineKeyboardButton(db.return_genre_name_by_code(i, type_code=type_code),callback_data=show_more_game_genre.new(f'{type_code}@{i}')))
     return markup
 
+def store_kb_types(type):
+    markup = InlineKeyboardMarkup(row_width=2)
+    for i in type:
+        markup.insert(InlineKeyboardButton(db.return_type_name_by_code(i),callback_data=show_genres_by_type.new(i)))
+    return markup
 def get_game(game_code:str, have_it_user:int, price:int, user_id:int) -> InlineKeyboardMarkup:
     check_frame = db.return_frame(1,game_code)
     game = db.return_game_info(game_code)

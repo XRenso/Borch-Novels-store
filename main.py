@@ -171,12 +171,19 @@ async def get_text(message: types.Message):
 
 
             case phr.store:
-                genres = db.return_genres()
-                markup = kb.store_kb_genres(genres)
+                types = db.return_type()
+                markup = kb.store_kb_types(types)
                 if not len(markup['inline_keyboard']):
-                    await message.answer(f'Игры отсутсвуют в магазине ❌')
+                    await message.answer(f'Отсутствует товар в магазине ❌')
                 else:
                     await message.answer(f'Выберите интересующую вас категорию 👇', reply_markup=markup)
+
+                # genres = db.return_genres()
+                # markup = kb.store_kb_genres(genres)
+                # if not len(markup['inline_keyboard']):
+                #     await message.answer(f'Игры отсутсвуют в магазине ❌')
+                # else:
+                #     await message.answer(f'Выберите интересующую вас категорию 👇', reply_markup=markup)
             case phr.shop:
                 await message.answer('Выберите интересующую вас функцию 👇 ', reply_markup=kb.shop_kb)
             case phr.main_menu:
@@ -320,9 +327,21 @@ async def profile_menu(call:types.CallbackQuery, callback_data: dict):
 
 @dp.callback_query_handler(kb.show_more_game_genre.filter())
 async def get_games_by_genre(call:types.CallbackQuery, callback_data: dict):
+    info = callback_data['genre_code'].split('@')
+    type_code = info[0]
+    genre_code = info[1]
+    markup = kb.return_library(db.return_game_by_genre(genre_code, type_code)).add(InlineKeyboardButton('Назад ↩️', callback_data=kb.store_action.new('go_to_genres')))
+    await call.message.edit_text(f'Товары жанра {db.return_genre_name_by_code(genre_code, type_code)}:',reply_markup=markup)
 
-    markup = kb.return_library(db.return_game_by_genre(callback_data['genre_code'])).add(InlineKeyboardButton('Назад ↩️', callback_data=kb.store_action.new('go_to_genres')))
-    await call.message.edit_text(f'Игры жанра {db.return_genre_name_by_code(callback_data["genre_code"])}:',reply_markup=markup)
+@dp.callback_query_handler(kb.show_genres_by_type.filter())
+async def get_genres_by_type(call:types.CallbackQuery, callback_data: dict):
+    type_code = callback_data['type_code']
+    genres = db.return_genres(type_code)
+    markup = kb.store_kb_genres(genres, type_code)
+    if not len(markup['inline_keyboard']):
+        await call.message.answer(f'Игры отсутствуют в магазине ❌')
+    else:
+        await call.message.answer(f'Выберите интересующий вас жанр 👇', reply_markup=markup)
 
 
 async def change_frames(call, frame_num, state:FSMContext):

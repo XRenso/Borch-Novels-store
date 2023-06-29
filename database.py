@@ -180,8 +180,8 @@ class Mongo:
             return self.frame.find_one({'frame_num':frame_num, 'game_code':game_code})
         else:
             return 0
-    def return_genre_name_by_code(self,genre_code):
-        return self.game.find_one({'genre_code':genre_code})['genre']
+    def return_genre_name_by_code(self,genre_code, type_code):
+        return self.game.find_one({'genre_code':genre_code, 'type_code':type_code})['genre']
 
     def rate_game(self,user_id,game_code, score):
         game_conf = self.return_game_cfg(user_id, game_code)
@@ -257,13 +257,16 @@ class Mongo:
 
 
 
-    def return_genres(self):
-        genres = self.game.distinct('genre_code')
-        genres.remove('off_guides')
-        genres.insert(0,'off_guides')
+    def return_genres(self, type_code):
+        genres = self.game.distinct('genre_code', {'type_code':type_code})
+        try:
+            genres.remove('off_guides')
+            genres.insert(0,'off_guides')
+        except:
+            pass
         return genres
-    def return_game_by_genre(self, genre_code):
-        return self.game.find({'genre_code':genre_code})
+    def return_game_by_genre(self, genre_code, type_code):
+        return self.game.find({'genre_code':genre_code, 'type_code':type_code})
 
     def return_game_satistic(self, game_code):
         achivments = self.achivement.distinct('achivement_code', {'game_code':game_code})
@@ -285,7 +288,11 @@ class Mongo:
                              f'{achivement["name"]} - получило {self.user.count_documents({f"achivements.game_code": achivement["game_code"], f"achivements.achivement_code":achivement["achivement_code"]})}\n'
         return statistic_text
 
-
+    def return_type(self):
+        types = self.game.distinct('type_code')
+        return types
+    def return_type_name_by_code(self,type_code):
+        return self.game.find_one({'type_code':type_code})['type_name']
 
     def bot_statistic(self):
         users_of_bot = self.user.count_documents({'user_id':{'$exists':True}})
