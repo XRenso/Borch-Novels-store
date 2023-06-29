@@ -75,7 +75,7 @@ class Mongo:
                 'variants_frame': variants_frame, # Кадры в которые ведут варианты, пишутся на том же месте, что и текст вариантов. Разделяются через \n
                 'sound': sound, #Звук, что будет отправлен вместе с сообщением
                 'sticker':sticker, # Отправит стикер вместе с вашим кадром
-                'modificators':modificators, # battle - бой, все остальное - ничего
+                'modificators':modificators, # int - математематическое выражение с переменной, что уже записана, str - присвоить переменной определенное значение
                 'change_add_conditions': change_add_conditions, # Доп. условия, которые нужно изменить в условиях игры
                 'check_add_conditions' : check_add_conditions, # Проверка на доп. условия из конфига игры
                 'fail_condition_frame': fail_condition_frame, # кадр, который наступит, если проверка будет провалена

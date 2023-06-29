@@ -10,4 +10,7 @@ def rating(rating_as_num):
     final_score += '○' * need_to_five
     return final_score
 
+def integer_modificator(expresion):
+    return eval(expresion)
+
 

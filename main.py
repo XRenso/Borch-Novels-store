@@ -453,12 +453,25 @@ async def change_frames(call, frame_num, state:FSMContext):
                         await state.update_data(achivement=ok)
 
             if frame['change_add_conditions']:
-                conditions = frame['change_add_conditions'].split('\n')
-                for i in conditions:
-                    info = i.split(':')
-                    key = info[0]
-                    value = info[1]
-                    db.update_user_game_config(call.message.chat.id, value, key, game['game_code'])
+                match frame['modificators']:
+                    case 'str':
+                        conditions = frame['change_add_conditions'].split('\n')
+                        for i in conditions:
+                            info = i.split(':')
+                            key = info[0]
+                            value = info[1]
+                            db.update_user_game_config(call.message.chat.id, value, key, game['game_code'])
+                    case 'int':
+                        conditions = frame['change_add_conditions'].split('\n')
+                        for i in conditions:
+                            info = i.split(':')
+                            key = info[0]
+                            value = info[1]
+                            cfg = db.return_game_cfg(user['user_id'], game['game_code'])
+                            original_value = cfg[key]
+                            expresion = f'{original_value}{value}'
+                            res = s_log.integer_modificator(expresion)
+                            db.update_user_game_config(call.message.chat.id, res, key, game['game_code'])
 
         elif frame == 0 and can_next == True:
             try:
