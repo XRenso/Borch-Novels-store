@@ -330,7 +330,7 @@ async def get_games_by_genre(call:types.CallbackQuery, callback_data: dict):
     info = callback_data['genre_code'].split('@')
     type_code = info[0]
     genre_code = info[1]
-    markup = kb.return_library(db.return_game_by_genre(genre_code, type_code)).add(InlineKeyboardButton('Назад ↩️', callback_data=kb.store_action.new('go_to_genres')))
+    markup = kb.return_library(db.return_game_by_genre(genre_code, type_code)).add(InlineKeyboardButton('Назад ↩️', callback_data=kb.store_action.new(f'{type_code}@go_to_genres')))
     await call.message.edit_text(f'Товары жанра {db.return_genre_name_by_code(genre_code, type_code)}:',reply_markup=markup)
 
 @dp.callback_query_handler(kb.show_genres_by_type.filter())
@@ -564,9 +564,12 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
 
 @dp.callback_query_handler(kb.store_action.filter())
 async def store_handler(call:types.CallbackQuery, callback_data: dict):
-    if callback_data['action'] == 'go_to_genres':
-        genres = db.return_genres()
-        markup = kb.store_kb_genres(genres)
+    info = callback_data['action'].split('@')
+    action = info[1]
+    type_code = info[0]
+    if action == 'go_to_genres':
+        genres = db.return_genres(type_code)
+        markup = kb.store_kb_genres(genres, type_code)
         await call.message.edit_text(f'Выберите интересующую вас категорию 👇', reply_markup=markup)
 
 
