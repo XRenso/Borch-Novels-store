@@ -42,6 +42,7 @@ confirm_reset_cb = CallbackData('conf_res','game_code')
 cancel_reset_cb = CallbackData('canc_res','ok')
 back_reset_cb = CallbackData('back_to_res','ok')
 
+back_to_types_from_genre = CallbackData('back_to_types','ok')
 
 start_btn = InlineKeyboardButton('Начать', callback_data='start_play_game')
 start_game = InlineKeyboardMarkup().add(start_btn)
@@ -119,6 +120,7 @@ def store_kb_genres(genre, type_code):
     markup = InlineKeyboardMarkup(row_width=2)
     for i in genre:
         markup.insert(InlineKeyboardButton(db.return_genre_name_by_code(i, type_code=type_code),callback_data=show_more_game_genre.new(f'{type_code}@{i}')))
+
     return markup
 
 def store_kb_types(type):

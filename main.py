@@ -333,6 +333,8 @@ async def get_genres_by_type(call:types.CallbackQuery, callback_data: dict):
     type_code = callback_data['type_code']
     genres = db.return_genres(type_code)
     markup = kb.store_kb_genres(genres, type_code)
+    back_to_types = InlineKeyboardButton(phr.back_to_game, callback_data=kb.store_action.new(f'{type_code}@go_to_types'))
+    markup.add(back_to_types)
     if not len(markup['inline_keyboard']):
         await call.message.edit_text(f'Игры отсутствуют в магазине ❌')
     else:
@@ -562,10 +564,21 @@ async def store_handler(call:types.CallbackQuery, callback_data: dict):
     info = callback_data['action'].split('@')
     action = info[1]
     type_code = info[0]
-    if action == 'go_to_genres':
-        genres = db.return_genres(type_code)
-        markup = kb.store_kb_genres(genres, type_code)
-        await call.message.edit_text(f'Выберите интересующую вас жанр 👇', reply_markup=markup)
+    match action:
+        case 'go_to_genres':
+            genres = db.return_genres(type_code)
+            back_to_types = InlineKeyboardButton(phr.back_to_game,
+                                                 callback_data=kb.store_action.new(f'{type_code}@go_to_types'))
+            markup = kb.store_kb_genres(genres, type_code)
+            markup.add(back_to_types)
+            await call.message.edit_text(f'Выберите интересующую вас жанр 👇', reply_markup=markup)
+        case 'go_to_types':
+            types = db.return_type()
+            markup = kb.store_kb_types(types)
+            if not len(markup['inline_keyboard']):
+                await call.message.edit_text(f'Отсутствует товар в магазине ❌')
+            else:
+                await call.message.edit_text(f'Выберите интересующую вас категорию 👇', reply_markup=markup)
 
 
 
