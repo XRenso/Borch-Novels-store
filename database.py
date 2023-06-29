@@ -85,7 +85,7 @@ class Mongo:
         else:
             return 0
 
-    def add_game(self, code: str, name: str, description: str, cover: str, creator:str, publisher:str,can_buy:int, price: int, discount:int, genre_code:str, genre:str, config: dict) -> 0 or None:
+    def add_game(self, code: str, name: str, description: str, cover: str, creator:str, publisher:str,can_buy:int, price: int, discount:int, genre_code:str, genre:str, config: dict, type_code:str,type_name:str) -> 0 or None:
         if self.game.count_documents({'game_code':code}) == 0:
             cfg = {
                 'frame_num': 1,
@@ -109,7 +109,9 @@ class Mongo:
             'game_config': cfg, # Конфиг игры
             'month_sales' : 0, # Продажи в месяц
             'rating': 0, # Общая оценка
-            'num_of_rates': 0 # Количество оценок
+            'num_of_rates': 0, # Количество оценок
+            'type_code': type_code, # Код категории
+            'type_name': type_name # Название категории
             }
             self.game.insert_one(game)
         else:
@@ -128,7 +130,7 @@ class Mongo:
         # self.game.update_many({'game_config.rate':{'$exists':False}},
         #                       {'$set':{'game_config.rate':0}})
         # self.user.update_one({'user_id':483058216, 'games_config.guide_store':{'$exists':True}} , {'$set':{f'games_config.$.guide_store.rate':5}})
-        pass
+        self.game.update_many({'type_code':{'$exists':False}, 'type_name':{'$exists':False}}, {'$set':{'type_code':'visual_novels', 'type_name':'Визуальные новеллы'}})
 
     def give_game_to_user(self, game_code:str, user_id:int, is_demo:int):
         if self.user.count_documents({'user_id':user_id}) == 1:
