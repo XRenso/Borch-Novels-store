@@ -178,12 +178,7 @@ async def get_text(message: types.Message):
                 else:
                     await message.answer(f'Выберите интересующую вас категорию 👇', reply_markup=markup)
 
-                # genres = db.return_genres()
-                # markup = kb.store_kb_genres(genres)
-                # if not len(markup['inline_keyboard']):
-                #     await message.answer(f'Игры отсутсвуют в магазине ❌')
-                # else:
-                #     await message.answer(f'Выберите интересующую вас категорию 👇', reply_markup=markup)
+
             case phr.shop:
                 await message.answer('Выберите интересующую вас функцию 👇 ', reply_markup=kb.shop_kb)
             case phr.main_menu:
@@ -570,7 +565,7 @@ async def store_handler(call:types.CallbackQuery, callback_data: dict):
     if action == 'go_to_genres':
         genres = db.return_genres(type_code)
         markup = kb.store_kb_genres(genres, type_code)
-        await call.message.edit_text(f'Выберите интересующую вас категорию 👇', reply_markup=markup)
+        await call.message.edit_text(f'Выберите интересующую вас жанр 👇', reply_markup=markup)
 
 
 
