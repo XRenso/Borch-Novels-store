@@ -423,7 +423,10 @@ async def change_frames(call, frame_num, state:FSMContext):
 
                         await state.update_data(game_text=message)
             else:
-                await call.message.delete()
+                try:
+                    await call.message.delete()
+                except:
+                    pass
                 await call.message.answer('На этом демо игры заканчивается. Приобретите полную версию игры 💳')
             if frame['sound']:
                 if data.get('sound') == None:
@@ -502,7 +505,10 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
     game_user_cfg = db.return_game_cfg(call.message.chat.id,game['game_code'])
     frame = db.return_frame(game_code=game['game_code'],frame_num=game_user_cfg['frame_num'])
     data = await state.get_data()
-    await call.message.delete()
+    try:
+        await call.message.delete()
+    except:
+        await call.message.edit_text('Игра запущена')
     if frame != 0:
         db.user_played_game(user_id=call.message.chat.id, game_code=callback_data['game_code'])
         if data.get('game_text'):
