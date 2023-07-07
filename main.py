@@ -397,7 +397,11 @@ async def change_frames(call, frame_num, state:FSMContext):
                     markup.add(InlineKeyboardButton(i, callback_data=kb.frame_change.new(frame_num[0])))
                     frame_num.pop(0)
                 try:
-                    await call.message.edit_media(content, reply_markup=markup)
+                    if content is not None:
+                        await call.message.edit_media(content, reply_markup=markup)
+                    else:
+                        await call.message.edit_text(frame['text']['ru'], reply_markup=markup,
+                                                            parse_mode='HTML')
                 except:
                     try:
                         if content is not None:
