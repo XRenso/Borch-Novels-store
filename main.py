@@ -400,7 +400,8 @@ async def change_frames(call, frame_num, state:FSMContext):
                     await call.message.edit_media(content, reply_markup=markup)
                 except:
                     try:
-                        await call.message.delete()
+                        if content is not None:
+                            await call.message.delete()
                     except:
                         pass
                     async with state.proxy():
