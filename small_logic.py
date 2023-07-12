@@ -55,7 +55,7 @@ def get_book_text(fname):
     return result
 
 async def generate_image(prompt, game_name):
-    text =f'Картинка на основе произведения {game_name}. \nСделай картинку трагичной и более печальной\nОписание картинки: {prompt}'
+    text =f'Картинка на основе произведения {game_name}\nОписание картинки: {prompt}'
     try:
         response = await asyncify(openai.Image.create)(
             prompt=text,
