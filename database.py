@@ -1,9 +1,8 @@
-import asyncio
 
 import pymongo
 import re
 
-import main
+
 import small_logic
 
 
@@ -318,15 +317,19 @@ class Mongo:
         return text
 
 
-    async def AI_images(self, game_code):
-        frames = self.frame.find({'game_code':game_code, 'content':None})
-        for key, value in enumerate(frames):
-            text = value['text']['ru']
-            image_url = small_logic.generate_image(text)
-            self.frame.update_one({'frame_num':value['frame_num'],'game_code':game_code}, {'$set':{'content':main.get_image_id(image_url), 'content_code':1}})
-
-            if key == 0:
-                return
+    async def AI_images(self, game_code, status, image_id=None, frame=None):
+        if status == 1:
+            frames = self.frame.find({'game_code':game_code, 'content':None})
+            return frames
+        else:
+            self.frame.update_one({'frame_num':frame['frame_num'],'game_code':game_code}, {'$set':{'content':image_id, 'content_code':1}})
+            # for key, value in enumerate(frames):
+            #     text = value['text']['ru']
+            #     image_url = small_logic.generate_image(text)
+            #     self.frame.update_one({'frame_num':value['frame_num'],'game_code':game_code}, {'$set':{'content':get_image_id(image_url), 'content_code':1}})
+            #
+            #     if key == 0:
+            #         return
 
 
 if __name__ == '__main__':

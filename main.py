@@ -62,7 +62,16 @@ async def start(message: types.Message):
 async def create_ai_images(message: types.Message):
     user = db.return_user_info(message.from_user.id)
     if user['is_admin']:
-        await db.AI_images('1984_book')
+        frames = await db.AI_images('1984_book', 1)
+        for key, value in enumerate(frames):
+                text = value['text']['ru']
+                image_url = s_log.generate_image(text)
+                id = await get_image_id(image_url)
+                id = id.photo[-1].file_id
+                await db.AI_images('1984_book',0,id,value)
+                if key == 0:
+                    return
+                # self.frame.update_one({'frame_num':value['frame_num'],'game_code':game_code}, {'$set':{'content':get_image_id(image_url), 'content_code':1}})
 @dp.callback_query_handler(kb.paper_cb.filter())
 async def agree_paper(call:types.CallbackQuery, callback_data:dict):
     await call.message.edit_text('Успешно принято соглашение ✅. \nПриятной эксплуатации магазина 🎊')
