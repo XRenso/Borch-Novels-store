@@ -329,16 +329,15 @@ class Mongo:
         for key,value in enumerate(frames):
             self.frame.update_one({'game_code':book_name,'content':value['content']},{'$set':{'content':None,'content_code':0}})
 
-    def hero_our_time(self):
-        text = small_logic.get_book_text('books/geroy-nashego-vremeni.docx')
+    def add_book_by_docx(self, f_name, game_code):
+        text = small_logic.get_book_text(f_name)
         all = len(text)
         done = 0
         for key,value in enumerate(text):
-            self.add_frame(game_code='hero_our_time_book',frame_num=key+1, is_demo=0,content_code=0,text={'ru':value},variants={str(key+2):'Продолжить'})
+            self.add_frame(game_code=game_code,frame_num=key+1, is_demo=0,content_code=0,text={'ru':value},variants={str(key+2):'Продолжить'})
             done +=1
             print(f'Done {done}/{all}')
 
 if __name__ == '__main__':
     print('Тест')
     check = Mongo()
-    check.delete_book_images('1984_book')
