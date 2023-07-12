@@ -323,15 +323,13 @@ class Mongo:
             return frames
         else:
             self.frame.update_one({'frame_num':frame['frame_num'],'game_code':game_code}, {'$set':{'content':image_id, 'content_code':1}})
-            # for key, value in enumerate(frames):
-            #     text = value['text']['ru']
-            #     image_url = small_logic.generate_image(text)
-            #     self.frame.update_one({'frame_num':value['frame_num'],'game_code':game_code}, {'$set':{'content':get_image_id(image_url), 'content_code':1}})
-            #
-            #     if key == 0:
-            #         return
 
+    def change_1984(self):
+        frames = self.frame.find({'game_code':'1984_book','content_code':1})
+        for key,value in enumerate(frames):
+            self.frame.update_one({'game_code':'1984_book','content':value['content']},{'$set':{'content':None,'content_code':0}})
 
 if __name__ == '__main__':
     print('Тест')
     check = Mongo()
+    check.change_1984()
