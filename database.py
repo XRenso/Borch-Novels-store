@@ -66,7 +66,7 @@ class Mongo:
             return 0
     def accepted_paper(self,user_id):
         self.user.update_one({'user_id':user_id},{'$set':{'accept_paper':1}})
-    def add_frame(self,game_code:str, frame_num:int, is_demo:int, content_code:int, text:dict,variants:str, variants_frame:str, sound:str = None, content:str=None,  modificators:str=None, sticker:str=None, change_add_conditions:str=None,check_add_conditions:str=None, fail_condition_frame:int=None, achivement:str=None) -> 0:
+    def add_frame(self,game_code:str, frame_num:int, is_demo:int, content_code:int, text:dict,variants:dict, sound:str = None, content:str=None,  modificators:str=None, sticker:str=None, change_add_conditions:str=None,check_add_conditions:str=None, fail_condition_frame:int=None, achivement:str=None) -> 0:
         if self.frame.count_documents({'frame_num':frame_num, 'game_code':game_code}) == 0 and self.game.count_documents({'game_code':game_code}) == 1:
             frame = {
                 'game_code':game_code, #Уникальный код игры
@@ -75,8 +75,7 @@ class Mongo:
                 'is_demo':is_demo, # Является ли кадр демо или нет
                 'text' : text, # Основной текст кадра
                 'content' : content, # Медиа файл, согласно контент коду
-                'variants': variants, # Варианты событий, разделяются через \n
-                'variants_frame': variants_frame, # Кадры в которые ведут варианты, пишутся на том же месте, что и текст вариантов. Разделяются через \n
+                'variants': variants, # Варианты к кадрам. {Цифра кадра : текст на кнопке}
                 'sound': sound, #Звук, что будет отправлен вместе с сообщением
                 'sticker':sticker, # Отправит стикер вместе с вашим кадром
                 'modificators':modificators, # int - математематическое выражение с переменной, что уже записана, str - присвоить переменной определенное значение
