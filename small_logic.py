@@ -4,7 +4,7 @@ import docx
 import re
 import openai
 from dotenv import load_dotenv
-
+from asyncify import asyncify
 load_dotenv()
 
 openai.api_key = os.getenv('API_KEY')
@@ -55,7 +55,7 @@ def get_book_text(fname):
     return result
 
 def generate_image(prompt):
-    response = openai.Image.create(
+    response = await asyncify(openai.Image.create)(
         prompt=prompt,
         n=1,
         size='256x256'
