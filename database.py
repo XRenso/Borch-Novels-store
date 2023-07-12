@@ -315,20 +315,8 @@ class Mongo:
         return text
 
 
-    def rebasing(self):
-
-        for key,value in enumerate(self.frame.find()):
-            frames_num = value['variants_frame'].split('\n')
-            variants = value['variants'].split('\n')
-            new_cfg = {}
-            for index, val in enumerate(frames_num):
-                cfg = {val:variants[index]}
-                new_cfg.update(cfg)
-            print(new_cfg)
-            self.frame.update_one({'frame_num':value['frame_num'], 'game_code':value['game_code']}, {'$set':{'variants':new_cfg}, '$unset':{'variants_frame':""}})
 
 
 if __name__ == '__main__':
     print('Тест')
     check = Mongo()
-    check.rebasing()
