@@ -68,14 +68,14 @@ async def create_ai_images(message: types.Message):
         if user['is_admin']:
             game = db.return_game_info(arguments)
             if game:
-                frames = await db.AI_images('1984_book', 1)
+                frames = await db.AI_images(arguments, 1)
                 for key, value in enumerate(frames):
                         text = value['text']['ru']
                         image_url = await s_log.generate_image(text, game['game_name'])
                         if image_url:
                             id = await get_image_id(image_url)
                             id = id.photo[-1].file_id
-                            await db.AI_images('1984_book',0,id,value)
+                            await db.AI_images(arguments,0,id,value)
                             await asyncio.sleep(3)
                 await message.answer('Картинки успешно сгенерированы')
             else:
