@@ -1,3 +1,5 @@
+import asyncio
+
 import aiogram.utils.exceptions
 from aiogram.types import ReplyKeyboardRemove, \
     ReplyKeyboardMarkup, KeyboardButton, \
@@ -50,7 +52,7 @@ class Cache(StatesGroup):
 async def start(message: types.Message):
     user = db.return_user_info(message.from_user.id)
     if user != 0 and user['accept_paper'] == 1:
-    # db.add_user(message.from_user.id)
+
         await message.answer_photo(photo='AgACAgIAAxkBAAIZlGSSdZ8ekz_L3D1UdfCD_2cKPV97AAJNxzEbVxOYSDqKrtfuwW3mAQADAgADeQADLwQ',
                                    caption= f'Здравствуй, {message.from_user.first_name}! 🎁 \n'
                                 f'\nДобро пожаловать в магазин Borch Store.\n'
@@ -61,17 +63,25 @@ async def start(message: types.Message):
 @dp.message_handler(commands = ['create'])
 async def create_ai_images(message: types.Message):
     user = db.return_user_info(message.from_user.id)
-    if user['is_admin']:
-        frames = await db.AI_images('1984_book', 1)
-        for key, value in enumerate(frames):
-                text = value['text']['ru']
-                image_url = s_log.generate_image(text)
-                id = await get_image_id(image_url)
-                id = id.photo[-1].file_id
-                await db.AI_images('1984_book',0,id,value)
-                if key == 0:
-                    return
-                # self.frame.update_one({'frame_num':value['frame_num'],'game_code':game_code}, {'$set':{'content':get_image_id(image_url), 'content_code':1}})
+    arguments = message.get_args()
+    if arguments:
+        if user['is_admin']:
+            game = db.return_game_info(arguments)
+            if game:
+                frames = await db.AI_images('1984_book', 1)
+                for key, value in enumerate(frames):
+                        text = value['text']['ru']
+                        image_url = s_log.generate_image(text)
+                        id = await get_image_id(image_url)
+                        id = id.photo[-1].file_id
+                        await db.AI_images('1984_book',0,id,value)
+                        await asyncio.sleep(3)
+                await message.answer('Картинки успешно сгенерированы')
+            else:
+                await message.answer('Такого кода игры нет')
+    else:
+        if user['is_admin']:
+            await message.answer('Отправьте id продукта')
 @dp.callback_query_handler(kb.paper_cb.filter())
 async def agree_paper(call:types.CallbackQuery, callback_data:dict):
     await call.message.edit_text('Успешно принято соглашение ✅. \nПриятной эксплуатации магазина 🎊')
