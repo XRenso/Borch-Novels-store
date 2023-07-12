@@ -392,10 +392,9 @@ async def change_frames(call, frame_num, state:FSMContext):
                         content = None
 
                 markup = InlineKeyboardMarkup()
-                frame_num = list(frame['variants_frame'].split('\n'))
-                for i in frame['variants'].split('\n'):
-                    markup.add(InlineKeyboardButton(i, callback_data=kb.frame_change.new(frame_num[0])))
-                    frame_num.pop(0)
+                # frame_num = list(frame['variants_frame'].split('\n'))
+                for key, value in frame['variants'].items():
+                    markup.add(InlineKeyboardButton(value, callback_data=kb.frame_change.new(key)))
                 try:
                     if content is not None:
                         await call.message.edit_media(content, reply_markup=markup)
@@ -536,10 +535,9 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
                 content = None
 
         markup = InlineKeyboardMarkup()
-        frame_num = list(frame['variants_frame'].split('\n'))
-        for i in frame['variants'].split('\n'):
-            markup.add(InlineKeyboardButton(i, callback_data=kb.frame_change.new(frame_num[0])))
-            frame_num.pop(0)
+        # frame_num = list(frame['variants_frame'].split('\n'))
+        for key, value in frame['variants'].items():
+            markup.add(InlineKeyboardButton(value, callback_data=kb.frame_change.new(key)))
         try:
             await call.message.edit_media(content, reply_markup=markup)
         except:
