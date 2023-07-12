@@ -403,8 +403,7 @@ async def change_frames(call, frame_num, state:FSMContext):
                                                             parse_mode='HTML')
                 except:
                     try:
-                        if content is not None:
-                            await call.message.delete()
+                        await call.message.delete()
                     except:
                         pass
                     async with state.proxy():
