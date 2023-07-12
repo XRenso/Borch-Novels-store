@@ -71,11 +71,12 @@ async def create_ai_images(message: types.Message):
                 frames = await db.AI_images('1984_book', 1)
                 for key, value in enumerate(frames):
                         text = value['text']['ru']
-                        image_url = await s_log.generate_image(text)
-                        id = await get_image_id(image_url)
-                        id = id.photo[-1].file_id
-                        await db.AI_images('1984_book',0,id,value)
-                        await asyncio.sleep(3)
+                        image_url = await s_log.generate_image(text, game['game_name'])
+                        if image_url:
+                            id = await get_image_id(image_url)
+                            id = id.photo[-1].file_id
+                            await db.AI_images('1984_book',0,id,value)
+                            await asyncio.sleep(3)
                 await message.answer('Картинки успешно сгенерированы')
             else:
                 await message.answer('Такого кода игры нет')

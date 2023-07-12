@@ -54,13 +54,16 @@ def get_book_text(fname):
     result.extend(sentences)
     return result
 
-async def generate_image(prompt):
-    response = await asyncify(openai.Image.create)(
-        prompt=prompt,
-        n=1,
-        size='256x256'
-    )
-    image_url = response['data'][0]['url']
-    return image_url
-
+async def generate_image(prompt, game_name):
+    text =f'Картинка на основе произведения {game_name}\nОписание картинки: {prompt}'
+    try:
+        response = await asyncify(openai.Image.create)(
+            prompt=text,
+            n=1,
+            size='256x256'
+        )
+        image_url = response['data'][0]['url']
+        return image_url
+    except openai.error.InvalidRequestError:
+        return 0
 
