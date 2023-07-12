@@ -54,7 +54,7 @@ def get_book_text(fname):
     result.extend(sentences)
     return result
 
-def generate_image(prompt):
+async def generate_image(prompt):
     response = await asyncify(openai.Image.create)(
         prompt=prompt,
         n=1,
