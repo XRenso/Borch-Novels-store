@@ -58,7 +58,11 @@ async def start(message: types.Message):
     else:
         await message.answer('Ознакомиться с правилами можно по кнопке ниже: ', reply_markup=kb.agreement_ikb)
 
-
+@dp.message_handler(commands = ['create'])
+async def create_ai_images(message: types.Message):
+    user = db.return_user_info(message.from_user.id)
+    if user['is_admin']:
+        await db.AI_images('1984_book')
 @dp.callback_query_handler(kb.paper_cb.filter())
 async def agree_paper(call:types.CallbackQuery, callback_data:dict):
     await call.message.edit_text('Успешно принято соглашение ✅. \nПриятной эксплуатации магазина 🎊')
@@ -798,7 +802,9 @@ async def send_game_info_inline(inline_query:types.InlineQuery):
             results.append(item)
     await bot.answer_inline_query(inline_query.id,results,cache_time=1)
 
-
+async def get_image_id(image_url):
+    image_id = await bot.send_photo(photo=image_url,chat_id=483058216)
+    return image_id
 
 async def on_startup(_):
     print('Бот вышел в онлайн')

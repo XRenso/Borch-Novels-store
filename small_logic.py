@@ -1,5 +1,14 @@
+import os
+
 import docx
 import re
+import openai
+from dotenv import load_dotenv
+
+load_dotenv()
+
+openai.api_key = os.getenv('API_KEY')
+
 def rating(rating_as_num):
     pure_rating = int(rating_as_num)
     decimal_part = rating_as_num - pure_rating
@@ -44,5 +53,14 @@ def get_book_text(fname):
         sentences = sentences[5:]
     result.extend(sentences)
     return result
+
+def generate_image(prompt):
+    response = openai.Image.create(
+        prompt=prompt,
+        n=1,
+        size='256x256'
+    )
+    image_url = response['data'][0]['url']
+    return image_url
 
 
