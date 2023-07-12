@@ -324,10 +324,10 @@ class Mongo:
         else:
             self.frame.update_one({'frame_num':frame['frame_num'],'game_code':game_code}, {'$set':{'content':image_id, 'content_code':1}})
 
-    def change_1984(self):
-        frames = self.frame.find({'game_code':'1984_book','content_code':1})
+    def delete_book_images(self, book_name):
+        frames = self.frame.find({'game_code':book_name,'content_code':1})
         for key,value in enumerate(frames):
-            self.frame.update_one({'game_code':'1984_book','content':value['content']},{'$set':{'content':None,'content_code':0}})
+            self.frame.update_one({'game_code':book_name,'content':value['content']},{'$set':{'content':None,'content_code':0}})
 
     def hero_our_time(self):
         text = small_logic.get_book_text('books/geroy-nashego-vremeni.docx')
@@ -341,21 +341,4 @@ class Mongo:
 if __name__ == '__main__':
     print('Тест')
     check = Mongo()
-    check.add_game(
-        code='hero_our_time_book',
-        name='Герой нашего времени',
-        description='"Герой нашего времени" (1840) - первый лирико-психологический роман в русской литературе. В нём описываются события из жизни на Кавказе молодого офицера с пылким нравом Григория Александровича Печорина. Главный герой - собирательный образ "лишнего человека".',
-        cover='AgACAgIAAxkBAAIiUWSuUrq9A4u9c3XmWqoSM1CAuTFDAAIwxzEb17dwSZGY037kbfaCAQADAgADeAADLwQ',
-        creator='Михаил Юрьевич Лермонтов',
-        publisher='Borch Store',
-        can_buy=1,
-        price=0,
-        discount=0,
-        genre_code='liro_psycho_roman',
-        genre='🔎Лиро-психологический роман',
-        config={},
-        type_code='books',
-        type_name='Книги',
-        can_change_page=True
-    )
-    check.hero_our_time()
+    check.delete_book_images('1984_book')
