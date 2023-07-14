@@ -34,6 +34,8 @@ profile_achivement_code = CallbackData('achivements','achivement_code')
 profile_action = CallbackData('profile', 'action')
 
 
+change_page_manual = CallbackData('changing_page','info')
+
 paper_cb = CallbackData('paper', 'agree')
 
 

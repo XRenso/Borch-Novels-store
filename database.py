@@ -132,11 +132,7 @@ class Mongo:
         self.user.update_one({'user_id': user_id, f'games_config.{game_code}': {'$exists': True}},
                              {'$set': {f'games_config.$.{game_code}.is_demo': now_cfg['is_demo'], f'games_config.$.{game_code}.rate':now_cfg['rate']}})
     def rebase(self):
-        # self.game.update_many({'rating':{'$exists':False}}, {'$set':{'rating':0,'num_of_rates':0}})
-        # self.game.update_many({'game_config.rate':{'$exists':False}},
-        #                       {'$set':{'game_config.rate':0}})
-        # self.user.update_one({'user_id':483058216, 'games_config.guide_store':{'$exists':True}} , {'$set':{f'games_config.$.guide_store.rate':5}})
-        self.game.update_many({'type_code':{'$exists':False}, 'type_name':{'$exists':False}}, {'$set':{'type_code':'visual_novels', 'type_name':'Визуальные новеллы'}})
+        self.game.update_many({'can_change_page':{'$exists':False}}, {'$set':{'can_change_page':False}})
 
     def give_game_to_user(self, game_code:str, user_id:int, is_demo:int):
         if self.user.count_documents({'user_id':user_id}) == 1:
@@ -342,3 +338,4 @@ class Mongo:
 if __name__ == '__main__':
     print('Тест')
     check = Mongo()
+    check.rebase()
