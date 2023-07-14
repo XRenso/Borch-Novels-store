@@ -556,10 +556,10 @@ async def change_frame_cb(call:types.CallbackQuery, callback_data: dict, state:F
 async def go_to_page(call:types.CallbackQuery, callback_data: dict, state:FSMContext):
     game_code = callback_data['info']
     try:
-        await call.message.edit_text(f'Напишите какую страницу вы желаете открыть?\nВ диапозоне от 1 до {db.return_number_of_frames(game_code)}')
+        await call.message.edit_text(f'Напишите какую страницу вы желаете открыть?\nВ диапозоне от 1 до {db.return_number_of_frames(game_code)}\n\nОтправьте 0 для отмены')
     except:
         await call.message.delete()
-        await call.message.answer(f'Напишите какую страницу вы желаете открыть?\nВ диапозоне от 1 до {db.return_number_of_frames(game_code)}')
+        await call.message.answer(f'Напишите какую страницу вы желаете открыть?\nВ диапозоне от 1 до {db.return_number_of_frames(game_code)}\n\nОтправьте 0 для отмены')
 
     await Store.goto_page.set()
 @dp.callback_query_handler(kb.get_demo.filter())
