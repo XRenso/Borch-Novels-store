@@ -41,6 +41,7 @@ async def clear_month_sales():
 
 class Store(StatesGroup):
     search_game = State()
+    goto_page = State()
 
 class Cache(StatesGroup):
     sound = State()
@@ -223,8 +224,32 @@ async def get_text(message: types.Message):
     else:
         await message.answer('Ознакомиться с правилами можно по кнопке ниже: ', reply_markup=kb.agreement_ikb)
 
+@dp.message_handler(state=Store.goto_page)
+async def going_to_page(message: types.Message, state: FSMContext):
+    page = message.text
+    try:
+        page = int(page)
+    except ValueError:
+        try:
+            await message.edit_text('Введите только число ❌')
+        except:
+            await message.delete()
+            await message.answer('Введите только число ❌')
+    user = db.return_user_info(message.from_user.id)
+    game_code = user['curr_game_code']
+    num_of_pages = db.return_number_of_frames(game_code)
+    if page in range(num_of_pages):
+        db.update_user_frame_num(user['user_id'],page, game_code)
+        markup = InlineKeyboardMarkup().add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.play_game.new(f'{game_code}')))
+        await message.edit_text('Страница успешно сменена', reply_markup=markup)
+    else:
+        try:
+            await message.edit_text('Неверный диапозон страницы ❌')
+        except:
+            await message.delete()
+            await message.answer('Неверный диапозон страницы ❌')
 
-
+    pass
 @dp.message_handler(state=Store.search_game)
 async def search_game_by_name(message: types.Message, state: FSMContext):
     search = message.text
@@ -425,7 +450,7 @@ async def change_frames(call, frame_num, state:FSMContext):
                 for key, value in frame['variants'].items():
                     markup.add(InlineKeyboardButton(value, callback_data=kb.frame_change.new(key)))
                 if game['can_change_page']:
-                    markup.add(InlineKeyboardButton(phr.change_page, callback_data=kb.change_page_manual.new('go')))
+                    markup.add(InlineKeyboardButton(phr.change_page, callback_data=kb.change_page_manual.new(f'{game["game_code"]}')))
                 try:
                     if content is not None:
                         await call.message.edit_media(content, reply_markup=markup)
@@ -531,7 +556,16 @@ async def change_frames(call, frame_num, state:FSMContext):
 async def change_frame_cb(call:types.CallbackQuery, callback_data: dict, state:FSMContext):
     await change_frames(call, int(callback_data['frame_num']), state)
 
+@dp.callback_query_handler(kb.change_page_manual.filter())
+async def go_to_page(call:types.CallbackQuery, callback_data: dict, state:FSMContext):
+    game_code = callback_data['info']
+    try:
+        await call.message.edit_text(f'Напишите какую страницу вы желаете открыть?\nВ диапозоне от 1 до {db.return_number_of_frames(game_code)}')
+    except:
+        await call.message.delete()
+        await call.message.answer(f'Напишите какую страницу вы желаете открыть?\nВ диапозоне от 1 до {db.return_number_of_frames(game_code)}')
 
+    await Store.goto_page.set()
 @dp.callback_query_handler(kb.get_demo.filter())
 async def get_demo_to_user(call:types.CallbackQuery, callback_data: dict, state:FSMContext):
     db.give_game_to_user(user_id=call.message.chat.id, game_code=callback_data['game_code'], is_demo=1)
@@ -576,7 +610,7 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
         for key, value in frame['variants'].items():
             markup.add(InlineKeyboardButton(value, callback_data=kb.frame_change.new(key)))
         if game['can_change_page']:
-            markup.add(InlineKeyboardButton(phr.change_page, callback_data=kb.change_page_manual.new('go')))
+            markup.add(InlineKeyboardButton(phr.change_page, callback_data=kb.change_page_manual.new(f'{game["game_code"]}')))
         try:
             await call.message.edit_media(content, reply_markup=markup)
         except:
