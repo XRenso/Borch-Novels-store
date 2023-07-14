@@ -230,26 +230,17 @@ async def going_to_page(message: types.Message, state: FSMContext):
     try:
         page = int(page)
     except ValueError:
-        try:
-            await message.edit_text('Введите только число ❌')
-        except:
-            await message.delete()
-            await message.answer('Введите только число ❌')
+        await message.answer('Введите только число ❌')
     user = db.return_user_info(message.from_user.id)
     game_code = user['curr_game_code']
     num_of_pages = db.return_number_of_frames(game_code)
     if page in range(num_of_pages):
         db.update_user_frame_num(user['user_id'],page, game_code)
         markup = InlineKeyboardMarkup().add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.play_game.new(f'{game_code}')))
-        await message.edit_text('Страница успешно сменена', reply_markup=markup)
-    else:
-        try:
-            await message.edit_text('Неверный диапозон страницы ❌')
-        except:
-            await message.delete()
-            await message.answer('Неверный диапозон страницы ❌')
+        await message.answer('Страница успешно сменена', reply_markup=markup)
 
-    pass
+    else:
+        await message.answer('Неверный диапозон страницы ❌')
 @dp.message_handler(state=Store.search_game)
 async def search_game_by_name(message: types.Message, state: FSMContext):
     search = message.text
