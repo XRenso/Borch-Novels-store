@@ -400,18 +400,23 @@ async def change_frames(call, frame_num, state:FSMContext):
         if frame != 0 and can_next:
             if game_cfg['is_demo'] <= frame['is_demo']:
                 db.update_user_frame_num(user['user_id'], frame_num, game['game_code'])
+                frame_text = frame['text']['ru']
+                if game['can_change_page']:
+                    frame_text = f"{frame_text}\n\n" \
+                                 f"Страница {frame['frame_num']} из {db.return_number_of_frames(game_code=game['game_code'])}"
+
                 match frame['content_code']:
                     case 1:
-                        content = InputMediaPhoto(media=frame['content'], caption=frame['text']['ru'],
+                        content = InputMediaPhoto(media=frame['content'], caption=frame_text,
                                                   parse_mode='HTML')
                     case 2:
-                        content = InputMediaVideo(media=frame['content'], caption=frame['text']['ru'],
+                        content = InputMediaVideo(media=frame['content'], caption=frame_text,
                                                   parse_mode='HTML')
                     case 3:
-                        content = InputMediaAudio(media=frame['content'], caption=frame['text']['ru'],
+                        content = InputMediaAudio(media=frame['content'], caption=frame_text,
                                                   parse_mode='HTML')
                     case 4:
-                        content = InputMediaAnimation(media=frame['content'], caption=frame['text']['ru'])
+                        content = InputMediaAnimation(media=frame['content'], caption=frame_text, parse_mode='HTML')
                     case _:
                         content = None
 
@@ -423,7 +428,7 @@ async def change_frames(call, frame_num, state:FSMContext):
                     if content is not None:
                         await call.message.edit_media(content, reply_markup=markup)
                     else:
-                        await call.message.edit_text(frame['text']['ru'], reply_markup=markup,
+                        await call.message.edit_text(frame_text, reply_markup=markup,
                                                             parse_mode='HTML')
                 except:
                     try:
@@ -431,21 +436,25 @@ async def change_frames(call, frame_num, state:FSMContext):
                     except:
                         pass
                     async with state.proxy():
+                        frame_text = frame['text']['ru']
+                        if game['can_change_page']:
+                            frame_text = f"{frame_text}\n\n" \
+                                         f"Страница {frame['frame_num']} из {db.return_number_of_frames(game_code=game['game_code'])}"
                         match frame['content_code']:
                             case 1:
-                                message = await call.message.answer_photo(frame['content'], caption=frame['text']['ru'],
+                                message = await call.message.answer_photo(frame['content'], caption=frame_text,
                                                                           reply_markup=markup, parse_mode='HTML')
                             case 2:
-                                message = await call.message.answer_video(frame['content'], caption=frame['text']['ru'],
+                                message = await call.message.answer_video(frame['content'], caption=frame_text,
                                                                           reply_markup=markup, parse_mode='HTML')
                             case 3:
-                                message = await call.message.answer_audio(frame['content'], caption=frame['text']['ru'],
+                                message = await call.message.answer_audio(frame['content'], caption=frame_text,
                                                                           reply_markup=markup, parse_mode='HTML')
                             case 4:
-                                message = await call.message.answer_animation(frame['content'], caption=frame['text']['ru'],
+                                message = await call.message.answer_animation(frame['content'], caption=frame_text,
                                                                               reply_markup=markup, parse_mode='HTML')
                             case _:
-                                message = await call.message.answer(frame['text']['ru'], reply_markup=markup,
+                                message = await call.message.answer(frame_text, reply_markup=markup,
                                                                     parse_mode='HTML')
 
                         await state.update_data(game_text=message)
@@ -544,16 +553,19 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
             except aiogram.utils.exceptions.MessageToDeleteNotFound:
                 pass
         db.update_now_user_game(call.message.chat.id,game['game_code'])
-
+        frame_text = frame['text']['ru']
+        if game['can_change_page']:
+            frame_text = f"{frame_text}\n\n" \
+                         f"Страница {frame['frame_num']} из {db.return_number_of_frames(game_code=game['game_code'])}"
         match frame['content_code']:
             case 1:
-                content = InputMediaPhoto(media=frame['content'], caption=frame['text']['ru'])
+                content = InputMediaPhoto(media=frame['content'], caption=frame_text,parse_mode='HTML')
             case 2:
-                content = InputMediaVideo(media=frame['content'], caption=frame['text']['ru'])
+                content = InputMediaVideo(media=frame['content'], caption=frame_text,parse_mode='HTML')
             case 3:
-                content = InputMediaAudio(media=frame['content'], caption=frame['text']['ru'])
+                content = InputMediaAudio(media=frame['content'], caption=frame_text,parse_mode='HTML')
             case 4:
-                content = InputMediaAnimation(media=frame['content'], caption=frame['text']['ru'])
+                content = InputMediaAnimation(media=frame['content'], caption=frame_text,parse_mode='HTML')
             case _:
                 content = None
 
@@ -569,18 +581,22 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
             except:
                 pass
             async with state.proxy():
+                frame_text = frame['text']['ru']
+                if game['can_change_page']:
+                    frame_text = f"{frame_text}\n\n" \
+                                 f"Страница {frame['frame_num']} из {db.return_number_of_frames(game_code=game['game_code'])}"
                 match frame['content_code']:
                     case 1:
-                        message = await call.message.answer_photo(frame['content'], caption=frame['text']['ru'], reply_markup=markup, parse_mode='HTML')
+                        message = await call.message.answer_photo(frame['content'], caption=frame_text, reply_markup=markup, parse_mode='HTML')
                     case 2:
-                        message = await call.message.answer_video(frame['content'], caption=frame['text']['ru'],reply_markup=markup, parse_mode='HTML')
+                        message = await call.message.answer_video(frame['content'], caption=frame_text,reply_markup=markup, parse_mode='HTML')
                     case 3:
-                        message = await call.message.answer_audio(frame['content'], caption=frame['text']['ru'],reply_markup=markup, parse_mode='HTML')
+                        message = await call.message.answer_audio(frame['content'], caption=frame_text,reply_markup=markup, parse_mode='HTML')
                     case 4:
-                        message = await call.message.answer_animation(frame['content'], caption=frame['text']['ru'],
+                        message = await call.message.answer_animation(frame['content'], caption=frame_text,
                                                                       reply_markup=markup, parse_mode='HTML')
                     case _:
-                        message = await call.message.answer(frame['text']['ru'],reply_markup=markup, parse_mode='HTML')
+                        message = await call.message.answer(frame_text,reply_markup=markup, parse_mode='HTML')
                 await state.update_data(game_text=message)
         if frame['sound']:
             if data.get('sound') == None:

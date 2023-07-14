@@ -299,7 +299,8 @@ class Mongo:
         return types
     def return_type_name_by_code(self,type_code):
         return self.game.find_one({'type_code':type_code})['type_name']
-
+    def return_number_of_frames(self,game_code):
+        return self.frame.count_documents({'game_code':game_code})
     def bot_statistic(self):
         users_of_bot = self.user.count_documents({'user_id':{'$exists':True}})
         number_of_games = self.game.count_documents({'game_code':{'$exists':True}})
