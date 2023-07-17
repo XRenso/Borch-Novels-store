@@ -181,7 +181,8 @@ async def get_text(message: types.Message):
                     if len(achivments) < 1:
                         achivments = 'У вас нет достижений ❌'
                         markup = kb.profile_kb_not_have_achivements
-                    await message.answer(f'Ваш id - {user_info["user_id"]}'
+                    await message.answer_photo(photo='AgACAgIAAxkBAAIlRGS0kvTRaTvuTMIEHLw6pM_Se0S3AAL7zjEbWFuhSQhs6LkM8O3DAQADAgADeQADLwQ',
+                                               caption=f'Ваш id - {user_info["user_id"]}'
                                          f'\nКоличество игр в библиотеке 📂- {len(db.return_user_library_games(message.from_user.id))}'
                                          f'\nВы проходите 🎮 - {curr_game}'
                                          f'\nКоличество ваших достижений 🌟 - '
@@ -352,11 +353,12 @@ async def profile_menu(call:types.CallbackQuery, callback_data: dict):
                 achivments = 'У вас нет достижений ❌'
                 markup = kb.profile_kb_not_have_achivements
 
-            await call.message.edit_text(f'Ваш id - {user_info["user_id"]}'
-                                 f'\nКоличество игр в библиотеке 📂 - {len(db.return_user_library_games(call.message.chat.id))}'
-                                 f'\nВы проходите 🎮 - {curr_game}'
-                                 f'\nКоличество ваших достижений 🌟 - '
-                                 f'{len(achivments)}', reply_markup=markup)
+            await call.message.edit_media(media=InputMediaPhoto(media='AgACAgIAAxkBAAIlRGS0kvTRaTvuTMIEHLw6pM_Se0S3AAL7zjEbWFuhSQhs6LkM8O3DAQADAgADeQADLwQ',caption=f'Ваш id - {user_info["user_id"]}'
+                                         f'\nКоличество игр в библиотеке 📂- {len(db.return_user_library_games(call.message.chat.id))}'
+                                         f'\nВы проходите 🎮 - {curr_game}'
+                                         f'\nКоличество ваших достижений 🌟 - '
+                                         f'{len(achivments)}'),
+                                                reply_markup=markup)
 
 
         case 'back_to_games':
@@ -416,7 +418,7 @@ async def change_frames(call, frame_num, state:FSMContext):
             await call.message.edit_text('Сессия устарела\nЗапустите игру заново 🔁')
         except:
             await call.message.delete()
-            await call.message.answer('Сессия устарела \nЗапустите игру заново 🔁.')
+            await call.message.answer('Сессия устарела \nЗапустите игру заново 🔁')
     else:
         if frame != 0 and can_next:
             if game_cfg['is_demo'] <= frame['is_demo']:
@@ -582,8 +584,11 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
         if data.get('game_text'):
             try:
                 await call.bot.delete_message(chat_id=call.message.chat.id,message_id=data.get('game_text').message_id)
-            except aiogram.utils.exceptions.MessageToDeleteNotFound:
-                pass
+            except:
+                try:
+                    await call.bot.edit_message_text(chat_id=call.message.chat.id,message_id=data.get('game_text').message_id, text='Сессия устарела \nЗапустите игру заново 🔁')
+                except:
+                    await call.bot.edit_message_caption(chat_id=call.message.chat.id,message_id=data.get('game_text').message_id, caption='Сессия устарела \nЗапустите игру заново 🔁', reply_markup=None)
         db.update_now_user_game(call.message.chat.id,game['game_code'])
         frame_text = frame['text']['ru']
         if game['can_change_page']:
