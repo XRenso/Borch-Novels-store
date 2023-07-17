@@ -202,7 +202,7 @@ async def get_text(message: types.Message):
                 if not len(markup['inline_keyboard']):
                     await message.answer(f'Отсутствует товар в магазине ❌')
                 else:
-                    await message.answer(f'Выберите интересующую вас категорию 👇', reply_markup=markup)
+                    await message.answer_photo(photo='AgACAgIAAxkBAAIlRmS0kvRiHbkGzpyvclOYwC94Wfb8AAL9zjEbWFuhSWJYQDJSBo2bAQADAgADeQADLwQ',caption=f'Выберите интересующую вас категорию 👇', reply_markup=markup)
 
 
             case phr.shop:
@@ -375,7 +375,8 @@ async def get_games_by_genre(call:types.CallbackQuery, callback_data: dict):
     type_code = info[0]
     genre_code = info[1]
     markup = kb.return_library(db.return_game_by_genre(genre_code, type_code)).add(InlineKeyboardButton('Назад ↩️', callback_data=kb.store_action.new(f'{type_code}@go_to_genres')))
-    await call.message.edit_text(f'Товары жанра {db.return_genre_name_by_code(genre_code, type_code)}:',reply_markup=markup)
+    content = InputMediaPhoto(media='AgACAgIAAxkBAAIlRmS0kvRiHbkGzpyvclOYwC94Wfb8AAL9zjEbWFuhSWJYQDJSBo2bAQADAgADeQADLwQ', caption=f'Товары жанра {db.return_genre_name_by_code(genre_code, type_code)}:')
+    await call.message.edit_media(content,reply_markup=markup)
 
 @dp.callback_query_handler(kb.show_genres_by_type.filter())
 async def get_genres_by_type(call:types.CallbackQuery, callback_data: dict):
@@ -385,9 +386,9 @@ async def get_genres_by_type(call:types.CallbackQuery, callback_data: dict):
     back_to_types = InlineKeyboardButton(phr.back_to_game, callback_data=kb.store_action.new(f'{type_code}@go_to_types'))
     markup.add(back_to_types)
     if not len(markup['inline_keyboard']):
-        await call.message.edit_text(f'Игры отсутствуют в магазине ❌')
+        await call.message.edit_caption(f'Игры отсутствуют в магазине ❌')
     else:
-        await call.message.edit_text(f'Выберите интересующий вас жанр 👇', reply_markup=markup)
+        await call.message.edit_caption(f'Выберите интересующий вас жанр 👇', reply_markup=markup)
 
 
 async def change_frames(call, frame_num, state:FSMContext):
@@ -680,7 +681,8 @@ async def store_handler(call:types.CallbackQuery, callback_data: dict):
             if not len(markup['inline_keyboard']):
                 await call.message.edit_text(f'Отсутствует товар в магазине ❌')
             else:
-                await call.message.edit_text(f'Выберите интересующую вас категорию 👇', reply_markup=markup)
+                content = InputMediaPhoto(media='AgACAgIAAxkBAAIlRmS0kvRiHbkGzpyvclOYwC94Wfb8AAL9zjEbWFuhSWJYQDJSBo2bAQADAgADeQADLwQ', caption=f'Выберите интересующую вас категорию 👇')
+                await call.message.edit_media(content, reply_markup=markup)
 
 
 
