@@ -338,7 +338,7 @@ async def profile_menu(call:types.CallbackQuery, callback_data: dict):
     match callback_data['action']:
         case 'show_achivements':
             markup = kb.return_games_btn_achivement(db.return_user_games_with_achivement(call.message.chat.id)).add(kb.back_to_profile)
-            await call.message.edit_text('Выберите игру, в которой хотите увидеть ваши достижения 👇', reply_markup=markup)
+            await call.message.edit_caption('Выберите игру, в которой хотите увидеть ваши достижения 👇', reply_markup=markup)
         case 'back_to_profile':
             user_info = db.return_user_info(call.message.chat.id)
             curr_game = db.return_game_info(user_info['curr_game_code'])
