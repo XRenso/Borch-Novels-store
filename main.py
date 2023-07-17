@@ -321,14 +321,15 @@ async def achivement_info(call:types.CallbackQuery, callback_data: dict):
     achivement_code = info[1]
     achivement  = db.return_achivement(game_code,achivement_code)
     markup = InlineKeyboardMarkup().add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.profile_achivement_games.new(achivement['game_code'])))
-    await call.message.delete()
-    await call.message.answer_photo(photo=achivement['cover'], caption=f'Достижение ✅ - {achivement["name"]}\nОписание:\n{achivement["description"]}', reply_markup=markup)
+    content = InputMediaPhoto(media=achivement['cover'], caption=f'Достижение ✅ - {achivement["name"]}\nОписание:\n{achivement["description"]}')
+    await call.message.edit_media(content, reply_markup=markup)
 
 @dp.callback_query_handler(kb.profile_achivement_games.filter())
 async def achivments_games(call:types.CallbackQuery, callback_data: dict):
     markup = kb.return_achivements(db.return_user_achivement_by_game_code(call.message.chat.id,callback_data['game_code']), game_code=callback_data['game_code']).add(kb.back_to_games)
     try:
-        await call.message.edit_caption('Выберите интересующее вас достижение 🤔', reply_markup=markup)
+        content = InputMediaPhoto(media='AgACAgIAAxkBAAIlRGS0kvTRaTvuTMIEHLw6pM_Se0S3AAL7zjEbWFuhSQhs6LkM8O3DAQADAgADeQADLwQ', caption='Выберите интересующее вас достижение 🤔')
+        await call.message.edit_media(content, reply_markup=markup)
     except:
         await call.message.delete()
         await call.message.answer_photo(photo='AgACAgIAAxkBAAIlRGS0kvTRaTvuTMIEHLw6pM_Se0S3AAL7zjEbWFuhSQhs6LkM8O3DAQADAgADeQADLwQ',caption='Выберите интересующее вас достижение 🤔', reply_markup=markup)
