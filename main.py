@@ -328,10 +328,10 @@ async def achivement_info(call:types.CallbackQuery, callback_data: dict):
 async def achivments_games(call:types.CallbackQuery, callback_data: dict):
     markup = kb.return_achivements(db.return_user_achivement_by_game_code(call.message.chat.id,callback_data['game_code']), game_code=callback_data['game_code']).add(kb.back_to_games)
     try:
-        await call.message.edit_text('Выберите интересующее вас достижение 🤔', reply_markup=markup)
+        await call.message.edit_caption('Выберите интересующее вас достижение 🤔', reply_markup=markup)
     except:
         await call.message.delete()
-        await call.message.answer('Выберите интересующее вас достижение 🤔', reply_markup=markup)
+        await call.message.answer_photo(photo='AgACAgIAAxkBAAIlRGS0kvTRaTvuTMIEHLw6pM_Se0S3AAL7zjEbWFuhSQhs6LkM8O3DAQADAgADeQADLwQ',caption='Выберите интересующее вас достижение 🤔', reply_markup=markup)
 
 @dp.callback_query_handler(kb.profile_action.filter())
 async def profile_menu(call:types.CallbackQuery, callback_data: dict):
