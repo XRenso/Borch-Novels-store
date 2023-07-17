@@ -328,18 +328,19 @@ async def achivement_info(call:types.CallbackQuery, callback_data: dict):
 async def achivments_games(call:types.CallbackQuery, callback_data: dict):
     markup = kb.return_achivements(db.return_user_achivement_by_game_code(call.message.chat.id,callback_data['game_code']), game_code=callback_data['game_code']).add(kb.back_to_games)
     try:
-        content = InputMediaPhoto(media='AgACAgIAAxkBAAIlRGS0kvTRaTvuTMIEHLw6pM_Se0S3AAL7zjEbWFuhSQhs6LkM8O3DAQADAgADeQADLwQ', caption='Выберите интересующее вас достижение 🤔')
+        content = InputMediaPhoto(media='AgACAgIAAxkBAAIlSWS0kvTmnIDiPDrB9RKkNIAyyqgnAAPPMRtYW6FJ1ybBvzYseRYBAAMCAAN5AAMvBA', caption='Выберите интересующее вас достижение 🤔')
         await call.message.edit_media(content, reply_markup=markup)
     except:
         await call.message.delete()
-        await call.message.answer_photo(photo='AgACAgIAAxkBAAIlRGS0kvTRaTvuTMIEHLw6pM_Se0S3AAL7zjEbWFuhSQhs6LkM8O3DAQADAgADeQADLwQ',caption='Выберите интересующее вас достижение 🤔', reply_markup=markup)
+        await call.message.answer_photo(photo='AgACAgIAAxkBAAIlSWS0kvTmnIDiPDrB9RKkNIAyyqgnAAPPMRtYW6FJ1ybBvzYseRYBAAMCAAN5AAMvBA',caption='Выберите интересующее вас достижение 🤔', reply_markup=markup)
 
 @dp.callback_query_handler(kb.profile_action.filter())
 async def profile_menu(call:types.CallbackQuery, callback_data: dict):
     match callback_data['action']:
         case 'show_achivements':
             markup = kb.return_games_btn_achivement(db.return_user_games_with_achivement(call.message.chat.id)).add(kb.back_to_profile)
-            await call.message.edit_caption('Выберите игру, в которой хотите увидеть ваши достижения 👇', reply_markup=markup)
+            content = InputMediaPhoto(media='AgACAgIAAxkBAAIlSWS0kvTmnIDiPDrB9RKkNIAyyqgnAAPPMRtYW6FJ1ybBvzYseRYBAAMCAAN5AAMvBA', caption='Выберите игру, в которой хотите увидеть ваши достижения 👇')
+            await call.message.edit_media(content, reply_markup=markup)
         case 'back_to_profile':
             user_info = db.return_user_info(call.message.chat.id)
             curr_game = db.return_game_info(user_info['curr_game_code'])
