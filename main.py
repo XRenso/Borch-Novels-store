@@ -164,9 +164,9 @@ async def get_text(message: types.Message):
             case phr.library:
                 markup = kb.return_library(db.return_user_library_games(message.from_user.id))
                 if not len(markup['inline_keyboard']):
-                    await message.answer('У вас нет игр ❌')
+                    await message.answer_photo(photo='AgACAgIAAxkBAAIlR2S0kvSkXcu0nOfH25I8w2y4MjuFAAL-zjEbWFuhSfUOS9uSCdUTAQADAgADeQADLwQ',caption='У вас нет игр ❌')
                 else:
-                    await message.answer('Ваша библиотека 📂', reply_markup=markup)
+                    await message.answer_photo(photo='AgACAgIAAxkBAAIlR2S0kvSkXcu0nOfH25I8w2y4MjuFAAL-zjEbWFuhSfUOS9uSCdUTAQADAgADeQADLwQ',caption='Ваша библиотека 📂', reply_markup=markup)
             case phr.profile:
                 user_info = db.return_user_info(message.from_user.id)
                 if user_info != 0:
