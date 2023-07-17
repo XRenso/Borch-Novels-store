@@ -674,7 +674,8 @@ async def store_handler(call:types.CallbackQuery, callback_data: dict):
                                                  callback_data=kb.store_action.new(f'{type_code}@go_to_types'))
             markup = kb.store_kb_genres(genres, type_code)
             markup.add(back_to_types)
-            await call.message.edit_text(f'Выберите интересующую вас жанр 👇', reply_markup=markup)
+            content = InputMediaPhoto(media='AgACAgIAAxkBAAIlRmS0kvRiHbkGzpyvclOYwC94Wfb8AAL9zjEbWFuhSWJYQDJSBo2bAQADAgADeQADLwQ', caption=f'Выберите интересующую вас жанр 👇')
+            await call.message.edit_media(content, reply_markup=markup)
         case 'go_to_types':
             types = db.return_type()
             markup = kb.store_kb_types(types)
