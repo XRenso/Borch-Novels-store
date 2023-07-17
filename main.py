@@ -363,9 +363,9 @@ async def profile_menu(call:types.CallbackQuery, callback_data: dict):
 
         case 'back_to_games':
             markup = kb.return_games_btn_achivement(db.return_user_games_with_achivement(call.message.chat.id)).add(kb.back_to_profile)
-            await call.message.edit_text('Выберите игру, в которой хотите увидеть ваши достижения 👇', reply_markup=markup)
+            await call.message.edit_caption('Выберите игру, в которой хотите увидеть ваши достижения 👇', reply_markup=markup)
         case 'no_achivements':
-            await call.message.edit_text('К сожалению у вас нет достижений ❌.\nИграйте в игры, чтобы их получить 🎮')
+            await call.message.edit_caption('К сожалению у вас нет достижений ❌.\nИграйте в игры, чтобы их получить 🎮')
 
 @dp.callback_query_handler(kb.show_more_game_genre.filter())
 async def get_games_by_genre(call:types.CallbackQuery, callback_data: dict):
