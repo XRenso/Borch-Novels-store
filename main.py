@@ -221,7 +221,7 @@ async def get_text(message: types.Message):
                 markup.row(designer,programmist)
                 markup.add(tg_chanel)
 
-                await message.answer(phr.info, reply_markup=markup)
+                await message.answer_photo(photo='AgACAgIAAxkBAAIlRWS0kvQ3UB9D23YElI6zwb_iEr40AAL8zjEbWFuhSaYY_HtSoELTAQADAgADeQADLwQ',caption=phr.info, reply_markup=markup)
     else:
         await message.answer('Ознакомиться с правилами можно по кнопке ниже: ', reply_markup=kb.agreement_ikb)
 
