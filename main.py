@@ -206,7 +206,7 @@ async def get_text(message: types.Message):
 
 
             case phr.shop:
-                await message.answer('Выберите интересующую вас функцию 👇 ', reply_markup=kb.shop_kb)
+                await message.answer_photo(photo='AgACAgIAAxkBAAIlSGS0kvRFxrhXUkBn47w7TfhKssj7AAL_zjEbWFuhSVPyV3miV65oAQADAgADeQADLwQ',caption='Выберите интересующую вас функцию 👇 ', reply_markup=kb.shop_kb)
             case phr.main_menu:
                 await message.answer('Добро пожаловать на главное меню ✨', reply_markup=kb.main_kb)
             case phr.shop_statistic:
