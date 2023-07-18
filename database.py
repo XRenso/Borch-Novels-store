@@ -340,11 +340,13 @@ class Mongo:
 
 
     def delete_game_from_user_library(self,user_id:int,game_code:str):
-        self.user.update_one({'user_id':user_id,f'games_config.{game_code}': {'$exists': True}}, {'$unset':{f'games_config.$.{game_code}':1}})
+        self.user.update_one({'user_id':user_id,f'games_config.{game_code}': {'$exists': True}}, {'$pull':{f'games_config': {f'{game_code}':self.return_game_cfg(user_id,game_code)}}})
 
+
+    
 if __name__ == '__main__':
     print('Тест')
     check = Mongo()
     check.__init__()
-
-
+    # print(check.return_user_info(483058216)['games_config'])
+    check.delete_game_from_user_library(483058216,'animal_dvore_book')
