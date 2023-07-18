@@ -308,9 +308,9 @@ class Mongo:
         text = f'О магазине\n' \
                f'Написать информацию\n' \
                f'Количество пользователей - {users_of_bot}\n' \
-               f'Количество игр - {number_of_games}\n' \
-               f'Количество платных игр - {number_of_paid_games}\n({percent_of_paid}%)\n' \
-               f'Количество бесплатных игр - {number_of_free_games}({percent_of_free}%)'
+               f'Количество товара - {number_of_games}\n' \
+               f'Количество платных товаров - {number_of_paid_games}\n({percent_of_paid}%)\n' \
+               f'Количество бесплатных товаров - {number_of_free_games}({percent_of_free}%)'
         return text
 
 
@@ -337,6 +337,10 @@ class Mongo:
 
     def delete_frames_by_game_code(self,game_code):
         self.frame.delete_many({"game_code":game_code})
+
+
+    def delete_game_from_user_library(self,user_id:int,game_code:str):
+        self.user.update_one({'user_id':user_id,f'games_config.{game_code}': {'$exists': True}}, {'$unset':{f'games_config.$.{game_code}':1}})
 
 if __name__ == '__main__':
     print('Тест')

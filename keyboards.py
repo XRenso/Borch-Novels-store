@@ -25,7 +25,7 @@ unavailable_game = CallbackData('unavailable', 'game_code')
 
 store_action = CallbackData('store', 'action')
 
-
+delete_game_from_library = CallbackData('delete_game','game_code')
 
 game_statistic = CallbackData('analytic', 'game_code')
 
@@ -161,4 +161,6 @@ def get_game(game_code:str, have_it_user:int, price:int, user_id:int) -> InlineK
 
     if user['is_admin'] == 1:
         markup.add(InlineKeyboardButton(phr.statistic,callback_data=game_statistic.new(game_code)))
+    if price == 0 and have_it_user == 1:
+        markup.add(InlineKeyboardButton(phr.delete_game_from_lib, callback_data=delete_game_from_library.new(game_code)))
     return markup.add(InlineKeyboardButton(text=phr.share_game, switch_inline_query=game['game_name']))

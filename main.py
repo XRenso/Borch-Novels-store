@@ -316,6 +316,18 @@ async def show_game_statistic(call:types.CallbackQuery, callback_data:dict):
         await call.message.delete()
         await call.message.answer(statistic_text, reply_markup=markup)
 
+
+@dp.callback_query_handler(kb.delete_game_from_library.filter())
+async def delete_game_from_library(call:types.CallbackQuery, callback_data:dict):
+    game_code = callback_data['game_code']
+    markup = InlineKeyboardMarkup().add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.get_game_info.new(callback_data['game_code'])))
+    db.delete_game_from_user_library(call.message.chat.id, game_code)
+    try:
+        await call.message.edit_text(phr.success_game_delete,reply_markup=markup)
+    except:
+        await call.message.delete()
+        await call.message.answer(phr.success_game_delete, reply_markup=markup)
+
 @dp.callback_query_handler(kb.profile_achivement_code.filter())
 async def achivement_info(call:types.CallbackQuery, callback_data: dict):
     info = callback_data['achivement_code'].split('<@')
