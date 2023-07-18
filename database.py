@@ -335,6 +335,12 @@ class Mongo:
             done +=1
             print(f'Done {done}/{all}')
 
+    def delete_frames_by_game_code(self,game_code):
+        self.frame.delete_many({"game_code":game_code})
+
 if __name__ == '__main__':
     print('Тест')
     check = Mongo()
+    check.__init__()
+
+

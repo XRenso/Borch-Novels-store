@@ -235,13 +235,15 @@ async def going_to_page(message: types.Message, state: FSMContext):
     user = db.return_user_info(message.from_user.id)
     game_code = user['curr_game_code']
     num_of_pages = db.return_number_of_frames(game_code)
+    markup = InlineKeyboardMarkup().add(
+        InlineKeyboardButton(phr.back_to_game, callback_data=kb.play_game.new(f'{game_code}')))
+
     if page in range(1, num_of_pages+1):
         db.update_user_frame_num(user['user_id'],page, game_code)
-        markup = InlineKeyboardMarkup().add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.play_game.new(f'{game_code}')))
         await message.answer('Страница успешно сменена', reply_markup=markup)
         await state.finish()
     elif page == 0:
-        await message.answer('Успешно отменено ✅')
+        await message.answer('Успешно отменено ✅', reply_markup=markup)
         await state.finish()
 
     else:

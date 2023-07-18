@@ -45,12 +45,12 @@ def get_book_text(fname):
     )+
     """, re.X)
     sentences = list(filter(lambda t: t, [t.strip() for t in split_regex.split(text)]))
-    ready = len(sentences)//5
+    ready = len(sentences)//10
     result = []
     for i in range(ready):
-        text = '. '.join(sentences[:5])
+        text = '. '.join(sentences[:10])
         result.append(text)
-        sentences = sentences[5:]
+        sentences = sentences[10:]
     result.extend(sentences)
     return result
 
