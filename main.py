@@ -706,15 +706,16 @@ async def store_handler(call:types.CallbackQuery, callback_data: dict):
 async def buy_game(call:types.CallbackQuery, callback_data: dict):
     game_code = callback_data['game_code']
     game = db.return_game_info(game_code)
+    markup = InlineKeyboardMarkup().add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.get_game_info.new(callback_data['game_code'])))
     match game['price']:
         case 0:
             db.give_game_to_user(game_code,call.message.chat.id, 0)
             db.update_month_game_sales(game['game_code'])
             try:
-                await call.message.edit_text(f'{game["game_name"]} успешно добавлена в библиотеку ✅')
+                await call.message.edit_text(f'{game["game_name"]} успешно добавлена в библиотеку ✅', reply_markup=markup)
             except:
                 await call.message.delete()
-                await call.message.answer(f'{game["game_name"]} успешно добавлена в библиотеку ✅')
+                await call.message.answer(f'{game["game_name"]} успешно добавлена в библиотеку ✅', reply_markup=markup)
         case _:
             await call.message.delete()
             await call.bot.send_invoice(
@@ -738,10 +739,6 @@ async def buy_game(call:types.CallbackQuery, callback_data: dict):
                 suggested_tip_amounts=[10*100,50*100,100*100,150*100],
                 start_parameter='no',
                 provider_data=None,
-                # photo_url=game['game_cover'].split('\n')[0],
-                # photo_size=100,
-                # photo_width=800,
-                # photo_height=450,
                 need_name=False,
                 need_email=False,
                 need_phone_number=False,
@@ -769,8 +766,10 @@ async def uspeh_buy(message:types.Message):
     game = db.return_game_info(message.successful_payment.invoice_payload)
     db.give_game_to_user(game['game_code'], message.from_user.id, 0)
     db.update_month_game_sales(game['game_code'])
+    markup = InlineKeyboardMarkup().add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.get_game_info.new(game['game_code'])))
+
     await message.answer(f'Благодарим вас за покупку на сумму {message.successful_payment.total_amount//100} руб.'
-                         f'\n Игра - {game["game_name"]}  - успешно добавлена в вашу библиотеку ✅')
+                         f'\n Игра - {game["game_name"]}  - успешно добавлена в вашу библиотеку ✅', reply_markup=markup)
 
 @dp.callback_query_handler(kb.unavailable_game.filter())
 async def unavailable_game(call:types.CallbackQuery, callback_data: dict):
