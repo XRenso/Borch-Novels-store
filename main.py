@@ -414,7 +414,8 @@ async def change_frames(call, frame_num, state:FSMContext):
     can_next = True
     now_frame_vars = db.return_frame(game_cfg["frame_num"], game["game_code"])["variants"]
     try:
-        print(now_frame_vars[frame_num])
+        # print(now_frame_vars[frame_num])
+        print(f'{frame_num}\n{now_frame_vars}')
         print(now_frame_vars[str(frame_num)])
 
     except:
