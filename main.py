@@ -605,7 +605,10 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
                 try:
                     await call.bot.edit_message_text(chat_id=call.message.chat.id,message_id=data.get('game_text').message_id, text='Сессия устарела \nЗапустите игру заново 🔁')
                 except:
-                    await call.bot.edit_message_caption(chat_id=call.message.chat.id,message_id=data.get('game_text').message_id, caption='Сессия устарела \nЗапустите игру заново 🔁', reply_markup=None)
+                    try:
+                        await call.bot.edit_message_caption(chat_id=call.message.chat.id,message_id=data.get('game_text').message_id, caption='Сессия устарела \nЗапустите игру заново 🔁', reply_markup=None)
+                    except:
+                        pass
         db.update_now_user_game(call.message.chat.id,game['game_code'])
         frame_text = frame['text']['ru']
         if game['can_change_page']:
