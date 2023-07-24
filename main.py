@@ -412,6 +412,12 @@ async def change_frames(call, frame_num, state:FSMContext):
     data = await state.get_data()
     frame = db.return_frame(frame_num=frame_num, game_code=game['game_code'])
     can_next = True
+    now_frame_vars = db.return_frame(game_cfg["frame_num"], game["game_code"])["variants"]
+    try:
+        now_frame_vars[frame_num]
+    except:
+        await call.message.edit_text("Сессия устарела\nЗапустите игру заново 🔁")
+        return
     if frame != 0 and frame['fail_condition_frame'] is not None and frame['check_add_conditions'] is not None:
         conditions = frame['check_add_conditions'].split('\n')
         for i in conditions:
