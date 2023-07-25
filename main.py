@@ -416,7 +416,10 @@ async def change_frames(call, frame_num, state:FSMContext):
     try:
         now_frame_vars[str(frame_num)]
     except:
-        await call.message.edit_text("Сессия устарела\nЗапустите игру заново 🔁")
+        try:
+            await call.message.edit_text("Сессия устарела\nЗапустите игру заново 🔁")
+        except:
+            await call.message.edit_caption(caption="Сессия устарела\nЗапустите игру заново 🔁",reply_markup=None)
         return
     if frame != 0 and frame['fail_condition_frame'] is not None and frame['check_add_conditions'] is not None:
         conditions = frame['check_add_conditions'].split('\n')
