@@ -734,8 +734,8 @@ async def buy_game(call:types.CallbackQuery, callback_data: dict):
                 chat_id=call.message.chat.id,
                 title= f'Покупка игры {game["game_name"]}',
                 description=game['game_description'],
-                payload=f'{game["game_code"]}',
-                provider_token='5707748563:LIVE:552031',
+                payload=f'buy@{game["game_code"]}',
+                provider_token=os.getenv('KASSA'),
                 currency='rub',
                 prices=[
                     LabeledPrice(
@@ -766,6 +766,39 @@ async def buy_game(call:types.CallbackQuery, callback_data: dict):
 
             )
 
+@dp.message_handler(commands = ['donate'])
+async def reset_game(message:types.Message):
+    await bot.send_invoice(
+                chat_id=message.chat.id,
+                title= f'Пожертвование на развитие сервера',
+                description=f'Эти средства нам помогут развивать свой проект дальше.',
+                payload=f'donation',
+                provider_token=os.getenv('KASSA'),
+                currency='rub',
+                prices=[
+                    LabeledPrice(
+                        label='Поддержка авторов',
+                        amount=80*100
+                    ),
+                ],
+                max_tip_amount=1000*100,
+                suggested_tip_amounts=[100*100,200*100,500*100,1000*100],
+                start_parameter='no',
+                provider_data=None,
+                need_name=False,
+                need_email=False,
+                need_phone_number=False,
+                need_shipping_address=False,
+                send_phone_number_to_provider=False,
+                send_email_to_provider=False,
+                is_flexible=False,
+                disable_notification=False,
+                protect_content=False,
+                reply_to_message_id=False,
+                allow_sending_without_reply=True,
+                reply_markup=None,
+
+            )
 
 
 @dp.pre_checkout_query_handler()
@@ -775,14 +808,19 @@ async def give_paid_game_to_user(pre_checkout_query:PreCheckoutQuery):
 
 @dp.message_handler(content_types=['successful_payment'])
 async def uspeh_buy(message:types.Message):
-    game = db.return_game_info(message.successful_payment.invoice_payload)
-    db.give_game_to_user(game['game_code'], message.from_user.id, 0)
-    db.update_month_game_sales(game['game_code'])
-    markup = InlineKeyboardMarkup().add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.get_game_info.new(game['game_code'])))
+    info = message.successful_payment.invoice_payload.split('@')
+    operation = info[0]
+    match operation:
+        case 'buy':
+            game = db.return_game_info(info[1])
+            db.give_game_to_user(game['game_code'], message.from_user.id, 0)
+            db.update_month_game_sales(game['game_code'])
+            markup = InlineKeyboardMarkup().add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.get_game_info.new(game['game_code'])))
 
-    await message.answer(f'Благодарим вас за покупку на сумму {message.successful_payment.total_amount//100} руб.'
-                         f'\n Игра - {game["game_name"]}  - успешно добавлена в вашу библиотеку ✅', reply_markup=markup)
-
+            await message.answer(f'Благодарим вас за покупку на сумму {message.successful_payment.total_amount//100} руб.'
+                                 f'\n Игра - {game["game_name"]}  - успешно добавлена в вашу библиотеку ✅', reply_markup=markup)
+        case 'donation':
+            await message.answer(f'Спасибо за вашу поддержку на {message.successful_payment.total_amount//100} руб. \nЭти деньги помогут нам в развитии проекта')
 @dp.callback_query_handler(kb.unavailable_game.filter())
 async def unavailable_game(call:types.CallbackQuery, callback_data: dict):
     game = db.return_game_info(callback_data['game_code'])
