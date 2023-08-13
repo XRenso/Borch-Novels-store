@@ -768,6 +768,7 @@ async def buy_game(call:types.CallbackQuery, callback_data: dict):
 
 @dp.message_handler(commands = ['donate'])
 async def reset_game(message:types.Message):
+    print(f'It is working')
     await bot.send_invoice(
                 chat_id=message.from_user.id,
                 title= f'Пожертвование на развитие сервера',
