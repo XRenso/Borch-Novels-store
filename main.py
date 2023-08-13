@@ -796,7 +796,7 @@ async def donate_us(call:types.CallbackQuery, callback_data:dict):
                         amount=110*100
                     ),
                 ],
-                max_tip_amount=1000*100,
+                max_tip_amount=1500*100,
                 suggested_tip_amounts=[150*100,300*100,500*100,1000*100],
                 start_parameter='no',
                 provider_data=None,
