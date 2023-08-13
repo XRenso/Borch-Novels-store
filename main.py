@@ -793,11 +793,11 @@ async def donate_us(call:types.CallbackQuery, callback_data:dict):
                 prices=[
                     LabeledPrice(
                         label='Поддержка авторов',
-                        amount=90*100
+                        amount=105*100
                     ),
                 ],
                 max_tip_amount=1000*100,
-                suggested_tip_amounts=[100*100,200*100,500*100,1000*100],
+                suggested_tip_amounts=[150*100,300*100,500*100,1000*100],
                 start_parameter='no',
                 provider_data=None,
                 need_name=False,
