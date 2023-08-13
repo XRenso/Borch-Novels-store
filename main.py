@@ -789,7 +789,7 @@ async def donate_us(call:types.CallbackQuery, callback_data:dict):
                 description=f'Эти средства нам помогут развивать свой проект дальше.',
                 payload=f'donation',
                 provider_token=os.getenv('KASSA'),
-                currency='rub',
+                currency='RUB',
                 prices=[
                     LabeledPrice(
                         label='Поддержка авторов',
