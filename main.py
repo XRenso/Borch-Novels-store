@@ -729,7 +729,10 @@ async def buy_game(call:types.CallbackQuery, callback_data: dict):
                 await call.message.delete()
                 await call.message.answer(f'{game["game_name"]} успешно добавлена в библиотеку ✅', reply_markup=markup)
         case _:
-            await call.message.delete()
+            try:
+                await call.message.delete()
+            except:
+                pass
             await call.bot.send_invoice(
                 chat_id=call.message.chat.id,
                 title= f'Покупка игры {game["game_name"]}',
@@ -767,10 +770,19 @@ async def buy_game(call:types.CallbackQuery, callback_data: dict):
             )
 
 @dp.message_handler(commands = ['donate'])
-async def reset_game(message:types.Message):
-    print(f'It is working')
-    await bot.send_invoice(
-                chat_id=message.from_user.id,
+async def donation_handler(message:types.Message):
+    markup = InlineKeyboardMarkup()
+    markup.add(InlineKeyboardButton('ПОддержать',callback_data=kb.donate.new('donate')))
+    await message.answer(f'Поддержать проект по кнопке ниже👇', reply_markup=markup)
+
+@dp.callback_query_handler(kb.donate.filter())
+async def donate_us(call:types.CallbackQuery, _):
+    try:
+        await call.message.delete()
+    except:
+        pass
+    await call.bot.send_invoice(
+                chat_id=call.message.chat.id,
                 title= f'Пожертвование на развитие сервера',
                 description=f'Эти средства нам помогут развивать свой проект дальше.',
                 payload=f'donation',

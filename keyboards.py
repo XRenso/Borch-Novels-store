@@ -21,6 +21,8 @@ get_game_info = CallbackData('info_game', 'game_code')
 buy_game = CallbackData('game_buying', 'game_code')
 get_demo = CallbackData('demo_game', 'game_code')
 
+donate = CallbackData('donate','thx')
+
 unavailable_game = CallbackData('unavailable', 'game_code')
 
 store_action = CallbackData('store', 'action')
