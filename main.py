@@ -159,7 +159,7 @@ async def cancel_reset(call:types.CallbackQuery, callback_data:dict):
 @dp.message_handler(commands = ['donate'])
 async def donation_handler(message:types.Message):
     markup = InlineKeyboardMarkup()
-    markup.add(InlineKeyboardButton('ПОддержать',callback_data=kb.donate.new('donate')))
+    markup.add(InlineKeyboardButton('Поддержать',callback_data=kb.donate.new('donate')))
     await message.answer(f'Поддержать проект по кнопке ниже👇', reply_markup=markup)
 
 @dp.message_handler(content_types=['text'])
@@ -778,7 +778,7 @@ async def buy_game(call:types.CallbackQuery, callback_data: dict):
 
 
 @dp.callback_query_handler(kb.donate.filter())
-async def donate_us(call:types.CallbackQuery, _):
+async def donate_us(call:types.CallbackQuery, callback_data:dict):
     try:
         await call.message.delete()
     except:
