@@ -735,7 +735,7 @@ async def buy_game(call:types.CallbackQuery, callback_data: dict):
                 title= f'Покупка игры {game["game_name"]}',
                 description=game['game_description'],
                 payload=f'{game["game_code"]}',
-                provider_token='381764678:TEST:59097',
+                provider_token='5707748563:LIVE:552031',
                 currency='rub',
                 prices=[
                     LabeledPrice(
