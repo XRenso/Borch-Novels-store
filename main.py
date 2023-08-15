@@ -50,7 +50,7 @@ class Cache(StatesGroup):
     achivement = State()
 
 @dp.message_handler(commands = ['get_post'])
-async def start(message: types.Message):
+async def tg_post(message: types.Message):
     if db.return_user_info(message.from_user.id)['is_admin']:
         markup = InlineKeyboardMarkup()
         markup.add(InlineKeyboardButton('Перейти к боту🔗', url='https://t.me/BorchStoreBot'))
