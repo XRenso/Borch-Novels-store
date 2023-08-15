@@ -13,7 +13,7 @@ from aiogram.types import InputMediaPhoto, InputMediaVideo, InputMediaAudio, Inp
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-
+import phrase
 from database import Mongo as mg
 import keyboards as kb
 from dotenv import load_dotenv
@@ -49,6 +49,12 @@ class Cache(StatesGroup):
     game_text = State()
     achivement = State()
 
+@dp.message_handler(commands = ['get_post'])
+async def start(message: types.Message):
+    if db.return_user_info(message.from_user.id)['is_admin']:
+        markup = InlineKeyboardMarkup()
+        markup.add(InlineKeyboardButton('Перейти к боту🔗', url='https://t.me/BorchStoreBot'))
+        await message.answer_photo(photo='AgACAgIAAxkBAAIZlGSSdZ8ekz_L3D1UdfCD_2cKPV97AAJNxzEbVxOYSDqKrtfuwW3mAQADAgADeQADLwQ', caption=phrase.post_text,reply_markup=markup)
 @dp.message_handler(commands = ['start'])
 async def start(message: types.Message):
     user = db.return_user_info(message.from_user.id)
