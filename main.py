@@ -55,7 +55,7 @@ async def tg_post(message: types.Message):
         markup = InlineKeyboardMarkup()
         markup.add(InlineKeyboardButton('Перейти к боту🔗', url='https://t.me/BorchStoreBot'))
         # await bot.send_photo(-1947730203,photo='AgACAgIAAxkBAAIZlGSSdZ8ekz_L3D1UdfCD_2cKPV97AAJNxzEbVxOYSDqKrtfuwW3mAQADAgADeQADLwQ', caption=phrase.post_text,reply_markup=markup)
-        await bot.send_message(1947730203,'Проверка')
+        await bot.send_message(-1947730203,'Проверка')
 @dp.message_handler(commands = ['start'])
 async def start(message: types.Message):
     user = db.return_user_info(message.from_user.id)
