@@ -49,12 +49,12 @@ class Cache(StatesGroup):
     game_text = State()
     achivement = State()
 
-@dp.message_handler(commands = ['get_post'])
-async def tg_post(message: types.Message):
-    if db.return_user_info(message.from_user.id)['is_admin']:
-        markup = InlineKeyboardMarkup()
-        markup.add(InlineKeyboardButton('Перейти к боту🔗', url='https://t.me/BorchStoreBot'))
-        await bot.send_photo('-1947730203',photo='AgACAgIAAxkBAAIZlGSSdZ8ekz_L3D1UdfCD_2cKPV97AAJNxzEbVxOYSDqKrtfuwW3mAQADAgADeQADLwQ', caption=phrase.post_text,reply_markup=markup)
+# @dp.message_handler(commands = ['get_post'])
+# async def tg_post(message: types.Message):
+#     if db.return_user_info(message.from_user.id)['is_admin']:
+#         markup = InlineKeyboardMarkup()
+#         markup.add(InlineKeyboardButton('Перейти к боту🔗', url='https://t.me/BorchStoreBot'))
+#         await bot.send_photo('-1947730203',photo='AgACAgIAAxkBAAIZlGSSdZ8ekz_L3D1UdfCD_2cKPV97AAJNxzEbVxOYSDqKrtfuwW3mAQADAgADeQADLwQ', caption=phrase.post_text,reply_markup=markup)
 @dp.message_handler(commands = ['start'])
 async def start(message: types.Message):
     user = db.return_user_info(message.from_user.id)
@@ -171,6 +171,7 @@ async def donation_handler(message:types.Message):
 @dp.message_handler(content_types=['text'])
 async def get_text(message: types.Message):
     user = db.return_user_info(message.from_user.id)
+    print(message.chat.id)
     if user != 0 and user['accept_paper'] == 1:
         match message.text:
             case phr.library:
