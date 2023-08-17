@@ -1,3 +1,4 @@
+import small_logic as s_log
 profile = 'Профиль 👾'
 search_game = 'Поиск 🔍'
 library = 'Библиотека 📁'
@@ -41,3 +42,24 @@ post_text = '''
 • Сохранение вашего продукта на огромный период времени ⏳
 
 Присоединяйтесь к нам уже скорее, нажав кнопку ниже 👇'''
+
+
+def get_product_info(game) -> str:
+       rating = 'У продукта нет оценок'
+       if game['num_of_rates'] > 0:
+              rating = game['rating'] / game['num_of_rates']
+              rating = s_log.rating(rating)
+       caption = f'Информация о продукте {game["game_name"]}\n' \
+                 f'Издатель - {game["publisher"]}\n' \
+                 f'Автор - {game["creator"]}\n' \
+                 f'Оценка - {rating}\n' \
+                 f'Жанр - {game["genre"]}\n' \
+                 f'Описание:\n' \
+                 f'{game["game_description"]}\n'
+       if game['price'] > 0:
+              caption = f'{caption}' \
+                        f'Цена - {game["price"]} руб'
+       else:
+              caption = f'{caption}' \
+                        f'Цена - Бесплатно'
+       return caption

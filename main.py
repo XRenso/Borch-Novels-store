@@ -274,25 +274,8 @@ async def show_game_info(call:types.CallbackQuery, callback_data:dict):
     game = db.return_game_info(callback_data['game_code'])
     markup = kb.get_game(game['game_code'], db.check_is_game_in_user_library(call.message.chat.id, game['game_code']),
                          game['price'], user_id=call.message.chat.id)
-    rating = 'У игры нет оценок'
-    if game['num_of_rates'] > 0:
-        rating = game['rating']/game['num_of_rates']
-        rating = s_log.rating(rating)
-    price = 'Бесплатно'
 
-    if game['price'] > 0:
-        price = f"{game['price']} руб"
-
-    game_info_text = f'{game["game_name"]}' \
-                     f'\nИздатель - {game["publisher"]}' \
-                     f'\nРазработчик - {game["creator"]}' \
-                     f'\nОценка - {rating}' \
-                     f'\nЖанр - {game["genre"]}' \
-                     f'\nОписание:' \
-                     f'\n{game["game_description"]}' \
-                     f'\nЦена - {price}'
-
-
+    game_info_text = phr.get_product_info(game)
 
     await call.message.edit_text(game_info_text, reply_markup=markup)
 
@@ -834,23 +817,7 @@ async def show_game_info(call:types.CallbackQuery, callback_data: dict):
     await call.message.delete()
     media = types.MediaGroup()
     markup = kb.get_game(game['game_code'], db.check_is_game_in_user_library(call.message.chat.id,game['game_code']), game['price'], user_id=call.message.chat.id)
-    rating = 'У игры нет оценок'
-    if game['num_of_rates'] > 0:
-        rating = game['rating']/game['num_of_rates']
-        rating = s_log.rating(rating)
-    price = 'Бесплатно'
-
-    if game['price'] > 0:
-        price = f"{game['price']} руб"
-
-    game_info_text = f'{game["game_name"]}' \
-                     f'\nИздатель - {game["publisher"]}' \
-                     f'\nРазработчик - {game["creator"]}' \
-                     f'\nОценка - {rating}' \
-                     f'\nЖанр - {game["genre"]}' \
-                     f'\nОписание:' \
-                     f'\n{game["game_description"]}' \
-                     f'\nЦена - {price}'
+    game_info_text = phr.get_product_info(game)
 
     for index, file_id in enumerate(game['game_cover'].split('\n')):
         match index:
@@ -880,23 +847,7 @@ async def send_game_info_by_inline_mode(call:types.CallbackQuery, callback_data:
                         case 'a':
                             media.attach_photo(photo=file_id)
 
-        rating = 'У игры нет оценок'
-        if game['num_of_rates'] > 0:
-            rating = game['rating'] / game['num_of_rates']
-            rating = s_log.rating(rating)
-        price = 'Бесплатно'
-
-        if game['price'] > 0:
-            price = f'{game["price"]} руб'
-
-        game_info_text = f'{game["game_name"]}' \
-                         f'\nИздатель - {game["publisher"]}' \
-                         f'\nРазработчик - {game["creator"]}' \
-                         f'\nОценка - {rating}' \
-                         f'\nЖанр - {game["genre"]}' \
-                         f'\nОписание:' \
-                         f'\n{game["game_description"]}' \
-                         f'\nЦена - {price}'
+        game_info_text = phr.get_product_info(game)
         try:
             await call.bot.send_media_group(chat_id=call['from']['id'],media=media)
             await call.bot.send_message(chat_id=call['from']['id'],text=game_info_text, reply_markup=markup)
@@ -916,23 +867,7 @@ async def send_game_info_inline(inline_query:types.InlineQuery):
         results = []
         for i in games:
             markup = InlineKeyboardMarkup().add(InlineKeyboardButton('Перейти к боту', url='https://t.me/BorchStoreBot?start=inline'))
-            rating = 'У игры нет оценок'
-            if i['num_of_rates'] > 0:
-                rating = i['rating'] / i['num_of_rates']
-                rating = s_log.rating(rating)
-            caption = f'Информация об игре {i["game_name"]}\n' \
-                      f'Издатель - {i["publisher"]}\n' \
-                      f'Разработчик - {i["creator"]}\n' \
-                      f'Оценка - {rating}\n' \
-                      f'Жанр - {i["genre"]}\n' \
-                      f'Описание:\n' \
-                      f'{i["game_description"]}\n'
-            if i['price'] > 0:
-                caption = f'{caption}' \
-                          f'Цена - {i["price"]} руб'
-            else:
-                caption = f'{caption}' \
-                          f'Цена - Бесплатно'
+            caption = phr.get_product_info(i)
             item = InlineQueryResultCachedPhoto(
                 id = hashlib.md5(i['game_cover'].split('\n')[0].encode()).hexdigest(),
                 title=i['game_name'],
