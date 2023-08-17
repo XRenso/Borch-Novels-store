@@ -763,8 +763,8 @@ async def buy_game(call:types.CallbackQuery, callback_data: dict):
                         amount=-game['discount'] * 100
                     )
                 ],
-                max_tip_amount=150*100,
-                suggested_tip_amounts=[10*100,50*100,100*100,150*100],
+                max_tip_amount=1000*100,
+                suggested_tip_amounts=[50*100,100*100,150*100,300*100],
                 start_parameter='no',
                 provider_data=None,
                 need_name=False,
