@@ -35,7 +35,6 @@ db.__init__()
 
 
 async def clear_month_sales():
-
     db.clear_month_sale()
 
 
@@ -68,29 +67,7 @@ async def start(message: types.Message):
     else:
         await message.answer('Ознакомиться с правилами можно по кнопке ниже: ', reply_markup=kb.agreement_ikb)
 
-@dp.message_handler(commands = ['create'])
-async def create_ai_images(message: types.Message):
-    user = db.return_user_info(message.from_user.id)
-    arguments = message.get_args()
-    if arguments:
-        if user['is_admin']:
-            game = db.return_game_info(arguments)
-            if game:
-                frames = await db.AI_images(arguments, 1)
-                for key, value in enumerate(frames):
-                        text = value['text']['ru']
-                        image_url = await s_log.generate_image(text, game['game_name'])
-                        if image_url:
-                            id = await get_image_id(image_url)
-                            id = id.photo[-1].file_id
-                            await db.AI_images(arguments,0,id,value)
-                            await asyncio.sleep(3)
-                await message.answer('Картинки успешно сгенерированы')
-            else:
-                await message.answer('Такого кода игры нет')
-    else:
-        if user['is_admin']:
-            await message.answer('Отправьте id продукта')
+
 @dp.callback_query_handler(kb.paper_cb.filter())
 async def agree_paper(call:types.CallbackQuery, callback_data:dict):
     await call.message.edit_text('Успешно принято соглашение ✅. \nПриятной эксплуатации магазина 🎊')
@@ -966,10 +943,6 @@ async def send_game_info_inline(inline_query:types.InlineQuery):
             )
             results.append(item)
     await bot.answer_inline_query(inline_query.id,results,cache_time=1)
-
-async def get_image_id(image_url):
-    image_id = await bot.send_photo(photo=image_url,chat_id=483058216)
-    return image_id
 
 async def on_startup(_):
     print('Бот вышел в онлайн')
