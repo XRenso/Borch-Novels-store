@@ -488,7 +488,7 @@ async def change_frames(call, frame_num, state:FSMContext, failed:int=0):
                     await call.message.delete()
                 except:
                     pass
-                await call.message.answer('На этом демо игры заканчивается. Приобретите полную версию игры 💳')
+                await call.message.answer('На этом демо продукта заканчивается. Приобретите полную версию 💳')
             if frame['sound']:
                 if data.get('sound') == None:
                     async with state.proxy():
@@ -539,15 +539,13 @@ async def change_frames(call, frame_num, state:FSMContext, failed:int=0):
 
         elif frame == 0 and can_next == True:
             try:
-                await call.message.edit_text('На этом игра заканчивается 🎉'
-                                             '\nБлагодарим за прохождение 🤝')
+                await call.message.edit_text(phr.end_of_product)
             except:
                 try:
                     await call.message.delete()
                 except:
                     pass
-                await call.message.answer('На этом игра заканчивается 🎉'
-                                          '\nБлагодарим за прохождение 🤝')
+                await call.message.answer(phr.end_of_product)
 
 
 @dp.callback_query_handler(kb.frame_change.filter())
