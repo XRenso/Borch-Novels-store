@@ -378,22 +378,23 @@ async def get_genres_by_type(call:types.CallbackQuery, callback_data: dict):
         await call.message.edit_caption(f'Выберите интересующий вас жанр 👇', reply_markup=markup)
 
 
-async def change_frames(call, frame_num, state:FSMContext):
+async def change_frames(call, frame_num, state:FSMContext, failed:int=0):
     user = db.return_user_info(call.message.chat.id)
     game = db.return_game_info(user['curr_game_code'])
     game_cfg = db.return_game_cfg(user['user_id'], game['game_code'])
     data = await state.get_data()
     frame = db.return_frame(frame_num=frame_num, game_code=game['game_code'])
     can_next = True
-    now_frame_vars = db.return_frame(game_cfg["frame_num"], game["game_code"])["variants"]
-    try:
-        now_frame_vars[str(frame_num)]
-    except:
+    if not failed:
+        now_frame_vars = db.return_frame(game_cfg["frame_num"], game["game_code"])["variants"]
         try:
-            await call.message.edit_text("Сессия устарела\nЗапустите игру заново 🔁")
+            now_frame_vars[str(frame_num)]
         except:
-            await call.message.edit_caption(caption="Сессия устарела\nЗапустите игру заново 🔁",reply_markup=None)
-        return
+            try:
+                await call.message.edit_text("Сессия устарела\nЗапустите игру заново 🔁")
+            except:
+                await call.message.edit_caption(caption="Сессия устарела\nЗапустите игру заново 🔁",reply_markup=None)
+            return
     if frame != 0 and frame['fail_condition_frame'] is not None and frame['check_add_conditions'] is not None:
         conditions = frame['check_add_conditions'].split('\n')
         for i in conditions:
@@ -403,7 +404,7 @@ async def change_frames(call, frame_num, state:FSMContext):
             cfg = db.return_game_cfg(call.message.chat.id, game['game_code'])
             if cfg[key] != value:
                 # frame = db.return_frame(frame_num=frame['fail_condition_frame'], game_code=game['game_code'])
-                await change_frames(call, frame['fail_condition_frame'], state)
+                await change_frames(call, frame['fail_condition_frame'], state, failed=1)
                 can_next = False
                 break
 
