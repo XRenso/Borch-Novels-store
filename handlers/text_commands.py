@@ -1,4 +1,4 @@
-from loader import dp,db
+from run import dp,db
 from aiogram import types
 import phrase as phr
 import keyboards as kb
