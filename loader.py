@@ -22,4 +22,5 @@ async def set_default_commands(dp):
     await dp.bot.set_my_commands([
         BotCommand("start", "Запустить бота"),
         BotCommand("donate", "Поддержать проект"),
+        BotCommand("reset_game", "Сбросить прогресс в игре")
     ])
