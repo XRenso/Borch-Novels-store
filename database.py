@@ -60,6 +60,7 @@ class Mongo:
                 'curr_game_code': None, # Текущая игра
                 'games_config': [], # Игровой конфиг
                 'achivements' : [], # Ачивки
+                'user_groups':{'Все игры':['every game']}, # Группы в библиотеке пользователя
                 'is_admin': 0, #Проверка на админа
                 'accept_paper':1 #Проверка на соглашение
             }
@@ -132,7 +133,7 @@ class Mongo:
         self.user.update_one({'user_id': user_id, f'games_config.{game_code}': {'$exists': True}},
                              {'$set': {f'games_config.$.{game_code}.is_demo': now_cfg['is_demo'], f'games_config.$.{game_code}.rate':now_cfg['rate']}})
     def rebase(self):
-        self.game.update_many({'can_change_page':{'$exists':False}}, {'$set':{'can_change_page':False}})
+        self.user.update_many({'user_groups':{'$exists':False}}, {'$set':{'user_groups':{'Все игры':['every game']}}})
 
     def give_game_to_user(self, game_code:str, user_id:int, is_demo:int):
         if self.user.count_documents({'user_id':user_id}) == 1:
@@ -342,11 +343,49 @@ class Mongo:
     def delete_game_from_user_library(self,user_id:int,game_code:str):
         self.user.update_one({'user_id':user_id,f'games_config.{game_code}': {'$exists': True}}, {'$pull':{f'games_config': {f'{game_code}':self.return_game_cfg(user_id,game_code)}}})
 
+    def return_user_group(self, user_id:int,group_name:str):
+        try:
+            j = self.user.find_one({'user_id':user_id,f'user_groups.{group_name}':{'$exists':True}})
+            if j is not None:
+                return j['user_groups'][group_name]
+            else:
+                return None
+        except KeyError:
+            return None
+    def create_user_group(self, user_id:int,group_name:str,game_code:str):
+        user = self.return_user_info(user_id)
+        if user:
+            group = self.return_user_group(user_id,group_name)
+            if group is not None:
+                if game_code not in group:
+                    self.user.update_one({'user_id':user_id},{'$push':{f'user_groups.{group_name}':game_code}})
+                else:
+                    return 0 # Игра уже имеется в папке
+            else:
+                self.user.update_one({'user_id':user_id},{'$set':{f'user_groups.{group_name}':[game_code]}})
+    def delete_game_from_group(self, user_id:int, group_name:str, game_code:str):
+        user = self.return_user_info(user_id)
+        if user:
+            group = self.return_user_group(user_id, group_name)
+            if group:
+                if game_code in group:
+                    self.user.update_one({'user_id': user_id, f'user_groups.{group_name}': {'$exists': True}}, {
+                        '$pull': {f'user_groups.{group_name}': game_code}})
 
-    
+    def delete_user_group(self, user_id:int, group_name:str):
+        user = self.return_user_info(user_id)
+        if user:
+            group = self.return_user_group(user_id, group_name)
+
+            try:
+                self.user.update_one({'user_id':user_id},{'$unset':{f'user_groups.{group_name}':1}})
+            except:
+                pass
+
 if __name__ == '__main__':
     print('Тест')
     check = Mongo()
     check.__init__()
-    # print(check.return_user_info(483058216)['games_config'])
-    check.delete_game_from_user_library(483058216,'animal_dvore_book')
+    check.create_user_group(483058216, 'Проверочка на', '1984')
+
+

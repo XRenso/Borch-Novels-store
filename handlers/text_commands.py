@@ -14,7 +14,13 @@ async def get_text(message: types.Message):
                 if not len(markup['inline_keyboard']):
                     await message.answer_photo(photo='AgACAgIAAxkBAAIlR2S0kvSkXcu0nOfH25I8w2y4MjuFAAL-zjEbWFuhSfUOS9uSCdUTAQADAgADeQADLwQ',caption='У вас нет игр ❌')
                 else:
-                    await message.answer_photo(photo='AgACAgIAAxkBAAIlR2S0kvSkXcu0nOfH25I8w2y4MjuFAAL-zjEbWFuhSfUOS9uSCdUTAQADAgADeQADLwQ',caption='Ваша библиотека 📂', reply_markup=markup)
+                    if len(user['user_groups']) == 1:
+                        await message.answer_photo(photo='AgACAgIAAxkBAAIlR2S0kvSkXcu0nOfH25I8w2y4MjuFAAL-zjEbWFuhSfUOS9uSCdUTAQADAgADeQADLwQ',caption='Ваша библиотека 📂', reply_markup=markup)
+                    else:
+                        await message.answer_photo(
+                            photo='AgACAgIAAxkBAAIlR2S0kvSkXcu0nOfH25I8w2y4MjuFAAL-zjEbWFuhSfUOS9uSCdUTAQADAgADeQADLwQ',
+                            caption='Ваша библиотека 📂', reply_markup=kb.lib_category(user['user_groups']))
+
             case phr.profile:
                 user_info = db.return_user_info(message.from_user.id)
                 if user_info != 0:

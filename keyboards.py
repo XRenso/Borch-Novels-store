@@ -52,6 +52,9 @@ start_btn = InlineKeyboardButton('Начать', callback_data='start_play_game'
 start_game = InlineKeyboardMarkup().add(start_btn)
 
 
+get_user_group = CallbackData('user_group','group_name')
+back_to_user_group = CallbackData('back_to_user_groups','back')
+
 ##Agreement
 paper = InlineKeyboardButton('Пользовательское соглашение', url='https://telegra.ph/Polzovatelskoe-soglashenie-06-21-6')
 agree = InlineKeyboardButton('Принять ✅', callback_data=paper_cb.new('ye'))
@@ -114,6 +117,11 @@ def return_library(games):
             markup.add(InlineKeyboardButton(i['game_name'], callback_data=show_more_info_game.new(i['game_code'])))
     return markup
 
+def lib_category(categories):
+    markup = InlineKeyboardMarkup()
+    for key,_ in categories.items():
+        markup.add(InlineKeyboardButton(key, callback_data=get_user_group.new(key)))
+    return markup
 def reset_library(games):
     markup = InlineKeyboardMarkup()
     if games !=0 :
