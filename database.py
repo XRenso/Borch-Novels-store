@@ -90,7 +90,7 @@ class Mongo:
         else:
             return 0
 
-    def add_game(self, code: str, name: str, description: str, cover: str, creator:str, publisher:str,can_buy:int, price: int, discount:int, genre_code:str, genre:str, config: dict, type_code:str,type_name:str, can_change_page:bool) -> 0 or None:
+    def add_game(self, code: str, name: str, description: str, cover: str, creator:str, publisher:str,can_buy:int, price: int, discount:int, genre_code:str, genre:str, config: dict, type_code:str,type_name:str, can_change_page:bool, poster_url:str) -> 0 or None:
         if self.game.count_documents({'game_code':code}) == 0:
             cfg = {
                 'frame_num': 1,
@@ -117,7 +117,8 @@ class Mongo:
             'num_of_rates': 0, # Количество оценок
             'type_code': type_code, # Код категории
             'type_name': type_name, # Название категории
-            'can_change_page': can_change_page # Есть ли возможность ручной смены страницы на любую
+            'can_change_page': can_change_page, # Есть ли возможность ручной смены страницы на любую
+            'poster_url': poster_url #Ссылка на постер картинку
             }
             self.game.insert_one(game)
         else:
