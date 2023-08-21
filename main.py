@@ -1,5 +1,3 @@
-import asyncio
-
 import aiogram.utils.exceptions
 from aiogram.types import ReplyKeyboardRemove, \
     ReplyKeyboardMarkup, KeyboardButton, \
