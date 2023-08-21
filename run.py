@@ -1,7 +1,7 @@
 from loader import dp,bot, set_default_commands, db
 from aiogram.utils import executor
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-import handlers
+from handlers import *
 
 
 async def clear_month_sales():
