@@ -126,12 +126,15 @@ class Mongo:
 
     def reset_game_setings(self, game_code:str, user_id:int):
         now_cfg = self.return_game_cfg(user_id, game_code)
+        try:
+            self.user.update_one({'user_id': user_id, f'games_config.{game_code}': {'$exists': True}},
+                                 {'$set': {f'games_config.$.{game_code}': self.return_game_info(game_code)['game_config']}})
 
-        self.user.update_one({'user_id': user_id, f'games_config.{game_code}': {'$exists': True}},
-                             {'$set': {f'games_config.$.{game_code}': self.return_game_info(game_code)['game_config']}})
+            self.user.update_one({'user_id': user_id, f'games_config.{game_code}': {'$exists': True}},
+                                 {'$set': {f'games_config.$.{game_code}.is_demo': now_cfg['is_demo'], f'games_config.$.{game_code}.rate':now_cfg['rate']}})
+        except TypeError:
+            return 0
 
-        self.user.update_one({'user_id': user_id, f'games_config.{game_code}': {'$exists': True}},
-                             {'$set': {f'games_config.$.{game_code}.is_demo': now_cfg['is_demo'], f'games_config.$.{game_code}.rate':now_cfg['rate']}})
     def rebase(self):
         self.user.update_many({'user_groups':{'$exists':False}}, {'$set':{'user_groups':{'Все игры':['every game']}}})
 
@@ -405,7 +408,7 @@ if __name__ == '__main__':
     print('Тест')
     check = Mongo()
     check.__init__()
-    check.delete_user_group(483058216,'123')
+    check.reset_game_setings('kazak',483058216)
     # check.create_user_group(483058216, 'Проверочка на', '1984')
 
 

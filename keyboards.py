@@ -61,6 +61,7 @@ choose_group_add = CallbackData('g_a','game_code', 'group_name')
 choose_group_remove = CallbackData('g_r', 'game_code','group_name')
 create_new_user_group = CallbackData('create_user_group','game_code')
 
+get_user_group_for_reset = CallbackData('gugfr','group_name')
 
 ##Agreement
 paper = InlineKeyboardButton('Пользовательское соглашение', url='https://telegra.ph/Polzovatelskoe-soglashenie-06-21-6')
@@ -135,6 +136,13 @@ def reset_library(games):
         for i in games:
             markup.add(InlineKeyboardButton(i['game_name'], callback_data=reset_games_cb.new(i['game_code'])))
     return markup
+def reset_library_categories(categories):
+    markup = InlineKeyboardMarkup()
+    if categories != 0 :
+        for key, _ in categories.items():
+            markup.add(InlineKeyboardButton(key, callback_data=get_user_group_for_reset.new(key)))
+    return markup
+
 def store_kb_genres(genre, type_code):
     markup = InlineKeyboardMarkup(row_width=1)
     for i in genre:
