@@ -46,7 +46,7 @@ async def get_text(message: types.Message):
 
 
             case phr.search_game:
-                await message.answer('Отправьте название игры, которую хотите найти. \nОтправьте 0 для отмены')
+                await message.answer('Отправьте название игры, которую хотите найти. \nОтправьте /cancel для отмены')
                 await Store.search_game.set()
 
 
