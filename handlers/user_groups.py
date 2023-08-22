@@ -45,6 +45,7 @@ async def control_user_group(call:types.CallbackQuery, callback_data:dict):
 async def add_game_to_user_group(call:types.CallbackQuery, callback_data:dict):
     game_code = callback_data['game_code']
     groups = db.get_user_group_by_game(call.message.chat.id, game_code, 1)
+    print(groups)
     markup = InlineKeyboardMarkup()
     for i in groups:
         markup.add(InlineKeyboardButton(i, callback_data=kb.choose_group_add.new(game_code,i)))

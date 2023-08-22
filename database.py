@@ -396,8 +396,8 @@ class Mongo:
             case 1:
                 user = self.return_user_info(user_id)
                 for key, value in user['user_groups'].items():
-                    if game_code not in value:
-                        if value[0] != 'every game' and key == 'Все игры':
+                    if game_code not in value and value[0] != 'every game':
+
                             user_groups.append(key)
         return user_groups
 
