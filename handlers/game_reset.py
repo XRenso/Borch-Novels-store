@@ -45,7 +45,7 @@ async def return_to_lib(call:types.CallbackQuery, callback_data:dict):
 @dp.callback_query_handler(kb.confirm_reset_cb.filter())
 async def confirm_reset(call:types.CallbackQuery, callback_data:dict):
     j = db.reset_game_setings(user_id=call.message.chat.id, game_code=callback_data['game_code'])
-    if not j:
+    if j == 0:
         markup = InlineKeyboardMarkup()
         markup.add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.back_reset_cb.new('ok')))
         await call.message.edit_text('Произошла ошибка.\nВидимо игры уже больше нет в вашей библиотеке\nРекомендуем удалить её из группы', reply_markup=markup)
