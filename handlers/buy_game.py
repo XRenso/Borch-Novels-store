@@ -3,6 +3,7 @@ from aiogram import types
 import keyboards as kb
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, LabeledPrice,PreCheckoutQuery
 import os
+import phrase as phr
 
 @dp.callback_query_handler(kb.buy_game.filter())
 async def buy_game(call:types.CallbackQuery, callback_data: dict):

@@ -382,10 +382,30 @@ class Mongo:
             except:
                 pass
 
+    def get_user_group_by_game(self,user_id:int,game_code:str,mode:int):
+        #mode - режим работы.
+        # 0 - вернет юзер группы, где игра имеется
+        # 1 - вернет юзер группы, где игры нет
+        user_groups = []
+        match mode:
+            case 0:
+                user = self.return_user_info(user_id)
+                for key,value in user['user_groups'].items():
+                    if game_code in value:
+                        user_groups.append(key)
+            case 1:
+                user = self.return_user_info(user_id)
+                for key, value in user['user_groups'].items():
+                    if game_code not in value:
+                        if value[0] != 'every game' and key == 'Все игры':
+                            user_groups.append(key)
+        return user_groups
+
 if __name__ == '__main__':
     print('Тест')
     check = Mongo()
     check.__init__()
-    check.create_user_group(483058216, 'Проверочка на', '1984')
+    check.delete_user_group(483058216,'123')
+    # check.create_user_group(483058216, 'Проверочка на', '1984')
 
 

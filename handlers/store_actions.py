@@ -30,6 +30,8 @@ async def going_to_page(message: types.Message, state: FSMContext):
     else:
         if type(page) is int:
             await message.answer('Неверный диапозон страницы ❌')
+
+
 @dp.message_handler(state=Store.search_game)
 async def search_game_by_name(message: types.Message, state: FSMContext):
     search = message.text

@@ -54,6 +54,13 @@ start_game = InlineKeyboardMarkup().add(start_btn)
 
 get_user_group = CallbackData('user_group','group_name')
 back_to_user_group = CallbackData('back_to_user_groups','back')
+add_to_user_group = CallbackData('add_to_user_group','game_code')
+remove_from_user_group = CallbackData('remove_from_user_group','game_code')
+control_user_group = CallbackData('control_user_group', 'game_code')
+choose_group_add = CallbackData('g_a','game_code', 'group_name')
+choose_group_remove = CallbackData('g_r', 'game_code','group_name')
+create_new_user_group = CallbackData('create_user_group','game_code')
+
 
 ##Agreement
 paper = InlineKeyboardButton('Пользовательское соглашение', url='https://telegra.ph/Polzovatelskoe-soglashenie-06-21-6')
@@ -129,14 +136,14 @@ def reset_library(games):
             markup.add(InlineKeyboardButton(i['game_name'], callback_data=reset_games_cb.new(i['game_code'])))
     return markup
 def store_kb_genres(genre, type_code):
-    markup = InlineKeyboardMarkup(row_width=2)
+    markup = InlineKeyboardMarkup(row_width=1)
     for i in genre:
         markup.insert(InlineKeyboardButton(db.return_genre_name_by_code(i, type_code=type_code),callback_data=show_more_game_genre.new(f'{type_code}@{i}')))
 
     return markup
 
 def store_kb_types(type):
-    markup = InlineKeyboardMarkup(row_width=2)
+    markup = InlineKeyboardMarkup(row_width=1)
     for i in type:
         markup.insert(InlineKeyboardButton(db.return_type_name_by_code(i),callback_data=show_genres_by_type.new(i)))
     return markup
@@ -171,6 +178,13 @@ def get_game(game_code:str, have_it_user:int, price:int, user_id:int) -> InlineK
 
     if user['is_admin'] == 1:
         markup.add(InlineKeyboardButton(phr.statistic,callback_data=game_statistic.new(game_code)))
+
+    if have_it_user == 1:
+        markup.add(InlineKeyboardButton(phr.control_user_group, callback_data=control_user_group.new(game_code)))
+
+    elif db.get_user_group_by_game(user_id, game_code, 0):
+        markup.add(InlineKeyboardButton(phr.remove_from_user_group, callback_data=remove_from_user_group.new(game_code)))
+
     if price == 0 and have_it_user == 1:
         markup.add(InlineKeyboardButton(phr.delete_game_from_lib, callback_data=delete_game_from_library.new(game_code)))
     return markup.add(InlineKeyboardButton(text=phr.share_game, switch_inline_query=game['game_name']))
