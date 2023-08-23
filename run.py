@@ -2,7 +2,8 @@ from loader import dp,bot, set_default_commands, db
 from aiogram.utils import executor
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from handlers import buy_game, donate, frame_mechanics, game_card, game_rate, game_reset,\
-    inline_mode, payment, profile, send_file_id,  store_catalog, store_actions, user_groups,start, text_commands
+    inline_mode, payment, profile, send_file_id,  store_catalog, store_actions, user_groups,start, info_command,\
+    text_commands
 
 
 async def clear_month_sales():

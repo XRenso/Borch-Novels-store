@@ -12,13 +12,13 @@ async def get_text(message: types.Message):
             case phr.library:
                 markup = kb.return_library(db.return_user_library_games(message.from_user.id))
                 if not len(markup['inline_keyboard']):
-                    await message.answer_photo(photo='AgACAgIAAxkBAAIlR2S0kvSkXcu0nOfH25I8w2y4MjuFAAL-zjEbWFuhSfUOS9uSCdUTAQADAgADeQADLwQ',caption='У вас нет игр ❌')
+                    await message.answer_photo(photo='AgACAgIAAxkBAAIwh2TlvPH-RIgfxZAjx5qUZJ8SXHa2AAKq2TEbo4EhS_6Xi0_d9uahAQADAgADeQADMAQ',caption='У вас нет игр ❌')
                 else:
                     if len(user['user_groups']) == 1:
-                        await message.answer_photo(photo='AgACAgIAAxkBAAIlR2S0kvSkXcu0nOfH25I8w2y4MjuFAAL-zjEbWFuhSfUOS9uSCdUTAQADAgADeQADLwQ',caption='Ваша библиотека 📂', reply_markup=markup)
+                        await message.answer_photo(photo='AgACAgIAAxkBAAIwh2TlvPH-RIgfxZAjx5qUZJ8SXHa2AAKq2TEbo4EhS_6Xi0_d9uahAQADAgADeQADMAQ',caption='Ваша библиотека 📂', reply_markup=markup)
                     else:
                         await message.answer_photo(
-                            photo='AgACAgIAAxkBAAIlR2S0kvSkXcu0nOfH25I8w2y4MjuFAAL-zjEbWFuhSfUOS9uSCdUTAQADAgADeQADLwQ',
+                            photo='AgACAgIAAxkBAAIwh2TlvPH-RIgfxZAjx5qUZJ8SXHa2AAKq2TEbo4EhS_6Xi0_d9uahAQADAgADeQADMAQ',
                             caption='Ваша библиотека 📂', reply_markup=kb.lib_category(user['user_groups']))
 
             case phr.profile:
@@ -38,7 +38,7 @@ async def get_text(message: types.Message):
                     await message.answer_photo(photo='AgACAgIAAxkBAAIlRGS0kvTRaTvuTMIEHLw6pM_Se0S3AAL7zjEbWFuhSQhs6LkM8O3DAQADAgADeQADLwQ',
                                                caption=f'Ваш id - {user_info["user_id"]}'
                                          f'\nКоличество игр в библиотеке 📂- {len(db.return_user_library_games(message.from_user.id))}'
-                                         f'\nВы проходите 🎮 - {curr_game}'
+                                         f'\nВы заняты 👉 - {curr_game}'
                                          f'\nКоличество ваших достижений 🌟 - '
                                          f'{len(achivments)}', reply_markup=markup)
                 else:
