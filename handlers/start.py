@@ -16,9 +16,12 @@ async def start(message: types.Message):
             game = db.return_game_info(game_code)
             media = types.MediaGroup()
             if db.return_user_info(message.from_user.id) != 0:
-                markup = kb.get_game(game['game_code'],
-                                     db.check_is_game_in_user_library(message.from_user.id, game['game_code']), game['price'],
-                                     user_id=message.from_user.id)
+                try:
+                    markup = kb.get_game(game['game_code'],
+                                         db.check_is_game_in_user_library(message.from_user.id, game['game_code']), game['price'],
+                                         user_id=message.from_user.id)
+                except TypeError:
+                    return
                 for index, file_id in enumerate(game['game_cover'].split('\n')):
                     match index:
                         case _:
