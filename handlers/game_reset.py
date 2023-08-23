@@ -68,8 +68,8 @@ async def show_games_from_group(call:types.CallbackQuery, callback_data:dict):
                 games.append(db.return_game_info(i))
         except TypeError:
             markup = InlineKeyboardMarkup()
-            markup.add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.back_to_user_group.new('ok')))
-            await call.message.edit_text(f'Данной группы больше не существует. Нажмите назад, чтобы вернуться в библиотеку', reply_markup=markup)
+            markup.add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.back_reset_cb.new('ok')))
+            await call.message.edit_text(f'Данной группы больше не существует. Нажмите назад, чтобы вернуться назад', reply_markup=markup)
             exist = False
     else:
         games = db.return_user_library_games(call.message.chat.id)
