@@ -38,7 +38,7 @@ async def get_text(message: types.Message):
                     await message.answer_photo(photo='AgACAgIAAxkBAAIlRGS0kvTRaTvuTMIEHLw6pM_Se0S3AAL7zjEbWFuhSQhs6LkM8O3DAQADAgADeQADLwQ',
                                                caption=f'Ваш id - {user_info["user_id"]}'
                                          f'\nКоличество игр в библиотеке 📂- {len(db.return_user_library_games(message.from_user.id))}'
-                                         f'\nВы заняты 👉 - {curr_game}'
+                                         f'\nВы заняты 🌐 - {curr_game}'
                                          f'\nКоличество ваших достижений 🌟 - '
                                          f'{len(achivments)}', reply_markup=markup)
                 else:
