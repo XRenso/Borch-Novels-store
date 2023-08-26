@@ -50,9 +50,4 @@ async def store_handler(call:types.CallbackQuery, callback_data: dict):
                 content = InputMediaPhoto(media='AgACAgIAAxkBAAIlRmS0kvRiHbkGzpyvclOYwC94Wfb8AAL9zjEbWFuhSWJYQDJSBo2bAQADAgADeQADLwQ', caption=f'Выберите интересующую вас категорию 👇')
                 await call.message.edit_media(content, reply_markup=markup)
 
-@dp.callback_query_handler(kb.unavailable_game.filter())
-async def unavailable_game(call:types.CallbackQuery, callback_data: dict):
-    game = db.return_game_info(callback_data['game_code'])
-    await call.message.edit_text(f'Мы понимаем как вы хотите поиграть в {game["game_name"]}'
-                                 f'\nОднако сейчас игра недоступна. Наши сожаления'
-                                 f'\nПодождите официального выхода')
+
