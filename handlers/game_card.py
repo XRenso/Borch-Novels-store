@@ -1,3 +1,5 @@
+import aiogram.utils.exceptions
+
 from loader import dp,db
 import keyboards as kb
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -11,8 +13,14 @@ async def show_game_info(call:types.CallbackQuery, callback_data:dict):
                          game['price'], user_id=call.message.chat.id)
 
     game_info_text = phr.get_product_info(game)
-
-    await call.message.edit_text(game_info_text, reply_markup=markup)
+    try:
+        await call.message.edit_text(game_info_text, reply_markup=markup)
+    except aiogram.utils.exceptions.BadRequest:
+        try:
+            await call.message.delete()
+        except:
+            await call.message.edit_caption('Сессия закрытка', reply_markup=None)
+        await call.message.answer(game_info_text,reply_markup=markup)
 
 @dp.callback_query_handler(kb.game_statistic.filter())
 async def show_game_statistic(call:types.CallbackQuery, callback_data:dict):
