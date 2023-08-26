@@ -78,6 +78,7 @@ async def change_frames(call, frame_num, state:FSMContext, failed:int=0):
                     markup.add(InlineKeyboardButton(value, callback_data=kb.frame_change.new(key)))
                 if game['can_change_page']:
                     markup.add(InlineKeyboardButton(phr.change_page, callback_data=kb.change_page_manual.new(f'{game["game_code"]}')))
+                markup.add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.get_game_info.new(game['game_code'])))
                 try:
                     if content is not None:
                         await call.message.edit_media(content, reply_markup=markup)
@@ -239,6 +240,7 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
             markup.add(InlineKeyboardButton(value, callback_data=kb.frame_change.new(key)))
         if game['can_change_page']:
             markup.add(InlineKeyboardButton(phr.change_page, callback_data=kb.change_page_manual.new(f'{game["game_code"]}')))
+        markup.add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.get_game_info.new(game['game_code'])))
         try:
             await call.message.edit_media(content, reply_markup=markup)
         except:
