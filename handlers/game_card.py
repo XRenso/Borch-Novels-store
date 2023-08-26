@@ -71,6 +71,6 @@ async def unavailable_game(call:types.CallbackQuery, callback_data: dict):
     game = db.return_game_info(callback_data['game_code'])
     markup = InlineKeyboardMarkup()
     markup.add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.get_game_info.new(game['game_code'])))
-    await call.message.edit_text(f'Мы понимаем как вы хотите запустить в {game["game_name"]}'
+    await call.message.edit_text(f'Мы понимаем как вы хотите запустить {game["game_name"]}'
                                  f'\nОднако сейчас продукт недоступен. Наши сожаления'
                                  f'\nПодождите официального выхода', reply_markup=markup)
