@@ -30,7 +30,7 @@ async def show_frame_info_admin(call:types.CallbackQuery, callback_data: dict, s
         variants += f'{key} => {val}\n'
     if frame['change_add_conditions']:
         change_conditions = 'Кадр изменяет конфиг:\n'
-        for i in change_conditions.split('\n'):
+        for i in frame['change_add_conditions'].split('\n'):
             change_conditions += f'{i}\n'
     else:
         change_conditions = 'Кадр не изменяет конфиг\n'
