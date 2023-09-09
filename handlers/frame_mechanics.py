@@ -235,7 +235,6 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
                 content = None
 
         markup = InlineKeyboardMarkup()
-        # frame_num = list(frame['variants_frame'].split('\n'))
         for key, value in frame['variants'].items():
             markup.add(InlineKeyboardButton(value, callback_data=kb.frame_change.new(key)))
         if game['can_change_page']:
@@ -255,16 +254,16 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
                                  f"Страница {frame['frame_num']} из {db.return_number_of_frames(game_code=game['game_code'])}"
                 match frame['content_code']:
                     case 1:
-                        message = await call.message.answer_photo(frame['content'], caption=frame_text, reply_markup=markup, parse_mode='HTML')
+                        message = await call.message.answer_photo(frame['content'], caption=frame_text, reply_markup=markup, parse_mode='HTML', protect_content=True)
                     case 2:
-                        message = await call.message.answer_video(frame['content'], caption=frame_text,reply_markup=markup, parse_mode='HTML')
+                        message = await call.message.answer_video(frame['content'], caption=frame_text,reply_markup=markup, parse_mode='HTML', protect_content=True)
                     case 3:
-                        message = await call.message.answer_audio(frame['content'], caption=frame_text,reply_markup=markup, parse_mode='HTML')
+                        message = await call.message.answer_audio(frame['content'], caption=frame_text,reply_markup=markup, parse_mode='HTML', protect_content=True)
                     case 4:
                         message = await call.message.answer_animation(frame['content'], caption=frame_text,
-                                                                      reply_markup=markup, parse_mode='HTML')
+                                                                      reply_markup=markup, parse_mode='HTML', protect_content=True)
                     case _:
-                        message = await call.message.answer(frame_text,reply_markup=markup, parse_mode='HTML')
+                        message = await call.message.answer(frame_text,reply_markup=markup, parse_mode='HTML', protect_content=True)
                 await state.update_data(game_text=message)
         if frame['sound']:
             if data.get('sound') == None:
