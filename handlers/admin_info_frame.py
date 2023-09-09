@@ -9,7 +9,7 @@ from aiogram.dispatcher import FSMContext
 @dp.callback_query_handler(kb.admin_frame_info.filter())
 async def show_frame_info_admin(call:types.CallbackQuery, callback_data: dict, state:FSMContext):
     game = db.return_game_info(callback_data['game_code'])
-    frame = db.return_frame(callback_data['frame_num'], game['game_code'])
+    frame = db.return_frame(int(callback_data['frame_num']), game['game_code'])
     match frame['content_code']:
         case 1:
             content = 'Изображение'
@@ -25,7 +25,7 @@ async def show_frame_info_admin(call:types.CallbackQuery, callback_data: dict, s
         demo = 'Кадр является демо'
     else:
         demo = 'Кадр не является демо'
-    variants = 'Варианты кадра:\n<i>Номер кадра</i> => <i>Текст кнопки</i>'
+    variants = 'Варианты кадра:\n<i>Номер кадра</i> => <i>Текст кнопки</i>\n'
     for key,val in frame['variants'].items():
         variants += f'{key} => {val}\n'
     if frame['change_add_conditions']:
@@ -33,7 +33,7 @@ async def show_frame_info_admin(call:types.CallbackQuery, callback_data: dict, s
         for i in change_conditions.split('\n'):
             change_conditions += f'{i}\n'
     else:
-        change_conditions = 'Кадр не изменяет конфиг'
+        change_conditions = 'Кадр не изменяет конфиг\n'
 
     if frame['check_add_conditions']:
         check_conditions='Кадр проверяет следующие условия:\n'
@@ -52,7 +52,8 @@ async def show_frame_info_admin(call:types.CallbackQuery, callback_data: dict, s
            f'Есть ли доп. сообщение стикер - {"Да" if frame["sticker"] else "Нет"}\n\n' \
            f'{change_conditions}\n' \
            f'{check_conditions}\n\n' \
-           f'Код достижения - <i>{frame["achivement"] if frame["achivement"] else "Кадр не дает достижения"}</i>'
+           f'Код достижения - <i>{frame["achivement"] if frame["achivement"] else "Кадр не дает достижения"}</i>\n\n' \
+           f'Полный json кадра:\n<code>{frame}</code>'
 
     markup = InlineKeyboardMarkup().add(InlineKeyboardButton(phr.back_to_game,callback_data=kb.play_game.new(game['game_code'])))
 
