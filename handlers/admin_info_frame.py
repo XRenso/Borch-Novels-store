@@ -60,4 +60,8 @@ async def show_frame_info_admin(call:types.CallbackQuery, callback_data: dict, s
     try:
         await call.message.edit_text(info, parse_mode='HTML',reply_markup=markup)
     except:
-        await call.message.edit_caption(caption=info, parse_mode='HTML',reply_markup=markup)
+        try:
+            await call.message.delete()
+        except:
+            await call.message.edit_caption('Закрыто ❌')
+        await call.message.answer(text=info, parse_mode='HTML',reply_markup=markup)
