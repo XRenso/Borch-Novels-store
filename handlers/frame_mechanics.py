@@ -78,6 +78,8 @@ async def change_frames(call, frame_num, state:FSMContext, failed:int=0):
                     markup.add(InlineKeyboardButton(value, callback_data=kb.frame_change.new(key)))
                 if game['can_change_page']:
                     markup.add(InlineKeyboardButton(phr.change_page, callback_data=kb.change_page_manual.new(f'{game["game_code"]}')))
+                if user['is_admin']:
+                    markup.add(InlineKeyboardButton(phr.admin_info_frame, callback_data=kb.admin_frame_info.new(frame['frame_num'], game['game_code'])))
                 markup.add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.get_game_info.new(game['game_code'])))
                 try:
                     if content is not None:
@@ -197,6 +199,7 @@ async def go_to_page(call:types.CallbackQuery, callback_data: dict, state:FSMCon
 @dp.callback_query_handler(kb.play_game.filter())
 async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMContext):
     game = db.return_game_info(callback_data['game_code'])
+    user = db.return_user_info(call.message.chat.id)
     game_user_cfg = db.return_game_cfg(call.message.chat.id,game['game_code'])
     frame = db.return_frame(game_code=game['game_code'],frame_num=game_user_cfg['frame_num'])
     data = await state.get_data()
@@ -239,6 +242,9 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
             markup.add(InlineKeyboardButton(value, callback_data=kb.frame_change.new(key)))
         if game['can_change_page']:
             markup.add(InlineKeyboardButton(phr.change_page, callback_data=kb.change_page_manual.new(f'{game["game_code"]}')))
+        if user['is_admin']:
+            markup.add(
+                InlineKeyboardButton(phr.admin_info_frame, callback_data=kb.admin_frame_info.new(frame['frame_num'], game['game_code'])))
         markup.add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.get_game_info.new(game['game_code'])))
         try:
             await call.message.edit_media(content, reply_markup=markup)

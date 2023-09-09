@@ -7,6 +7,9 @@ from database import Mongo as mg
 db = mg()
 db.__init__()
 #Callback data preset
+admin_frame_info = CallbackData('admin','frame_num','game_code')
+
+
 frame_change = CallbackData('frame','frame_num')
 play_game = CallbackData('playing_game', 'game_code')
 rate_game = CallbackData('rate', 'game_code')

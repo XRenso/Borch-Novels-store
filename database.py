@@ -406,7 +406,6 @@ if __name__ == '__main__':
     print('Тест')
     check = Mongo()
     check.__init__()
-    check.reset_game_setings('kazak',483058216)
     # check.create_user_group(483058216, 'Проверочка на', '1984')
 
 
