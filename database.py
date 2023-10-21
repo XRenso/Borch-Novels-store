@@ -13,7 +13,23 @@ class Mongo:
         self.frame = self.connection['frame']
         self.game = self.connection['game']
         self.achivement = self.connection['achivement']
+        self.bot_status = self.connection['bot_status']
 
+    def is_bot_in_tech_mode(self):
+        bot = self.bot_status.find_one()
+        status_code = bot['status']
+        if status_code == 200:
+            status_code = False
+        elif status_code == 503:
+            status_code = True
+        return status_code
+
+    def change_tech_mode_server(self, tech_mode:bool=None):
+        if tech_mode is not None:
+            if tech_mode:
+                self.bot_status.update_one({'status':200},{'$set':{'status':503}})
+            else:
+                self.bot_status.update_one({'status':503},{'$set':{'status':200}})
 
     def add_achivement(self,game_code:str,name:str,achivement_code:str,cover:str,description:str):
 
