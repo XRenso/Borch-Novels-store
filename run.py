@@ -17,4 +17,4 @@ if __name__ == '__main__':
     scheduler.start()
     dp.middleware.setup(tech_mode.Server_status())
     dp.middleware.setup(commads.Commands())
-    executor.start_polling(dp,skip_updates=True,on_startup=set_default_commands)
+    executor.start_polling(dp,skip_updates=True)
