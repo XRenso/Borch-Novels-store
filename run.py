@@ -4,7 +4,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from middlewares import tech_mode, commads
 from handlers import buy_game, donate, frame_mechanics, game_card, game_rate, game_reset,\
     inline_mode, payment, profile, send_file_id,  store_catalog, store_actions, user_groups,start, info_command,\
-    set_tech_mode,\
+    set_tech_mode,send_everyone,\
     text_commands, admin_info_frame
 
 

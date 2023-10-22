@@ -418,6 +418,12 @@ class Mongo:
                             user_groups.append(key)
         return user_groups
 
+
+    def get_all_users_id(self) -> list:
+        user_id = []
+        for doc in self.user.find():
+            user_id.append(doc['user_id'])
+        return user_id
 if __name__ == '__main__':
     print('Тест')
     check = Mongo()
