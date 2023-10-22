@@ -8,9 +8,14 @@ class Server_status(BaseMiddleware):
             try:
                 user_id = message.from_user.id
                 user = db.return_user_info(user_id)
-                if not user['is_admin']:
+                try:
+                    if not user['is_admin']:
+                        await message.answer('🤖 Бот находится на техобслуживание. Подождите немного.\n'
+                                                    '📰 Следите за новостями в нашем тг канале - @BorchStore')
+                        raise CancelHandler()
+                except TypeError:
                     await message.answer('🤖 Бот находится на техобслуживание. Подождите немного.\n'
-                                                '📰 Следите за новостями в нашем тг канале - @BorchStore')
+                                         '📰 Следите за новостями в нашем тг канале - @BorchStore')
                     raise CancelHandler()
             except AttributeError:
                 pass
