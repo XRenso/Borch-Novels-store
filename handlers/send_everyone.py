@@ -47,6 +47,7 @@ async def send_message(message: types.Message, state: FSMContext):
         #     from_chat_id=message.from_user.id,
         #     message_id=message.message_id
         # )
+        await message.answer('Рассылка отправлена ✅')
         users_id = db.get_all_users_id()
         for i in users_id:
             try:
@@ -59,5 +60,6 @@ async def send_message(message: types.Message, state: FSMContext):
                 pass
     else:
         await message.answer('Успешная отмена ❌')
+
     await state.finish()
 
