@@ -1,3 +1,5 @@
+import aiogram.dispatcher.filters
+
 from loader import dp,db,bot
 from states.Admin import Admin
 from aiogram import types
@@ -40,18 +42,21 @@ async def send_everyone_handler(call:types.CallbackQuery, callback_data: dict):
 async def send_message(message: types.Message, state: FSMContext):
     msg = message.text
     if msg != '/cancel':
-        await bot.copy_message(
-            chat_id=message.from_user.id,
-            from_chat_id=message.from_user.id,
-            message_id=message.message_id
-        )
-        # users_id = db.get_all_users_id()
-        # for i in users_id:
-        #     await bot.copy_message(
-        #         chat_id=i,
-        #         from_chat_id=message.from_user.id,
-        #         message_id=message.message_id
-        #     )
+        # await bot.copy_message(
+        #     chat_id=message.from_user.id,
+        #     from_chat_id=message.from_user.id,
+        #     message_id=message.message_id
+        # )
+        users_id = db.get_all_users_id()
+        for i in users_id:
+            try:
+                await bot.copy_message(
+                    chat_id=i,
+                    from_chat_id=message.from_user.id,
+                    message_id=message.message_id
+                )
+            except:
+                pass
     else:
         await message.answer('Успешная отмена ❌')
     await state.finish()
