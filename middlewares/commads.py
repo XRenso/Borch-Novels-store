@@ -32,5 +32,5 @@ class Commands(BaseMiddleware):
                 BotCommand("donate", "Поддержать проект"),
                 BotCommand("info", "Информация про наш магазин"),
                 BotCommand("reset_game", "Сбросить прогресс в игре"),
-                BotCommand("cancel", "Отменить ввод"),
+                BotCommand("cancel", "Отменить ввод")
             ])
