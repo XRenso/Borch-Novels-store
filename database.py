@@ -288,7 +288,7 @@ class Mongo:
             pass
         return genres
     def return_game_by_genre(self, genre_code, type_code):
-        return self.game.find({'genre_code':genre_code, 'type_code':type_code})
+        return list(self.game.find({'genre_code':genre_code, 'type_code':type_code}))
 
     def return_game_satistic(self, game_code):
         achivments = self.achivement.distinct('achivement_code', {'game_code':game_code})

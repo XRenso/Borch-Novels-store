@@ -8,6 +8,7 @@ from aiogram.dispatcher import FSMContext
 @dp.callback_query_handler(kb.get_user_group.filter())
 async def get_user_group_games(call:types.CallbackQuery, callback_data:dict):
     group_name = callback_data['group_name']
+    page = int(callback_data['page'])
     exist = True
     if group_name != 'Все игры':
         games = []
@@ -22,7 +23,7 @@ async def get_user_group_games(call:types.CallbackQuery, callback_data:dict):
     else:
         games = db.return_user_library_games(call.message.chat.id)
     if exist:
-        markup = kb.return_library(games)
+        markup = kb.return_library(games, page=page, category_code=group_name)
         markup.add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.back_to_user_group.new('ok')))
         await call.message.edit_caption(caption=f'Библиотека категория - «{group_name}»', reply_markup=markup)
 

@@ -10,7 +10,7 @@ async def get_text(message: types.Message):
     if user != 0 and user['accept_paper'] == 1:
         match message.text:
             case phr.library:
-                markup = kb.return_library(db.return_user_library_games(message.from_user.id))
+                markup = kb.return_library(db.return_user_library_games(message.from_user.id), page=0, type='lib',category_code='Все игры')
                 if not len(markup['inline_keyboard']):
                     await message.answer_photo(photo='AgACAgIAAxkBAAIwh2TlvPH-RIgfxZAjx5qUZJ8SXHa2AAKq2TEbo4EhS_6Xi0_d9uahAQADAgADeQADMAQ',caption='У вас нет игр ❌')
                 else:

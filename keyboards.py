@@ -19,12 +19,15 @@ rating = CallbackData('rating_score','score')
 
 show_by_genre = CallbackData('gen', 'genre_code')
 show_more_info_game = CallbackData('game', 'game_code')
-show_more_game_genre = CallbackData('genre','genre_code')
+show_more_game_genre = CallbackData('genre','type_code','genre_code', 'page')
 show_genres_by_type = CallbackData('type', 'type_code')
 inline_show_game_info = CallbackData('inline_game','game_code')
 get_game_info = CallbackData('info_game', 'game_code')
 buy_game = CallbackData('game_buying', 'game_code')
 get_demo = CallbackData('demo_game', 'game_code')
+
+
+next_page = CallbackData('change_page','category')
 
 donate = CallbackData('donate','thx')
 
@@ -57,7 +60,7 @@ start_btn = InlineKeyboardButton('Начать', callback_data='start_play_game'
 start_game = InlineKeyboardMarkup().add(start_btn)
 
 
-get_user_group = CallbackData('user_group','group_name')
+get_user_group = CallbackData('user_group','group_name', 'page')
 back_to_user_group = CallbackData('back_to_user_groups','back')
 add_to_user_group = CallbackData('add_to_user_group','game_code')
 remove_from_user_group = CallbackData('remove_from_user_group','game_code')
@@ -123,17 +126,59 @@ def return_achivements(achivments,game_code):
     return markup
 
 
-def return_library(games):
+def return_library(games, type='lib',page=0, category_code=None, type_code=None):
     markup = InlineKeyboardMarkup()
-    if games != 0:
+    if len(games) <= 5:
+        if games != 0:
+            for i in games:
+                markup.add(InlineKeyboardButton(i['game_name'], callback_data=show_more_info_game.new(i['game_code'])))
+    else:
+        counter = len(games)//5
+        if len(games)%5 !=0:
+            counter+=1
+        page_counter = InlineKeyboardButton(f'{page+1}/{counter}',callback_data='Lol')
+        games = games[5*page:5*page+5]
         for i in games:
             markup.add(InlineKeyboardButton(i['game_name'], callback_data=show_more_info_game.new(i['game_code'])))
+        match type:
+            case 'store':
+                if page > 0:
+                    back_btn = InlineKeyboardButton('⬅️', callback_data=show_more_game_genre.new(type_code,category_code,str(page-1)))
+                else:
+                    back_btn = InlineKeyboardButton('⬅️', callback_data=show_more_game_genre.new(type_code,category_code,str(page)))
+
+                if 5*(page+1) in range(len(games)+1):
+                    next_btn = InlineKeyboardButton('➡️', callback_data=show_more_game_genre.new(type_code,category_code,str(page+1)))
+                else:
+                    next_btn = InlineKeyboardButton('➡️', callback_data=show_more_game_genre.new(type_code,category_code,str(page)))
+
+                markup.add(back_btn,
+                           page_counter,
+                           next_btn)
+            case 'lib':
+                if page > 0:
+                    back_btn = InlineKeyboardButton('⬅️',
+                                                    callback_data=get_user_group.new(category_code, str(page - 1)))
+                else:
+                    back_btn = InlineKeyboardButton('⬅️',
+                                                    callback_data=get_user_group.new(category_code, str(page)))
+
+                if 5 * (page + 1) in range(len(games)+1):
+                    next_btn = InlineKeyboardButton('➡️', callback_data=
+                        get_user_group.new(category_code, str(page + 1)))
+                else:
+                    next_btn = InlineKeyboardButton('➡️', callback_data=
+                        get_user_group.new(category_code, str(page)))
+
+                markup.add(back_btn,
+                           page_counter,
+                           next_btn)
     return markup
 
 def lib_category(categories):
     markup = InlineKeyboardMarkup()
     for key,_ in categories.items():
-        markup.add(InlineKeyboardButton(key, callback_data=get_user_group.new(key)))
+        markup.add(InlineKeyboardButton(key, callback_data=get_user_group.new(key, '0')))
     return markup
 def reset_library(games):
     markup = InlineKeyboardMarkup()
@@ -151,7 +196,7 @@ def reset_library_categories(categories):
 def store_kb_genres(genre, type_code):
     markup = InlineKeyboardMarkup(row_width=1)
     for i in genre:
-        markup.insert(InlineKeyboardButton(db.return_genre_name_by_code(i, type_code=type_code),callback_data=show_more_game_genre.new(f'{type_code}@{i}')))
+        markup.insert(InlineKeyboardButton(db.return_genre_name_by_code(i, type_code=type_code),callback_data=show_more_game_genre.new(type_code,i,'0')))
 
     return markup
 

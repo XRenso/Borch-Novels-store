@@ -8,10 +8,11 @@ from aiogram.types import InputMediaPhoto
 
 @dp.callback_query_handler(kb.show_more_game_genre.filter())
 async def get_games_by_genre(call:types.CallbackQuery, callback_data: dict):
-    info = callback_data['genre_code'].split('@')
-    type_code = info[0]
-    genre_code = info[1]
-    markup = kb.return_library(db.return_game_by_genre(genre_code, type_code)).add(InlineKeyboardButton('Назад ↩️', callback_data=kb.store_action.new(f'{type_code}@go_to_genres')))
+
+    type_code = callback_data['type_code']
+    genre_code = callback_data['genre_code']
+    page = int(callback_data['page'])
+    markup = kb.return_library(db.return_game_by_genre(genre_code, type_code), type='store',page=page, type_code=type_code, category_code=genre_code).add(InlineKeyboardButton('Назад ↩️', callback_data=kb.store_action.new(f'{type_code}@go_to_genres')))
     content = InputMediaPhoto(media='AgACAgIAAxkBAAIlRmS0kvRiHbkGzpyvclOYwC94Wfb8AAL9zjEbWFuhSWJYQDJSBo2bAQADAgADeQADLwQ', caption=f'Товары жанра {db.return_genre_name_by_code(genre_code, type_code)}:')
     await call.message.edit_media(content,reply_markup=markup)
 
