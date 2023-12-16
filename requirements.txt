@@ -3,5 +3,4 @@ pymongo
 python-dotenv
 APScheduler
 python-docx
-openai
 asyncify

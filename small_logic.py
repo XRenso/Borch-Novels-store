@@ -2,12 +2,12 @@ import os
 
 import docx
 import re
-import openai
+
 from dotenv import load_dotenv
 from asyncify import asyncify
 load_dotenv()
 
-openai.api_key = os.getenv('API_KEY')
+
 
 def rating(rating_as_num):
     pure_rating = int(rating_as_num)
