@@ -43,7 +43,7 @@ async def search_game_by_name(message: types.Message, state: FSMContext):
         games = db.search_game_by_name(search)
         markup = kb.return_library(games)
         if not len(markup['inline_keyboard']):
-            await message.answer(f'К сожалению у нас нет игр по запросу {search} 😕\nВы можете попробовать ещё раз, написав снова название, либо ззавершить поиск с пощью команды /cancel')
+            await message.answer(f'К сожалению у нас нет игр по запросу {search} 😕\nВы можете попробовать ещё раз, написав снова название, либо завершить поиск с пощью команды /cancel')
         else:
             await message.answer(f'Результат поиска по запросу {search}:', reply_markup=markup)
             await state.finish()
