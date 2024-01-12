@@ -39,7 +39,7 @@ async def going_to_page(message: types.Message, state: FSMContext):
 @dp.message_handler(state=Store.search_game)
 async def search_game_by_name(message: types.Message, state: FSMContext):
     search = message.text
-    if search != '/cance':
+    if search != '/cancel':
         games = db.search_game_by_name(search)
         markup = kb.return_library(games)
         if not len(markup['inline_keyboard']):
