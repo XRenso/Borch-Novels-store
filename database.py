@@ -252,7 +252,7 @@ class Mongo:
             return 0
 
     def search_game_by_name(self, search):
-        return self.game.find({'game_name': re.compile(rf"(?i){search}")})
+        return list(self.game.find({'game_name': re.compile(rf"(?i){search}")}))
 
 
     def return_user_library_games(self,user_id:int) -> list or 0:
