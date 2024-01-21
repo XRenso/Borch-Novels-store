@@ -16,6 +16,10 @@ async def get_games_by_genre(call:types.CallbackQuery, callback_data: dict):
     content = InputMediaPhoto(media='AgACAgIAAxkBAAIlRmS0kvRiHbkGzpyvclOYwC94Wfb8AAL9zjEbWFuhSWJYQDJSBo2bAQADAgADeQADLwQ', caption=f'Товары жанра {db.return_genre_name_by_code(genre_code, type_code)}:')
     await call.message.edit_media(content,reply_markup=markup)
 
+@dp.callback_query_handler(kb.end_list.filter())
+async def list_is_end(call:types.CallbackQuery, callback_data: dict):
+    await call.answer('Дальше ничего нет', show_alert=True)
+
 @dp.callback_query_handler(kb.get_all_pages.filter())
 async def change_page_of_group(call:types.CallbackQuery, callback_data: dict):
     type = callback_data['type']

@@ -169,14 +169,14 @@ def return_library(games, type='lib',page=0, category_code=None, type_code=None)
                                                     callback_data=get_user_group.new(category_code, str(page - 1)))
                 else:
                     back_btn = InlineKeyboardButton('⬅️',
-                                                    callback_data=get_user_group.new(category_code, str(page)))
+                                                    callback_data=end_list.new('bad'))
 
                 if 5 * (page + 1) in range(len(games)+1):
                     next_btn = InlineKeyboardButton('➡️', callback_data=
                         get_user_group.new(category_code, str(page + 1)))
                 else:
                     next_btn = InlineKeyboardButton('➡️', callback_data=
-                        get_user_group.new(category_code, str(page)))
+                        end_list.new('bad'))
 
                 markup.add(back_btn,
                            page_counter,
