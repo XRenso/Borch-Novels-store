@@ -26,6 +26,9 @@ get_game_info = CallbackData('info_game', 'game_code')
 buy_game = CallbackData('game_buying', 'game_code')
 get_demo = CallbackData('demo_game', 'game_code')
 
+get_all_pages = CallbackData('pages', 'type','type_code','category_code')
+end_list = CallbackData('pgs_end','info')
+
 
 next_page = CallbackData('change_page','category')
 
@@ -136,26 +139,31 @@ def return_library(games, type='lib',page=0, category_code=None, type_code=None)
         counter = len(games)//5
         if len(games)%5 !=0:
             counter+=1
-        page_counter = InlineKeyboardButton(f'{page+1}/{counter}',callback_data='Lol')
         games = games[5*page:5*page+5]
         for i in games:
             markup.add(InlineKeyboardButton(i['game_name'], callback_data=show_more_info_game.new(i['game_code'])))
         match type:
             case 'store':
+                page_counter = InlineKeyboardButton(f'{page + 1}/{counter}',
+                                                    callback_data=get_all_pages.new(type, type_code, category_code))
+
                 if page > 0:
                     back_btn = InlineKeyboardButton('⬅️', callback_data=show_more_game_genre.new(type_code,category_code,str(page-1)))
                 else:
-                    back_btn = InlineKeyboardButton('⬅️', callback_data=show_more_game_genre.new(type_code,category_code,str(page)))
+                    back_btn = InlineKeyboardButton('⬅️', callback_data=end_list.new('bad'))
 
                 if 5*(page+1) in range(len(games)+1):
                     next_btn = InlineKeyboardButton('➡️', callback_data=show_more_game_genre.new(type_code,category_code,str(page+1)))
                 else:
-                    next_btn = InlineKeyboardButton('➡️', callback_data=show_more_game_genre.new(type_code,category_code,str(page)))
+                    next_btn = InlineKeyboardButton('➡️', callback_data=end_list.new('bad'))
 
                 markup.add(back_btn,
                            page_counter,
                            next_btn)
             case 'lib':
+                page_counter = InlineKeyboardButton(f'{page + 1}/{counter}',
+                                                    callback_data=get_all_pages.new(type, 'n', category_code))
+
                 if page > 0:
                     back_btn = InlineKeyboardButton('⬅️',
                                                     callback_data=get_user_group.new(category_code, str(page - 1)))
