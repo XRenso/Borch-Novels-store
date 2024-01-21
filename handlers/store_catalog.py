@@ -18,7 +18,7 @@ async def get_games_by_genre(call:types.CallbackQuery, callback_data: dict):
 
 @dp.callback_query_handler(kb.end_list.filter())
 async def list_is_end(call:types.CallbackQuery, callback_data: dict):
-    await call.answer('Дальше ничего нет', show_alert=True)
+    await call.answer('Дальше ничего нет', show_alert=False)
 
 @dp.callback_query_handler(kb.get_all_pages.filter())
 async def change_page_of_group(call:types.CallbackQuery, callback_data: dict):
