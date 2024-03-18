@@ -1,7 +1,8 @@
 from loader import dp,db
 from aiogram import types
+from aiogram.filters.command import Command
 
-@dp.message_handler(commands = ['set_tech_mode'])
+@dp.message(Command('set_tech_mode'))
 async def i_want_tech_mode(message: types.Message):
     user = db.return_user_info(message.from_user.id)
     if user['is_admin']:

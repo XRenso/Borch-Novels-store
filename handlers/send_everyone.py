@@ -1,44 +1,33 @@
-import aiogram.dispatcher.filters
-
 from loader import dp,db,bot
 from states.Admin import Admin
-from aiogram import types
-from aiogram.dispatcher import FSMContext
+from aiogram import types, F
+from aiogram.fsm.context import FSMContext
 import keyboards as kb
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.utils.keyboard import InlineKeyboardBuilder,InlineKeyboardButton
+from aiogram.filters.command import Command
 
 
-
-@dp.message_handler(commands = ['send_everyone'])
+@dp.message(Command('send_everyone'))
 async def send_everyone(message: types.Message):
     user = db.return_user_info(message.from_user.id)
     if user['is_admin']:
-        markup = InlineKeyboardMarkup()
-        markup.add(InlineKeyboardButton('Да✅', callback_data=kb.send_everyone.new('yes')))
-        markup.add(InlineKeyboardButton('Нет❌', callback_data=kb.send_everyone.new('no')))
+        markup = InlineKeyboardBuilder()
+        markup.add(InlineKeyboardButton(text='Да✅', callback_data=kb.RSS_CallbackData(confirm='yes').pack()))
+        markup.add(InlineKeyboardButton(text='Нет❌', callback_data=kb.RSS_CallbackData(confirm='no').pack()))
 
-        await message.answer('Вы уверены, что хотите сделать рассылку?', reply_markup=markup)
+        await message.answer('Вы уверены, что хотите сделать рассылку?', reply_markup=markup.as_markup())
 
-@dp.callback_query_handler(kb.send_everyone.filter())
-async def send_everyone_handler(call:types.CallbackQuery, callback_data: dict):
-    status = callback_data['confirm']
+@dp.callback_query(kb.RSS_CallbackData.filter())
+async def send_everyone_handler(call:types.CallbackQuery, callback_data: kb.RSS_CallbackData, state:FSMContext):
+    status = callback_data.confirm
 
     if status == 'yes':
         await call.message.edit_text('Отправьте сообщение для рассылки.\nОтменить ввод можно командой - /cancel')
-        await Admin.send_message.set()
+        await state.set_state(Admin.send_message)
     elif status == 'no':
         await call.message.edit_text('Успешно отменена рассылка')
 
-@dp.message_handler(state=Admin.send_message,content_types=[
-            types.ContentType.PHOTO,
-            types.ContentType.DOCUMENT,
-            types.ContentType.TEXT,
-            types.ContentType.AUDIO,
-            types.ContentType.VOICE,
-            types.ContentType.VIDEO,
-            types.ContentType.ANIMATION,
-            types.ContentType.STICKER
-        ])
+@dp.message(Admin.send_message, F.any)
 async def send_message(message: types.Message, state: FSMContext):
     msg = message.text
     if msg != '/cancel':
@@ -61,5 +50,5 @@ async def send_message(message: types.Message, state: FSMContext):
     else:
         await message.answer('Успешная отмена ❌')
 
-    await state.finish()
+    await state.clear()
 

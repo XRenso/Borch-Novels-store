@@ -1,6 +1,5 @@
 from aiogram.types import BotCommand
 from aiogram import Bot, Dispatcher
-from aiogram.contrib.fsm_storage.memory import MemoryStorage # просто, хранящее информацию в ОП
 from dotenv import load_dotenv, find_dotenv
 import os
 import logging
@@ -13,9 +12,9 @@ else:
 
 db = mg()
 db.__init__()
-storage = MemoryStorage()
-bot = Bot(token=os.getenv('TOKEN'))
-dp = Dispatcher(bot, storage=storage)
+
+bot = Bot(token=os.getenv('TOKEN'), parse_mode='HTML')
+dp = Dispatcher()
 logging.basicConfig(level=logging.INFO)
 
 async def set_default_commands(dp):

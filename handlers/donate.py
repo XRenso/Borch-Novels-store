@@ -1,17 +1,20 @@
 from loader import dp
 from aiogram import types
 import keyboards as kb
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, LabeledPrice
+from aiogram.filters.command import Command
+from aiogram.types import LabeledPrice
+from aiogram.utils.keyboard import (ReplyKeyboardBuilder, InlineKeyboardBuilder,
+                                    InlineKeyboardButton, KeyboardButton)
 import os
-@dp.message_handler(commands = ['donate'])
+@dp.message(Command('donate'))
 async def donation_handler(message:types.Message):
-    markup = InlineKeyboardMarkup()
-    markup.add(InlineKeyboardButton('Поддержать',callback_data=kb.donate.new('donate')))
-    await message.answer(f'Поддержать проект по кнопке ниже👇', reply_markup=markup)
+    markup = InlineKeyboardBuilder()
+    markup.add(InlineKeyboardButton(text='Поддержать',callback_data=kb.Donate_CallbackData(thx='donate').pack()))
+    await message.answer(f'Поддержать проект по кнопке ниже👇', reply_markup=markup.as_markup())
 
 
-@dp.callback_query_handler(kb.donate.filter())
-async def donate_us(call:types.CallbackQuery, callback_data:dict):
+@dp.callback_query(kb.Donate_CallbackData.filter())
+async def donate_us(call:types.CallbackQuery, callback_data:kb.Donate_CallbackData):
     try:
         await call.message.delete()
     except:

@@ -1,11 +1,12 @@
 from loader import dp,db
 import keyboards as kb
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.utils.keyboard import (ReplyKeyboardBuilder, InlineKeyboardBuilder,
+                                    InlineKeyboardButton, KeyboardButton)
 from aiogram import types
 import phrase as phr
 from aiogram.types import InputMediaPhoto, InputMediaVideo, InputMediaAudio, InputMediaAnimation
 from states.Store import Store
-from aiogram.dispatcher import FSMContext
+from aiogram.fsm.context import FSMContext
 import small_logic as s_log
 async def change_frames(call, frame_num, state:FSMContext, failed:int=0):
     user = db.return_user_info(call.message.chat.id)
@@ -72,49 +73,48 @@ async def change_frames(call, frame_num, state:FSMContext, failed:int=0):
                     case _:
                         content = None
 
-                markup = InlineKeyboardMarkup()
+                markup = InlineKeyboardBuilder()
                 # frame_num = list(frame['variants_frame'].split('\n'))
                 for key, value in frame['variants'].items():
-                    markup.add(InlineKeyboardButton(value, callback_data=kb.frame_change.new(key)))
+                    markup.add(InlineKeyboardButton(text=value, callback_data=kb.FrameChange_CallbackData(frame_num=int(key)).pack()))
                 if game['can_change_page']:
-                    markup.add(InlineKeyboardButton(phr.change_page, callback_data=kb.change_page_manual.new(f'{game["game_code"]}')))
+                    markup.add(InlineKeyboardButton(text=phr.change_page, callback_data=kb.ChangePageManual_CallbackData(game_code=game["game_code"]).pack()))
                 if user['is_admin']:
-                    markup.add(InlineKeyboardButton(phr.admin_info_frame, callback_data=kb.admin_frame_info.new(frame['frame_num'], game['game_code'])))
-                markup.add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.get_game_info.new(game['game_code'])))
+                    markup.add(InlineKeyboardButton(text=phr.admin_info_frame, callback_data=kb.Admin_CallbackData(frame_num=int(frame['frame_num']), game_code=game['game_code']).pack()))
+                markup.add(InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.GetGameInfo_CallbackData(game_code=game['game_code']).pack()))
                 try:
                     if content is not None:
-                        await call.message.edit_media(content, reply_markup=markup)
+                        await call.message.edit_media(content, reply_markup=markup.as_markup())
                     else:
-                        await call.message.edit_text(frame_text, reply_markup=markup,
-                                                            parse_mode='HTML')
+                        await call.message.edit_text(frame_text, reply_markup=markup.as_markup())
                 except:
                     try:
                         await call.message.delete()
                     except:
                         pass
-                    async with state.proxy():
-                        frame_text = frame['text']['ru']
-                        if game['can_change_page']:
-                            frame_text = f"{frame_text}\n\n" \
-                                         f"Страница {frame['frame_num']} из {db.return_number_of_frames(game_code=game['game_code'])}"
-                        match frame['content_code']:
-                            case 1:
-                                message = await call.message.answer_photo(frame['content'], caption=frame_text,
-                                                                          reply_markup=markup, parse_mode='HTML')
-                            case 2:
-                                message = await call.message.answer_video(frame['content'], caption=frame_text,
-                                                                          reply_markup=markup, parse_mode='HTML')
-                            case 3:
-                                message = await call.message.answer_audio(frame['content'], caption=frame_text,
-                                                                          reply_markup=markup, parse_mode='HTML')
-                            case 4:
-                                message = await call.message.answer_animation(frame['content'], caption=frame_text,
-                                                                              reply_markup=markup, parse_mode='HTML')
-                            case _:
-                                message = await call.message.answer(frame_text, reply_markup=markup,
-                                                                    parse_mode='HTML')
 
-                        await state.update_data(game_text=message)
+                    frame_text = frame['text']['ru']
+                    if game['can_change_page']:
+                        frame_text = f"{frame_text}\n\n" \
+                                     f"Страница {frame['frame_num']} из {db.return_number_of_frames(game_code=game['game_code'])}"
+                    match frame['content_code']:
+                        case 1:
+                            message = await call.message.answer_photo(frame['content'], caption=frame_text,
+                                                                      reply_markup=markup, parse_mode='HTML')
+                        case 2:
+                            message = await call.message.answer_video(frame['content'], caption=frame_text,
+                                                                      reply_markup=markup, parse_mode='HTML')
+                        case 3:
+                            message = await call.message.answer_audio(frame['content'], caption=frame_text,
+                                                                      reply_markup=markup, parse_mode='HTML')
+                        case 4:
+                            message = await call.message.answer_animation(frame['content'], caption=frame_text,
+                                                                          reply_markup=markup, parse_mode='HTML')
+                        case _:
+                            message = await call.message.answer(frame_text, reply_markup=markup,
+                                                                parse_mode='HTML')
+
+                    await state.update_data(game_text=message)
             else:
                 try:
                     await call.message.delete()
@@ -123,30 +123,27 @@ async def change_frames(call, frame_num, state:FSMContext, failed:int=0):
                 await call.message.answer('На этом демо продукта заканчивается. Приобретите полную версию 💳')
             if frame['sound']:
                 if data.get('sound') == None:
-                    async with state.proxy():
-                        sound = await call.message.answer_audio(frame['sound'])
-                        await state.update_data(sound=sound)
-                        await state.update_data(sound_id=frame['sound'])
+                    sound = await call.message.answer_audio(frame['sound'])
+                    await state.update_data(sound=sound)
+                    await state.update_data(sound_id=frame['sound'])
                 else:
                     old_id = data.get('sound_id')
                     if old_id != frame['sound']:
                         await call.bot.delete_message(message_id=data.get('sound').message_id, chat_id=call.message.chat.id)
-                        async with state.proxy():
-                            sound = await call.message.answer_audio(frame['sound'])
-                            await state.update_data(sound=sound)
-                            await state.update_data(sound_id=frame['sound'])
+                        sound = await call.message.answer_audio(frame['sound'])
+                        await state.update_data(sound=sound)
+                        await state.update_data(sound_id=frame['sound'])
 
 
             if frame['achivement']:
                 achiv = db.give_achivement_to_user(game_code=game['game_code'], achivement_code=frame['achivement'],
                                                    user_id=call.message.chat.id)
                 if achiv != 0:
-                    async with state.proxy():
-                        achivement = db.return_achivement(game_code=game['game_code'],
-                                                          achivement_code=frame['achivement'])
-                        ok = await call.message.answer(
-                            text=f'Получено достижение ✅ {achivement["name"]}\nЧтобы посмотреть все достижения перейдите к меню достижений  📂')
-                        await state.update_data(achivement=ok)
+                    achivement = db.return_achivement(game_code=game['game_code'],
+                                                      achivement_code=frame['achivement'])
+                    ok = await call.message.answer(
+                        text=f'Получено достижение ✅ {achivement["name"]}\nЧтобы посмотреть все достижения перейдите к меню достижений  📂')
+                    await state.update_data(achivement=ok)
 
             if frame['change_add_conditions']:
                 match frame['modificators']:
@@ -180,23 +177,23 @@ async def change_frames(call, frame_num, state:FSMContext, failed:int=0):
                 await call.message.answer(phr.end_of_product)
 
 
-@dp.callback_query_handler(kb.frame_change.filter())
-async def change_frame_cb(call:types.CallbackQuery, callback_data: dict, state:FSMContext):
-    await change_frames(call, int(callback_data['frame_num']), state)
+@dp.callback_query(kb.FrameChange_CallbackData.filter())
+async def change_frame_cb(call:types.CallbackQuery, callback_data: kb.FrameChange_CallbackData, state:FSMContext):
+    await change_frames(call, int(callback_data.frame_num), state)
 
-@dp.callback_query_handler(kb.change_page_manual.filter())
-async def go_to_page(call:types.CallbackQuery, callback_data: dict, state:FSMContext):
-    game_code = callback_data['info']
+@dp.callback_query(kb.ChangePageManual_CallbackData.filter())
+async def go_to_page(call:types.CallbackQuery, callback_data: kb.ChangePageManual_CallbackData, state:FSMContext):
+    game_code = callback_data.game_code
     try:
         await call.message.edit_text(f'Напишите какую страницу вы желаете открыть?\nВ диапозоне от 1 до {db.return_number_of_frames(game_code)}\n\nОтправьте /cancel для отмены')
     except:
         await call.message.delete()
         await call.message.answer(f'Напишите какую страницу вы желаете открыть?\nВ диапозоне от 1 до {db.return_number_of_frames(game_code)}\n\nОтправьте /cancel для отмены')
 
-    await Store.goto_page.set()
+    await state.set_state(Store.goto_page)
 
 
-@dp.callback_query_handler(kb.play_game.filter())
+@dp.callback_query(kb.PlayingGame_CallbackData.filter())
 async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMContext):
     game = db.return_game_info(callback_data['game_code'])
     user = db.return_user_info(call.message.chat.id)
@@ -237,46 +234,44 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
             case _:
                 content = None
 
-        markup = InlineKeyboardMarkup()
+        markup = InlineKeyboardBuilder()
         for key, value in frame['variants'].items():
-            markup.add(InlineKeyboardButton(value, callback_data=kb.frame_change.new(key)))
+            markup.add(InlineKeyboardButton(text=value, callback_data=kb.FrameChange_CallbackData(frame_num=int(key)).pack()))
         if game['can_change_page']:
-            markup.add(InlineKeyboardButton(phr.change_page, callback_data=kb.change_page_manual.new(f'{game["game_code"]}')))
+            markup.add(InlineKeyboardButton(text=phr.change_page, callback_data=kb.ChangePageManual_CallbackData(game_code=game["game_code"]).pack()))
         if user['is_admin']:
             markup.add(
-                InlineKeyboardButton(phr.admin_info_frame, callback_data=kb.admin_frame_info.new(frame['frame_num'], game['game_code'])))
-        markup.add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.get_game_info.new(game['game_code'])))
+                InlineKeyboardButton(text=phr.admin_info_frame, callback_data=kb.Admin_CallbackData(frame_num=int(frame['frame_num']), game_code=game['game_code']).pack()))
+        markup.add(InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.GetGameInfo_CallbackData(game_code=game['game_code']).pack()))
         try:
-            await call.message.edit_media(content, reply_markup=markup)
+            await call.message.edit_media(content, reply_markup=markup.as_markup())
         except:
             try:
                 await call.message.delete()
             except:
                 pass
-            async with state.proxy():
-                frame_text = frame['text']['ru']
-                if game['can_change_page']:
-                    frame_text = f"{frame_text}\n\n" \
-                                 f"Страница {frame['frame_num']} из {db.return_number_of_frames(game_code=game['game_code'])}"
-                match frame['content_code']:
-                    case 1:
-                        message = await call.message.answer_photo(frame['content'], caption=frame_text, reply_markup=markup, parse_mode='HTML', protect_content=True)
-                    case 2:
-                        message = await call.message.answer_video(frame['content'], caption=frame_text,reply_markup=markup, parse_mode='HTML', protect_content=True)
-                    case 3:
-                        message = await call.message.answer_audio(frame['content'], caption=frame_text,reply_markup=markup, parse_mode='HTML', protect_content=True)
-                    case 4:
-                        message = await call.message.answer_animation(frame['content'], caption=frame_text,
-                                                                      reply_markup=markup, parse_mode='HTML', protect_content=True)
-                    case _:
-                        message = await call.message.answer(frame_text,reply_markup=markup, parse_mode='HTML', protect_content=True)
-                await state.update_data(game_text=message)
+            frame_text = frame['text']['ru']
+            if game['can_change_page']:
+                frame_text = f"{frame_text}\n\n" \
+                             f"Страница {frame['frame_num']} из {db.return_number_of_frames(game_code=game['game_code'])}"
+            match frame['content_code']:
+                case 1:
+                    message = await call.message.answer_photo(frame['content'], caption=frame_text, reply_markup=markup, parse_mode='HTML', protect_content=True)
+                case 2:
+                    message = await call.message.answer_video(frame['content'], caption=frame_text,reply_markup=markup, parse_mode='HTML', protect_content=True)
+                case 3:
+                    message = await call.message.answer_audio(frame['content'], caption=frame_text,reply_markup=markup, parse_mode='HTML', protect_content=True)
+                case 4:
+                    message = await call.message.answer_animation(frame['content'], caption=frame_text,
+                                                                  reply_markup=markup, parse_mode='HTML', protect_content=True)
+                case _:
+                    message = await call.message.answer(frame_text,reply_markup=markup, parse_mode='HTML', protect_content=True)
+            await state.update_data(game_text=message)
         if frame['sound']:
             if data.get('sound') == None:
-                async with state.proxy():
-                    sound = await call.message.answer_audio(frame['sound'])
-                    await state.update_data(sound=sound)
-                    await state.update_data(sound_id=frame['sound'])
+                sound = await call.message.answer_audio(frame['sound'])
+                await state.update_data(sound=sound)
+                await state.update_data(sound_id=frame['sound'])
 
             else:
                     old_id = data.get('sound_id')
@@ -284,9 +279,8 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
                     if old_id != frame['sound']:
                         await call.bot.delete_message(message_id=data.get('sound').message_id,
                                                       chat_id=call.message.chat.id)
-                        async with state.proxy():
-                            sound = await call.message.answer_audio(frame['sound'])
-                            await state.update_data(sound=sound)
-                            await state.update_data(sound_id=frame['sound'])
+                        sound = await call.message.answer_audio(frame['sound'])
+                        await state.update_data(sound=sound)
+                        await state.update_data(sound_id=frame['sound'])
     else:
         await call.message.answer('У игры пока нет кадров. Но скоро это будет исправлено')

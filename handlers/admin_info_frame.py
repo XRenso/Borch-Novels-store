@@ -1,15 +1,16 @@
 from loader import dp,db
 import keyboards as kb
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram import types
+from aiogram.utils.keyboard import (ReplyKeyboardBuilder, InlineKeyboardBuilder,
+                                    InlineKeyboardButton, KeyboardButton)
+from aiogram import types, F
 import phrase as phr
-from aiogram.dispatcher import FSMContext
+from aiogram.fsm.context import FSMContext
 
 
-@dp.callback_query_handler(kb.admin_frame_info.filter())
-async def show_frame_info_admin(call:types.CallbackQuery, callback_data: dict, state:FSMContext):
-    game = db.return_game_info(callback_data['game_code'])
-    frame = db.return_frame(int(callback_data['frame_num']), game['game_code'])
+@dp.callback_query(kb.Admin_CallbackData.filter())
+async def show_frame_info_admin(call:types.CallbackQuery, callback_data: kb.Admin_CallbackData, state:FSMContext):
+    game = db.return_game_info(callback_data.game_code)
+    frame = db.return_frame(int(callback_data.frame_num), game['game_code'])
     match frame['content_code']:
         case 1:
             content = 'Изображение'
@@ -55,13 +56,13 @@ async def show_frame_info_admin(call:types.CallbackQuery, callback_data: dict, s
            f'Код достижения - <i>{frame["achivement"] if frame["achivement"] else "Кадр не дает достижения"}</i>\n\n' \
            f'Полный json кадра:\n<code>{frame}</code>'
 
-    markup = InlineKeyboardMarkup().add(InlineKeyboardButton(phr.back_to_game,callback_data=kb.play_game.new(game['game_code'])))
+    markup = InlineKeyboardBuilder().add(InlineKeyboardButton(text=phr.back_to_game,callback_data=kb.PlayingGame_CallbackData(game_code=game['game_code']).pack()))
 
     try:
-        await call.message.edit_text(info, parse_mode='HTML',reply_markup=markup)
+        await call.message.edit_text(info,reply_markup=markup.as_markup())
     except:
         try:
             await call.message.delete()
         except:
             await call.message.edit_caption('Закрыто ❌')
-        await call.message.answer(text=info, parse_mode='HTML',reply_markup=markup)
+        await call.message.answer(text=info,reply_markup=markup.as_markup())

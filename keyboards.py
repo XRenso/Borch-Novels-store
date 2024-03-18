@@ -1,256 +1,346 @@
 from aiogram.types import ReplyKeyboardRemove, \
-    ReplyKeyboardMarkup, KeyboardButton, \
-    InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.utils.callback_data import CallbackData
+    ReplyKeyboardMarkup, InlineKeyboardMarkup
+from aiogram.utils.keyboard import (ReplyKeyboardBuilder, InlineKeyboardBuilder,
+                                    InlineKeyboardButton, KeyboardButton)
+from aiogram.filters.callback_data import CallbackData
 import phrase as phr
 from database import Mongo as mg
 db = mg()
 db.__init__()
 #Callback data preset
-admin_frame_info = CallbackData('admin','frame_num','game_code')
+class Admin_CallbackData(CallbackData,prefix='admin'):
+    frame_num: int
+    game_code: str
+
+class RSS_CallbackData(CallbackData,prefix='rssA'):
+    confirm: str
+
+class FrameChange_CallbackData(CallbackData,prefix='frame_num'):
+    frame_num:int
 
 
-send_everyone = CallbackData('rssA', 'confirm')
+class PlayingGame_CallbackData(CallbackData,prefix='playing_game'):
+    game_code:str
 
-frame_change = CallbackData('frame','frame_num')
-play_game = CallbackData('playing_game', 'game_code')
-rate_game = CallbackData('rate', 'game_code')
-rating = CallbackData('rating_score','score')
+class RateGame_CallbackData(CallbackData,prefix='rate'):
+    game_code:str
 
-show_by_genre = CallbackData('gen', 'genre_code')
-show_more_info_game = CallbackData('game', 'game_code')
-show_more_game_genre = CallbackData('genre','type_code','genre_code', 'page')
-show_genres_by_type = CallbackData('type', 'type_code')
-inline_show_game_info = CallbackData('inline_game','game_code')
-get_game_info = CallbackData('info_game', 'game_code')
-buy_game = CallbackData('game_buying', 'game_code')
-get_demo = CallbackData('demo_game', 'game_code')
+class Rating_CallbackData(CallbackData,prefix='rating_score'):
+    game_code:str
+    score:int
 
-get_all_pages = CallbackData('pages', 'type','type_code','category_code')
-end_list = CallbackData('pgs_end','info')
+class ShowByGenre_CallbackData(CallbackData,prefix='gen'):
+    genre_code:str
 
+class ShowMoreInfoGame_CallbackData(CallbackData,prefix='game'):
+    game_code:str
 
-next_page = CallbackData('change_page','category')
+class ShowMoreGameGenre_CallbackData(CallbackData,prefix='genre'):
+    type_code:str
+    genre_code:str
+    page:int
 
-donate = CallbackData('donate','thx')
+class ShowGenresByType_CallbackData(CallbackData,prefix='type'):
+    type_code:str
 
-unavailable_game = CallbackData('unavailable', 'game_code')
+class InlineShowGameInfo_CallbackData(CallbackData,prefix='inline_game'):
+    game_code:str
 
-store_action = CallbackData('store', 'action')
-
-delete_game_from_library = CallbackData('delete_game','game_code')
-
-game_statistic = CallbackData('analytic', 'game_code')
-
-profile_achivement_games = CallbackData('games', 'game_code')
-profile_achivement_code = CallbackData('achivements','achivement_code')
-profile_action = CallbackData('profile', 'action')
+class GetGameInfo_CallbackData(CallbackData,prefix='info_game'):
+    game_code:str
 
 
-change_page_manual = CallbackData('changing_page','info')
+class BuyGame_CallbackData(CallbackData,prefix='game_buying'):
+    game_code:str
 
-paper_cb = CallbackData('paper', 'agree')
+class GetDemo_CallbackData(CallbackData,prefix='demo_game'):
+    game_code:str
+
+class GetAllPages_CallbackData(CallbackData,prefix='pages'):
+    type:str
+    type_code:str
+    category_code:str
+
+class EndList_CallbackData(CallbackData,prefix='pgs_end'):
+    info:str
+
+class NextPage_CallbackData(CallbackData, prefix='change_page'):
+    category:str
+
+class Donate_CallbackData(CallbackData, prefix='donate'):
+    thx:str
 
 
-reset_games_cb = CallbackData('res_games','game_code')
-confirm_reset_cb = CallbackData('conf_res','game_code')
-cancel_reset_cb = CallbackData('canc_res','ok')
-back_reset_cb = CallbackData('back_to_res','ok')
+class UnavailableGame_CallbackData(CallbackData, prefix='unavailable'):
+    game_code:str
 
-back_to_types_from_genre = CallbackData('back_to_types','ok')
-
-start_btn = InlineKeyboardButton('Начать', callback_data='start_play_game')
-start_game = InlineKeyboardMarkup().add(start_btn)
+class StoreAction_CallbackData(CallbackData, prefix='store'):
+    action:str
+    type_code:str
 
 
-get_user_group = CallbackData('user_group','group_name', 'page')
-back_to_user_group = CallbackData('back_to_user_groups','back')
-add_to_user_group = CallbackData('add_to_user_group','game_code')
-remove_from_user_group = CallbackData('remove_from_user_group','game_code')
-control_user_group = CallbackData('control_user_group', 'game_code')
-choose_group_add = CallbackData('g_a','game_code', 'group_name')
-choose_group_remove = CallbackData('g_r', 'game_code','group_name')
-create_new_user_group = CallbackData('create_user_group','game_code')
+class DeleteGameFromLibrary_CallbackData(CallbackData,prefix='delete_game'):
+    game_code:str
 
-get_user_group_for_reset = CallbackData('gugfr','group_name')
+class GameStatistic_CallbackData(CallbackData, prefix='analytic'):
+    game_code:str
+
+class ProfileAchivementGames_CallbackData(CallbackData, prefix='games'):
+    game_code:str
+
+class ProfileAchivementCode_CallbackData(CallbackData, prefix='achivements'):
+    game_code:str
+    achivement_code:str
+
+
+class ProfileAction_CallbackData(CallbackData, prefix='profile'):
+    action:str
+
+class ChangePageManual_CallbackData(CallbackData, prefix='changing_page'):
+    game_code:str
+
+
+
+class PaperAgree_CallbackData(CallbackData, prefix='paper'):
+    agree:str
+
+class ResetGame_CallbackData(CallbackData, prefix='res_games'):
+    game_code:str
+
+class ConfirmResetGame_CallbackData(CallbackData, prefix='conf_res'):
+    game_code:str
+
+
+class CancelResetGame_CallbackData(CallbackData, prefix='canc_res'):
+    ok:str
+
+class BackResetGame_CallbackData(CallbackData, prefix='back_to_res'):
+    ok:str
+
+class BackToTypesFromGenre_CallbackData(CallbackData, prefix='back_to_types'):
+    ok:str
+
+
+start_btn = InlineKeyboardButton(text='Начать', callback_data='start_play_game')
+start_game = InlineKeyboardBuilder().add(start_btn).as_markup()
+
+class GetUserGroup_CallbackData(CallbackData, prefix='user_group'):
+    group_name:str
+    page:int
+
+class BackToUserGroup_CallbackData(CallbackData, prefix='back_to_user_groups'):
+    back:str
+
+class AddToUserGroup_CallbackData(CallbackData, prefix='add_to_user_group'):
+    game_code:str
+
+class RemoveFromUserGroup_CallbackData(CallbackData, prefix='remove_from_user_group'):
+    game_code:str
+
+class ControlUserGroup_CallbackData(CallbackData, prefix='control_user_group'):
+    game_code:str
+
+class ChooseGroupAdd_CallbackData(CallbackData, prefix='g_a'):
+    game_code:str
+    group_name:str
+
+class ChooseGroupRemove_CallbackData(CallbackData, prefix='g_r'):
+    game_code:str
+    group_name:str
+
+class CreateNewUserGroup_CallbackData(CallbackData, prefix='create_user_group'):
+    game_code:str
+
+class GetUserGroupForReset_CallbackData(CallbackData, prefix='gugfr'):
+    group_name:str
 
 ##Agreement
-paper = InlineKeyboardButton('Пользовательское соглашение', url='https://telegra.ph/Polzovatelskoe-soglashenie-06-21-6')
-agree = InlineKeyboardButton('Принять ✅', callback_data=paper_cb.new('ye'))
+paper = InlineKeyboardButton(text='Пользовательское соглашение', url='https://telegra.ph/Polzovatelskoe-soglashenie-06-21-6')
+agree = InlineKeyboardButton(text='Принять ✅', callback_data=PaperAgree_CallbackData(agree='ye').pack())
 
-agreement_ikb = InlineKeyboardMarkup().add(paper).add(agree)
+agreement_ikb = InlineKeyboardBuilder().add(paper).add(agree).as_markup()
 
 ##Main kb
-main_kb = ReplyKeyboardMarkup(resize_keyboard=True)
-about_me = KeyboardButton(phr.profile)
-library = KeyboardButton(phr.library)
-shop = KeyboardButton(phr.shop)
-about_us = KeyboardButton(phr.about_us)
-main_kb.row(library,shop).row(about_us,about_me)
+main_kb_builder = ReplyKeyboardBuilder()
+about_me = KeyboardButton(text=phr.profile)
+library = KeyboardButton(text=phr.library)
+shop = KeyboardButton(text=phr.shop)
+about_us = KeyboardButton(text=phr.about_us)
+main_kb_builder.row(library,shop).row(about_us,about_me)
+main_kb = main_kb_builder.as_markup(resize_keyboard=True)
+
 
 ##Shop kb
-store = KeyboardButton(phr.store)
-find_game = KeyboardButton(phr.search_game)
-shop_statistic = KeyboardButton(phr.shop_statistic)
-main_menu = KeyboardButton(phr.main_menu)
-shop_kb = ReplyKeyboardMarkup(resize_keyboard=True)
-shop_kb.add(store,find_game).row(shop_statistic,main_menu)
-
+store = KeyboardButton(text=phr.store)
+find_game = KeyboardButton(text=phr.search_game)
+shop_statistic = KeyboardButton(text=phr.shop_statistic)
+main_menu = KeyboardButton(text=phr.main_menu)
+shop_kb_builder = ReplyKeyboardBuilder()
+shop_kb_builder.add(store,find_game).row(shop_statistic,main_menu)
+shop_kb = shop_kb_builder.as_markup(resize_keyboard=True)
 
 
 
 ##profile keyboard
-back_to_profile = InlineKeyboardButton('Назад ↩️', callback_data=profile_action.new('back_to_profile'))
-back_to_games = InlineKeyboardButton('Назад ↩️',callback_data=profile_action.new('back_to_games'))
-show_achivements = InlineKeyboardButton('Показать достижения ✅ ', callback_data=profile_action.new('show_achivements'))
-bad_achivements = InlineKeyboardButton('У вас нет достижений ❌', callback_data=profile_action.new('no_achivements'))
+back_to_profile = InlineKeyboardButton(text='Назад ↩️', callback_data=ProfileAction_CallbackData(action='back_to_profile').pack())
+back_to_games = InlineKeyboardButton(text='Назад ↩️',callback_data=ProfileAction_CallbackData(action='back_to_games').pack())
+show_achivements = InlineKeyboardButton(text='Показать достижения ✅ ', callback_data=ProfileAction_CallbackData(action='show_achivements').pack())
+bad_achivements = InlineKeyboardButton(text='У вас нет достижений ❌', callback_data=ProfileAction_CallbackData(action='no_achivements').pack())
 
-profile_kb_have_achivements = InlineKeyboardMarkup().add(show_achivements)
 
-profile_kb_not_have_achivements = InlineKeyboardMarkup().add(bad_achivements)
+
+profile_kb_have_achivements_builder = InlineKeyboardBuilder().add(show_achivements)
+profile_kb_have_achivements = profile_kb_have_achivements_builder.as_markup()
+profile_kb_not_have_achivements_builder = InlineKeyboardBuilder().add(bad_achivements)
+profile_kb_not_have_achivements = profile_kb_not_have_achivements_builder.as_markup()
 
 
 
 def return_games_btn_achivement(games):
     if games != 0:
-        markup = InlineKeyboardMarkup()
+        markup = InlineKeyboardBuilder()
         for i in games:
             game = db.return_game_info(i)
-            markup.add(InlineKeyboardButton(game['game_name'], callback_data=profile_achivement_games.new(i)))
-        return markup
+            markup.add(InlineKeyboardButton(text=game['game_name'], callback_data=ProfileAchivementGames_CallbackData(game_code=i).pack()))
+        return markup.as_markup()
 
 
 def return_achivements(achivments,game_code):
-    markup = InlineKeyboardMarkup()
+    markup = InlineKeyboardBuilder()
     for i in achivments:
         achivment = db.return_achivement(game_code=game_code, achivement_code=i)
         if achivment != 0:
-            markup.add(InlineKeyboardButton(achivment["name"], callback_data=profile_achivement_code.new(f"{game_code}<@{achivment['achivement_code']}")))
-    return markup
+            markup.add(InlineKeyboardButton(text=achivment["name"], callback_data=ProfileAchivementCode_CallbackData(game_code=game_code,achivement_code=achivment['achivement_code']).pack()))
+    return markup.as_markup()
 
 
 def return_library(games, type='lib',page=0, category_code=None, type_code=None):
-    markup = InlineKeyboardMarkup()
+    markup = InlineKeyboardBuilder()
     if len(games) <= 5:
         if games != 0:
             for i in games:
-                markup.add(InlineKeyboardButton(i['game_name'], callback_data=show_more_info_game.new(i['game_code'])))
+                markup.row(InlineKeyboardButton(text=i['game_name'], callback_data=ShowMoreInfoGame_CallbackData(game_code=i['game_code']).pack()))
     else:
         counter = len(games)//5
         if len(games)%5 !=0:
             counter+=1
         games = games[5*page:5*page+5]
         for i in games:
-            markup.add(InlineKeyboardButton(i['game_name'], callback_data=show_more_info_game.new(i['game_code'])))
+            markup.row(InlineKeyboardButton(text=i['game_name'], callback_data=ShowMoreInfoGame_CallbackData(game_code=i['game_code']).pack()))
         match type:
             case 'store':
-                page_counter = InlineKeyboardButton(f'{page + 1}/{counter}',
-                                                    callback_data=get_all_pages.new(type, type_code, category_code))
+                page_counter = InlineKeyboardButton(text=f'{page + 1}/{counter}',
+                                                    callback_data=GetAllPages_CallbackData(type=type, type_code=type_code, category_code=category_code).pack())
 
                 if page > 0:
-                    back_btn = InlineKeyboardButton('⬅️', callback_data=show_more_game_genre.new(type_code,category_code,str(page-1)))
+                    back_btn = InlineKeyboardButton(text='⬅️', callback_data=ShowMoreGameGenre_CallbackData(type_code=type_code,genre_code=category_code,page=page-1).pack())
                 else:
-                    back_btn = InlineKeyboardButton('⬅️', callback_data=end_list.new('bad'))
+                    back_btn = InlineKeyboardButton(text='⬅️', callback_data=EndList_CallbackData(info='bad').pack())
 
                 if 5*(page+1) in range(len(games)+1):
-                    next_btn = InlineKeyboardButton('➡️', callback_data=show_more_game_genre.new(type_code,category_code,str(page+1)))
+                    next_btn = InlineKeyboardButton(text='➡️', callback_data=ShowMoreGameGenre_CallbackData(type_code=type_code,genre_code=category_code,page=page+1).pack())
                 else:
-                    next_btn = InlineKeyboardButton('➡️', callback_data=end_list.new('bad'))
-
-                markup.add(back_btn,
+                    next_btn = InlineKeyboardButton(text='➡️', callback_data=EndList_CallbackData(info='bad').pack())
+                markup.row(back_btn,
                            page_counter,
                            next_btn)
             case 'lib':
-                page_counter = InlineKeyboardButton(f'{page + 1}/{counter}',
-                                                    callback_data=get_all_pages.new(type, 'n', category_code))
+                page_counter = InlineKeyboardButton(text=f'{page + 1}/{counter}',
+                                                    callback_data=GetAllPages_CallbackData(type=type, type_code='n', category_code=category_code).pack())
 
                 if page > 0:
-                    back_btn = InlineKeyboardButton('⬅️',
-                                                    callback_data=get_user_group.new(category_code, str(page - 1)))
+                    back_btn = InlineKeyboardButton(text='⬅️',
+                                                    callback_data=GetUserGroup_CallbackData(group_name=category_code, page=page - 1).pack())
                 else:
-                    back_btn = InlineKeyboardButton('⬅️',
-                                                    callback_data=end_list.new('bad'))
+                    back_btn = InlineKeyboardButton(text='⬅️',
+                                                    callback_data=EndList_CallbackData(info='bad').pack())
 
                 if 5 * (page + 1) in range(len(games)+1):
-                    next_btn = InlineKeyboardButton('➡️', callback_data=
-                        get_user_group.new(category_code, str(page + 1)))
+                    next_btn = InlineKeyboardButton(text='➡️', callback_data=
+                        GetUserGroup_CallbackData(group_name=category_code, page=page+1).pack())
                 else:
-                    next_btn = InlineKeyboardButton('➡️', callback_data=
-                        end_list.new('bad'))
+                    next_btn = InlineKeyboardButton(text='➡️', callback_data=
+                        EndList_CallbackData(info='bad').pack())
 
-                markup.add(back_btn,
+                markup.row(back_btn,
                            page_counter,
                            next_btn)
     return markup
 
 def lib_category(categories):
-    markup = InlineKeyboardMarkup()
+    markup = InlineKeyboardBuilder()
     for key,_ in categories.items():
-        markup.add(InlineKeyboardButton(key, callback_data=get_user_group.new(key, '0')))
-    return markup
+        markup.row(InlineKeyboardButton(text=key, callback_data=GetUserGroup_CallbackData(group_name=key, page=0).pack()))
+    return markup.as_markup()
 def reset_library(games):
-    markup = InlineKeyboardMarkup()
+    markup = InlineKeyboardBuilder()
     if games !=0 :
         for i in games:
-            markup.add(InlineKeyboardButton(i['game_name'], callback_data=reset_games_cb.new(i['game_code'])))
-    return markup
+            markup.add(InlineKeyboardButton(text=i['game_name'], callback_data=ResetGame_CallbackData(game_code=i['game_code']).pack()))
+    return markup.as_markup()
 def reset_library_categories(categories):
-    markup = InlineKeyboardMarkup()
+    markup = InlineKeyboardBuilder()
     if categories != 0 :
         for key, _ in categories.items():
-            markup.add(InlineKeyboardButton(key, callback_data=get_user_group_for_reset.new(key)))
-    return markup
+            markup.add(InlineKeyboardButton(text=key, callback_data=GetUserGroupForReset_CallbackData(group_name=key).pack()))
+    return markup.as_markup()
 
 def store_kb_genres(genre, type_code):
-    markup = InlineKeyboardMarkup(row_width=1)
+    markup = InlineKeyboardBuilder()
+    btn = []
     for i in genre:
-        markup.insert(InlineKeyboardButton(db.return_genre_name_by_code(i, type_code=type_code),callback_data=show_more_game_genre.new(type_code,i,'0')))
+        btn.append(InlineKeyboardButton(text=db.return_genre_name_by_code(i, type_code=type_code),callback_data=ShowMoreGameGenre_CallbackData(type_code=type_code,genre_code=i,page=0).pack()))
 
-    return markup
+    markup.row(*btn,width=1)
+
+    return markup.as_markup()
 
 def store_kb_types(type):
-    markup = InlineKeyboardMarkup(row_width=1)
+    markup = InlineKeyboardBuilder()
+    btn = []
     for i in type:
-        markup.insert(InlineKeyboardButton(db.return_type_name_by_code(i),callback_data=show_genres_by_type.new(i)))
-    return markup
+        btn.append(InlineKeyboardButton(text=db.return_type_name_by_code(i),callback_data=ShowGenresByType_CallbackData(type_code=i).pack()))
+    markup.row(*btn,width=1)
+    return markup.as_markup()
 def get_game(game_code:str, have_it_user:int, price:int, user_id:int) -> InlineKeyboardMarkup:
     check_frame = db.return_frame(1,game_code)
     game = db.return_game_info(game_code)
-    markup = InlineKeyboardMarkup()
+    markup = InlineKeyboardBuilder()
     game_cfg = db.return_game_cfg(user_id, game_code)
     user = db.return_user_info(user_id)
     if check_frame != 0 and game['can_buy'] != 0:
         match have_it_user:
             case 1 if not game_cfg or game_cfg['is_demo'] == 0:
-                markup.row(InlineKeyboardButton('Запустить 🎮', callback_data=play_game.new(game_code)), InlineKeyboardButton('Оценить 🌟', callback_data=rate_game.new(game_code)))
+                markup.row(InlineKeyboardButton(text='Запустить 🎮', callback_data=PlayingGame_CallbackData(game_code=game_code).pack()), InlineKeyboardButton(text='Оценить 🌟', callback_data=RateGame_CallbackData(game_code=game_code).pack()))
             case _:
                 match price:
                     case 0:
-                        markup.add(InlineKeyboardButton('Получить 👇', callback_data=buy_game.new(game_code)))
+                        markup.row(InlineKeyboardButton(text='Получить 👇', callback_data=BuyGame_CallbackData(game_code=game_code).pack()))
                     case _:
                             if game_cfg == 0:
-                                markup.add(InlineKeyboardButton('Купить 💳', callback_data=buy_game.new(game_code)))
+                                markup.row(InlineKeyboardButton(text='Купить 💳', callback_data=BuyGame_CallbackData(game_code=game_code).pack()))
                             elif game_cfg['is_demo'] == 1:
-                                markup.add(InlineKeyboardButton('Купить полную версию 💳', callback_data=buy_game.new(game_code)))
+                                markup.row(InlineKeyboardButton(text='Купить полную версию 💳', callback_data=BuyGame_CallbackData(game_code=game_code).pack()))
                             if game_cfg == 0:
-                                markup.add(InlineKeyboardButton('Получить демо 👇', callback_data=get_demo.new(game_code)))
+                                markup.row(InlineKeyboardButton(text='Получить демо 👇', callback_data=GetDemo_CallbackData(game_code=game_code).pack()))
                             else:
-                                    markup.add(InlineKeyboardButton('Запустить 🎮', callback_data=play_game.new(game_code)))
+                                    markup.row(InlineKeyboardButton(text='Запустить 🎮', callback_data=PlayingGame_CallbackData(game_code=game_code).pack()))
     else:
         if have_it_user == 0:
-            markup.add(InlineKeyboardButton('Продукт недоступен ❌', callback_data=unavailable_game.new(game_code)))
+            markup.row(InlineKeyboardButton(text='Продукт недоступен ❌', callback_data=UnavailableGame_CallbackData(game_code=game_code).pack()))
         else:
-            markup.row(InlineKeyboardButton('Запустить 🎮', callback_data=play_game.new(game_code)), InlineKeyboardButton('Оценить 🌟', callback_data=rate_game.new(game_code)))
+            markup.row(InlineKeyboardButton(text='Запустить 🎮', callback_data=PlayingGame_CallbackData(game_code=game_code).pack()), InlineKeyboardButton(text='Оценить 🌟', callback_data=RateGame_CallbackData(game_code=game_code).pack()))
 
     if user['is_admin'] == 1:
-        markup.add(InlineKeyboardButton(phr.statistic,callback_data=game_statistic.new(game_code)))
+        markup.row(InlineKeyboardButton(text=phr.statistic,callback_data=GameStatistic_CallbackData(game_code=game_code).pack()))
 
     if have_it_user == 1:
-        markup.add(InlineKeyboardButton(phr.control_user_group, callback_data=control_user_group.new(game_code)))
+        markup.row(InlineKeyboardButton(text=phr.control_user_group, callback_data=ControlUserGroup_CallbackData(game_code=game_code).pack()))
 
     elif db.get_user_group_by_game(user_id, game_code, 0):
-        markup.add(InlineKeyboardButton(phr.remove_from_user_group, callback_data=remove_from_user_group.new(game_code)))
+        markup.row(InlineKeyboardButton(text=phr.remove_from_user_group, callback_data=RemoveFromUserGroup_CallbackData(game_code=game_code).pack()))
 
     if price == 0 and have_it_user == 1:
-        markup.add(InlineKeyboardButton(phr.delete_game_from_lib, callback_data=delete_game_from_library.new(game_code)))
-    return markup.add(InlineKeyboardButton(text=phr.share_game, switch_inline_query=game['game_name']))
+        markup.row(InlineKeyboardButton(text=phr.delete_game_from_lib, callback_data=DeleteGameFromLibrary_CallbackData(game_code=game_code).pack()))
+    markup.row(InlineKeyboardButton(text=phr.share_game, switch_inline_query=game['game_name']))
+    return markup.as_markup()

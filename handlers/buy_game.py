@@ -1,24 +1,26 @@
 from loader import dp,db,bot
 from aiogram import types
 import keyboards as kb
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, LabeledPrice,PreCheckoutQuery
+from aiogram.types import  LabeledPrice,PreCheckoutQuery
+from aiogram.utils.keyboard import (ReplyKeyboardBuilder, InlineKeyboardBuilder,
+                                    InlineKeyboardButton, KeyboardButton)
 import os
 import phrase as phr
 
-@dp.callback_query_handler(kb.buy_game.filter())
-async def buy_game(call:types.CallbackQuery, callback_data: dict):
-    game_code = callback_data['game_code']
+@dp.callback_query(kb.BuyGame_CallbackData.filter())
+async def buy_game(call:types.CallbackQuery, callback_data: kb.BuyGame_CallbackData):
+    game_code = callback_data.game_code
     game = db.return_game_info(game_code)
-    markup = InlineKeyboardMarkup().add(InlineKeyboardButton(phr.back_to_game, callback_data=kb.get_game_info.new(callback_data['game_code'])))
+    markup = InlineKeyboardBuilder().add(InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.get_game_info.new(callback_data['game_code'])))
     match game['price']:
         case 0:
             db.give_game_to_user(game_code,call.message.chat.id, 0)
             db.update_month_game_sales(game['game_code'])
             try:
-                await call.message.edit_text(f'{game["game_name"]} успешно добавлена в библиотеку ✅', reply_markup=markup)
+                await call.message.edit_text(f'{game["game_name"]} успешно добавлена в библиотеку ✅', reply_markup=markup.as_markup())
             except:
                 await call.message.delete()
-                await call.message.answer(f'{game["game_name"]} успешно добавлена в библиотеку ✅', reply_markup=markup)
+                await call.message.answer(f'{game["game_name"]} успешно добавлена в библиотеку ✅', reply_markup=markup.as_markup())
         case _:
             try:
                 await call.message.delete()
@@ -60,6 +62,6 @@ async def buy_game(call:types.CallbackQuery, callback_data: dict):
 
             )
 
-@dp.pre_checkout_query_handler()
+@dp.pre_checkout_query()
 async def give_paid_game_to_user(pre_checkout_query:PreCheckoutQuery):
     await bot.answer_pre_checkout_query(pre_checkout_query.id,ok=True)

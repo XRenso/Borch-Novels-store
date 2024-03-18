@@ -1,36 +1,42 @@
-from aiogram.dispatcher.middlewares import BaseMiddleware
-from aiogram.dispatcher.handler import CancelHandler
+from aiogram import BaseMiddleware
 from aiogram.types import BotCommand
-from aiogram import types
-from loader import db,dp
+from aiogram.types import Message
+from typing import Callable, Awaitable, Dict, Any
+from loader import db,dp, bot
 class Commands(BaseMiddleware):
-    async def on_pre_process_message(self, message: types.Message, data: dict):
-        user_id = message.from_user.id
+    async def __call__(
+            self,
+            handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
+            event: Message,
+            data: Dict[str, Any]
+    ) -> Any:
+        user_id = event.from_user.id
         user = db.return_user_info(user_id)
         try:
             if not user['is_admin']:
-                await dp.bot.set_my_commands([
-                    BotCommand("start", "Запустить бота"),
-                    BotCommand("donate", "Поддержать проект"),
-                    BotCommand("info", "Информация про наш магазин"),
-                    BotCommand("reset_game", "Сбросить прогресс в игре"),
-                    BotCommand("cancel", "Отменить ввод")
+                await bot.set_my_commands([
+                    BotCommand(command="start", description="Запустить бота"),
+                    BotCommand(command="donate", description="Поддержать проект"),
+                    BotCommand(command="info", description="Информация про наш магазин"),
+                    BotCommand(command="reset_game", description="Сбросить прогресс в игре"),
+                    BotCommand(command="cancel", description="Отменить ввод")
                 ])
             else:
-                await dp.bot.set_my_commands([
-                    BotCommand("start", "Запустить бота"),
-                    BotCommand("donate", "Поддержать проект"),
-                    BotCommand("info", "Информация про наш магазин"),
-                    BotCommand("reset_game", "Сбросить прогресс в игре"),
-                    BotCommand("cancel", "Отменить ввод"),
-                    BotCommand('set_tech_mode','Переключить тех. режим'),
-                    BotCommand('send_everyone','Отправить всем сообщение')
+                await bot.set_my_commands([
+                    BotCommand(command="start", description="Запустить бота"),
+                    BotCommand(command="donate", description="Поддержать проект"),
+                    BotCommand(command="info", description="Информация про наш магазин"),
+                    BotCommand(command="reset_game", description="Сбросить прогресс в игре"),
+                    BotCommand(command="cancel", description="Отменить ввод"),
+                    BotCommand(command='set_tech_mode',description='Переключить тех. режим'),
+                    BotCommand(command='send_everyone',description='Отправить всем сообщение')
                 ])
         except TypeError:
-            await dp.bot.set_my_commands([
-                BotCommand("start", "Запустить бота"),
-                BotCommand("donate", "Поддержать проект"),
-                BotCommand("info", "Информация про наш магазин"),
-                BotCommand("reset_game", "Сбросить прогресс в игре"),
-                BotCommand("cancel", "Отменить ввод")
+            await bot.set_my_commands([
+                BotCommand(command="start", description="Запустить бота"),
+                BotCommand(command="donate", description="Поддержать проект"),
+                BotCommand(command="info", description="Информация про наш магазин"),
+                BotCommand(command="reset_game", description="Сбросить прогресс в игре"),
+                BotCommand(command="cancel", description="Отменить ввод")
             ])
+        return await handler(event,data)
