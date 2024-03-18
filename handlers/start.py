@@ -13,32 +13,32 @@ async def start(message: types.Message):
                                 f'\nДобро пожаловать в магазин Borch Store.\n'
                              f'\n🔱 Используйте меню, для взаимодействия с ботом.', reply_markup=kb.main_kb)
 
-        try:
-            game_code = message.get_args()
-            if game_code is not None:
-                game = db.return_game_info(game_code)
-                media = MediaGroupBuilder()
-                if db.return_user_info(message.from_user.id) != 0:
-                    try:
-                        markup = kb.get_game(game['game_code'],
-                                             db.check_is_game_in_user_library(message.from_user.id, game['game_code']), game['price'],
-                                             user_id=message.from_user.id)
-                    except TypeError:
-                        return
-                    for index, file_id in enumerate(game['game_cover'].split('\n')):
-                        match index:
-                            case _:
-                                match file_id.lower()[0]:
-                                    case 'b':
-                                        media.add_video(media=file_id)
-                                    case 'a':
-                                        media.add_photo(media=file_id)
 
-                    game_info_text = phr.get_product_info(game)
-                    await message.answer_media_group(media=media.build())
-                    await message.answer(game_info_text, reply_markup=markup.as_markup())
-        except AttributeError:
-            pass
+
+        if message.get_args():
+            game_code = message.get_args()
+            game = db.return_game_info(game_code)
+            media = MediaGroupBuilder()
+            if db.return_user_info(message.from_user.id) != 0:
+                try:
+                    markup = kb.get_game(game['game_code'],
+                                         db.check_is_game_in_user_library(message.from_user.id, game['game_code']), game['price'],
+                                         user_id=message.from_user.id)
+                except TypeError:
+                    return
+                for index, file_id in enumerate(game['game_cover'].split('\n')):
+                    match index:
+                        case _:
+                            match file_id.lower()[0]:
+                                case 'b':
+                                    media.add_video(media=file_id)
+                                case 'a':
+                                    media.add_photo(media=file_id)
+
+                game_info_text = phr.get_product_info(game)
+                await message.answer_media_group(media=media.build())
+                await message.answer(game_info_text, reply_markup=markup.as_markup())
+
     else:
         await message.answer('Ознакомиться с правилами можно по кнопке ниже: ', reply_markup=kb.agreement_ikb)
 
