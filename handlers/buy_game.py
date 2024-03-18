@@ -11,7 +11,7 @@ import phrase as phr
 async def buy_game(call:types.CallbackQuery, callback_data: kb.BuyGame_CallbackData):
     game_code = callback_data.game_code
     game = db.return_game_info(game_code)
-    markup = InlineKeyboardBuilder().add(InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.get_game_info.new(callback_data['game_code'])))
+    markup = InlineKeyboardBuilder().add(InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.GetGameInfo_CallbackData(game_code=callback_data.game_code).pack()))
     match game['price']:
         case 0:
             db.give_game_to_user(game_code,call.message.chat.id, 0)
