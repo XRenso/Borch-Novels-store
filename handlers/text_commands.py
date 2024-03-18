@@ -55,7 +55,7 @@ async def get_text(message: types.Message, state:FSMContext):
             case phr.store:
                 types = db.return_type()
                 markup = kb.store_kb_types(types)
-                if not len(markup['inline_keyboard']):
+                if not len(markup.as_markup().inline_keyboard):
                     await message.answer(f'Отсутствует товар в магазине ❌')
                 else:
                     await message.answer_photo(photo='AgACAgIAAxkBAAIlRmS0kvRiHbkGzpyvclOYwC94Wfb8AAL9zjEbWFuhSWJYQDJSBo2bAQADAgADeQADLwQ',caption=f'Выберите интересующую вас категорию 👇', reply_markup=markup.as_markup())
