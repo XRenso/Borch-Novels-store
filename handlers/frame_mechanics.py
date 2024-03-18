@@ -194,8 +194,8 @@ async def go_to_page(call:types.CallbackQuery, callback_data: kb.ChangePageManua
 
 
 @dp.callback_query(kb.PlayingGame_CallbackData.filter())
-async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMContext):
-    game = db.return_game_info(callback_data['game_code'])
+async def start_play(call:types.CallbackQuery, callback_data: kb.PlayingGame_CallbackData, state:FSMContext):
+    game = db.return_game_info(callback_data.game_code)
     user = db.return_user_info(call.message.chat.id)
     game_user_cfg = db.return_game_cfg(call.message.chat.id,game['game_code'])
     frame = db.return_frame(game_code=game['game_code'],frame_num=game_user_cfg['frame_num'])
@@ -205,7 +205,7 @@ async def start_play(call:types.CallbackQuery, callback_data: dict, state:FSMCon
     except:
         await call.message.edit_text('Игра запущена')
     if frame != 0:
-        db.user_played_game(user_id=call.message.chat.id, game_code=callback_data['game_code'])
+        db.user_played_game(user_id=call.message.chat.id, game_code=callback_data.game_code)
         if data.get('game_text'):
             try:
                 await call.bot.delete_message(chat_id=call.message.chat.id,message_id=data.get('game_text').message_id)
