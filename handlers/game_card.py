@@ -63,7 +63,7 @@ async def show_game_info(call:types.CallbackQuery, callback_data: kb.ShowMoreInf
 
 
     await call.message.answer_media_group(media=media.build())
-    await call.message.answer(game_info_text, reply_markup=markup)
+    await call.message.answer(game_info_text, reply_markup=markup.as_markup())
 
 
 @dp.callback_query(kb.UnavailableGame_CallbackData.filter())
