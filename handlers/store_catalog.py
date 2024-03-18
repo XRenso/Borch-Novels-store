@@ -85,9 +85,9 @@ async def get_genres_by_type(call:types.CallbackQuery, callback_data: kb.ShowGen
     back_to_types = InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.StoreAction_CallbackData(type_code=type_code,action='go_to_types').pack())
     markup.add(back_to_types)
     if not len(markup.as_markup().inline_keyboard):
-        await call.message.edit_caption(f'Игры отсутствуют в магазине ❌')
+        await call.message.edit_caption(caption=f'Игры отсутствуют в магазине ❌')
     else:
-        await call.message.edit_caption(f'Выберите интересующий вас жанр 👇', reply_markup=markup.as_markup())
+        await call.message.edit_caption(caption=f'Выберите интересующий вас жанр 👇', reply_markup=markup.as_markup())
 
 @dp.callback_query(kb.StoreAction_CallbackData.filter())
 async def store_handler(call:types.CallbackQuery, callback_data: kb.StoreAction_CallbackData):
@@ -99,14 +99,14 @@ async def store_handler(call:types.CallbackQuery, callback_data: kb.StoreAction_
             back_to_types = InlineKeyboardButton(text=phr.back_to_game,
                                                  callback_data=kb.StoreAction_CallbackData(type_code=type_code,action='go_to_types').pack())
             markup = kb.store_kb_genres(genres, type_code)
-            markup.add(back_to_types)
+            markup.row(back_to_types)
             content = InputMediaPhoto(media='AgACAgIAAxkBAAIlRmS0kvRiHbkGzpyvclOYwC94Wfb8AAL9zjEbWFuhSWJYQDJSBo2bAQADAgADeQADLwQ', caption=f'Выберите интересующую вас жанр 👇')
             await call.message.edit_media(content, reply_markup=markup.as_markup())
         case 'go_to_types':
             types = db.return_type()
             markup = kb.store_kb_types(types)
             if not len(markup.as_markup().inline_keyboard):
-                await call.message.edit_text(f'Отсутствует товар в магазине ❌')
+                await call.message.edit_text(text=f'Отсутствует товар в магазине ❌')
             else:
                 content = InputMediaPhoto(media='AgACAgIAAxkBAAIlRmS0kvRiHbkGzpyvclOYwC94Wfb8AAL9zjEbWFuhSWJYQDJSBo2bAQADAgADeQADLwQ', caption=f'Выберите интересующую вас категорию 👇')
                 await call.message.edit_media(content, reply_markup=markup.as_markup())
