@@ -76,12 +76,12 @@ async def change_frames(call, frame_num, state:FSMContext, failed:int=0):
                 markup = InlineKeyboardBuilder()
                 # frame_num = list(frame['variants_frame'].split('\n'))
                 for key, value in frame['variants'].items():
-                    markup.add(InlineKeyboardButton(text=value, callback_data=kb.FrameChange_CallbackData(frame_num=int(key)).pack()))
+                    markup.row(InlineKeyboardButton(text=value, callback_data=kb.FrameChange_CallbackData(frame_num=int(key)).pack()))
                 if game['can_change_page']:
-                    markup.add(InlineKeyboardButton(text=phr.change_page, callback_data=kb.ChangePageManual_CallbackData(game_code=game["game_code"]).pack()))
+                    markup.row(InlineKeyboardButton(text=phr.change_page, callback_data=kb.ChangePageManual_CallbackData(game_code=game["game_code"]).pack()))
                 if user['is_admin']:
-                    markup.add(InlineKeyboardButton(text=phr.admin_info_frame, callback_data=kb.Admin_CallbackData(frame_num=int(frame['frame_num']), game_code=game['game_code']).pack()))
-                markup.add(InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.GetGameInfo_CallbackData(game_code=game['game_code']).pack()))
+                    markup.row(InlineKeyboardButton(text=phr.admin_info_frame, callback_data=kb.Admin_CallbackData(frame_num=int(frame['frame_num']), game_code=game['game_code']).pack()))
+                markup.row(InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.GetGameInfo_CallbackData(game_code=game['game_code']).pack()))
                 try:
                     if content is not None:
                         await call.message.edit_media(content, reply_markup=markup.as_markup())
@@ -236,13 +236,13 @@ async def start_play(call:types.CallbackQuery, callback_data: kb.PlayingGame_Cal
 
         markup = InlineKeyboardBuilder()
         for key, value in frame['variants'].items():
-            markup.add(InlineKeyboardButton(text=value, callback_data=kb.FrameChange_CallbackData(frame_num=int(key)).pack()))
+            markup.row(InlineKeyboardButton(text=value, callback_data=kb.FrameChange_CallbackData(frame_num=int(key)).pack()))
         if game['can_change_page']:
-            markup.add(InlineKeyboardButton(text=phr.change_page, callback_data=kb.ChangePageManual_CallbackData(game_code=game["game_code"]).pack()))
+            markup.row(InlineKeyboardButton(text=phr.change_page, callback_data=kb.ChangePageManual_CallbackData(game_code=game["game_code"]).pack()))
         if user['is_admin']:
-            markup.add(
+            markup.row(
                 InlineKeyboardButton(text=phr.admin_info_frame, callback_data=kb.Admin_CallbackData(frame_num=int(frame['frame_num']), game_code=game['game_code']).pack()))
-        markup.add(InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.GetGameInfo_CallbackData(game_code=game['game_code']).pack()))
+        markup.row(InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.GetGameInfo_CallbackData(game_code=game['game_code']).pack()))
         try:
             await call.message.edit_media(content, reply_markup=markup.as_markup())
         except:
