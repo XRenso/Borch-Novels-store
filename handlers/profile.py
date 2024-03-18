@@ -18,7 +18,7 @@ async def achivments_games(call:types.CallbackQuery, callback_data: kb.ProfileAc
     markup = kb.return_achivements(db.return_user_achivement_by_game_code(call.message.chat.id,callback_data.game_code), game_code=callback_data.game_code).add(kb.back_to_games)
     try:
         content = InputMediaPhoto(media='AgACAgIAAxkBAAIlSWS0kvTmnIDiPDrB9RKkNIAyyqgnAAPPMRtYW6FJ1ybBvzYseRYBAAMCAAN5AAMvBA', caption='Выберите интересующее вас достижение 🤔')
-        await call.message.edit_media(content, reply_markup=markup)
+        await call.message.edit_media(content, reply_markup=markup.as_markup())
     except:
         await call.message.delete()
         await call.message.answer_photo(photo='AgACAgIAAxkBAAIlSWS0kvTmnIDiPDrB9RKkNIAyyqgnAAPPMRtYW6FJ1ybBvzYseRYBAAMCAAN5AAMvBA',caption='Выберите интересующее вас достижение 🤔', reply_markup=markup.as_markup())

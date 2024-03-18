@@ -210,7 +210,7 @@ def return_achivements(achivments,game_code):
     for i in achivments:
         achivment = db.return_achivement(game_code=game_code, achivement_code=i)
         if achivment != 0:
-            markup.add(InlineKeyboardButton(text=achivment["name"], callback_data=ProfileAchivementCode_CallbackData(game_code=game_code,achivement_code=achivment['achivement_code']).pack()))
+            markup.row(InlineKeyboardButton(text=achivment["name"], callback_data=ProfileAchivementCode_CallbackData(game_code=game_code,achivement_code=achivment['achivement_code']).pack()))
     return markup
 
 
