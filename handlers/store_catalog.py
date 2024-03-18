@@ -13,7 +13,7 @@ async def get_games_by_genre(call:types.CallbackQuery, callback_data: kb.ShowMor
     type_code = callback_data.type_code
     genre_code = callback_data.genre_code
     page = int(callback_data.page)
-    markup = kb.return_library(db.return_game_by_genre(genre_code, type_code), type='store',page=page, type_code=type_code, category_code=genre_code).add(InlineKeyboardButton(text='Назад ↩️', callback_data=kb.StoreAction_CallbackData(type_code=type_code,action='go_to_genres').pack()))
+    markup = kb.return_library(db.return_game_by_genre(genre_code, type_code), type='store',page=page, type_code=type_code, category_code=genre_code).row(InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.StoreAction_CallbackData(type_code=type_code,action='go_to_genres').pack()))
     content = InputMediaPhoto(media='AgACAgIAAxkBAAIlRmS0kvRiHbkGzpyvclOYwC94Wfb8AAL9zjEbWFuhSWJYQDJSBo2bAQADAgADeQADLwQ', caption=f'Товары жанра {db.return_genre_name_by_code(genre_code, type_code)}:')
     await call.message.edit_media(content,reply_markup=markup.as_markup())
 
@@ -53,7 +53,7 @@ async def change_page_of_group(call:types.CallbackQuery, callback_data: kb.GetAl
 
             except TypeError:
                 markup = InlineKeyboardBuilder()
-                markup.add(InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.BackToUserGroup_CallbackData(back='ok').pack()))
+                markup.row(InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.BackToUserGroup_CallbackData(back='ok').pack()))
                 await call.message.edit_caption(
                     f'Данной группы больше не существует. Нажмите назад, чтобы вернуться в библиотеку',
                     reply_markup=markup.as_markup())
@@ -62,7 +62,7 @@ async def change_page_of_group(call:types.CallbackQuery, callback_data: kb.GetAl
                 if len(games) % 5 != 0:
                     pages += 1
                 for i in range(1,pages+1):
-                    markup.add(InlineKeyboardButton(text=f'{i}',
+                    markup.row(InlineKeyboardButton(text=f'{i}',
                                                     callback_data=kb.GetUserGroup_CallbackData(group_name=category_code,
                                                                                               page=i - 1).pack()))
                 await call.message.edit_caption(caption=f'Библиотека категория - «{category_code}»\nВыберите страницу:', reply_markup=markup.as_markup())
@@ -72,7 +72,7 @@ async def change_page_of_group(call:types.CallbackQuery, callback_data: kb.GetAl
             if len(games) % 5 != 0:
                 pages += 1
             for i in range(1, pages + 1):
-                markup.add(InlineKeyboardButton(text=f'{i}',
+                markup.row(InlineKeyboardButton(text=f'{i}',
                                                 callback_data=kb.GetUserGroup_CallbackData(group_name=category_code,
                                                                                     page=i-1).pack()))
             await call.message.edit_caption(caption=f'Библиотека категория - «{category_code}»\nВыберите страницу:', reply_markup=markup.as_markup())
@@ -83,7 +83,7 @@ async def get_genres_by_type(call:types.CallbackQuery, callback_data: kb.ShowGen
     genres = db.return_genres(type_code)
     markup = kb.store_kb_genres(genres, type_code)
     back_to_types = InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.StoreAction_CallbackData(type_code=type_code,action='go_to_types').pack())
-    markup.add(back_to_types)
+    markup.row(back_to_types)
     if not len(markup.as_markup().inline_keyboard):
         await call.message.edit_caption(caption=f'Игры отсутствуют в магазине ❌')
     else:
