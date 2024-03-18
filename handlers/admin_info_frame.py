@@ -45,7 +45,7 @@ async def show_frame_info_admin(call:types.CallbackQuery, callback_data: kb.Admi
         check_conditions='Кадр не проверяет никакие условия'
 
     info = f'<i>Название продукта</i> - {game["game_name"]}\n' \
-           f'Номер кадра - {callback_data["frame_num"]}\n\n' \
+           f'Номер кадра - {callback_data.frame_num}\n\n' \
            f'Содержимое - <i>{content}</i>\n\n' \
            f'{demo}\n\n' \
            f'{variants}\n' \
