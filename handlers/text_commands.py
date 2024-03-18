@@ -3,10 +3,11 @@ from aiogram import types, F
 import phrase as phr
 import keyboards as kb
 from states.Store import Store
+from aiogram.fsm.context import FSMContext
 from aiogram.utils.keyboard import (ReplyKeyboardBuilder, InlineKeyboardBuilder,
                                     InlineKeyboardButton, KeyboardButton)
 @dp.message(F.text)
-async def get_text(message: types.Message):
+async def get_text(message: types.Message, state:FSMContext):
     user = db.return_user_info(message.from_user.id)
     if user != 0 and user['accept_paper'] == 1:
         match message.text:
@@ -48,7 +49,8 @@ async def get_text(message: types.Message):
 
             case phr.search_game:
                 await message.answer('Отправьте название игры, которую хотите найти. \nОтправьте /cancel для отмены')
-                await Store.search_game.set()
+
+                await state.set_state(Store.search_game)
 
             case phr.store:
                 types = db.return_type()
