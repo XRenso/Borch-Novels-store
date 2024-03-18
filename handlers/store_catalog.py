@@ -72,7 +72,7 @@ async def change_page_of_group(call:types.CallbackQuery, callback_data: kb.GetAl
             if len(games) % 5 != 0:
                 pages += 1
             for i in range(1, pages + 1):
-                markup.row(InlineKeyboardButton(text=f'{i}',
+                markup.add(InlineKeyboardButton(text=f'{i}',
                                                 callback_data=kb.GetUserGroup_CallbackData(group_name=category_code,
                                                                                     page=i-1).pack()))
             await call.message.edit_caption(caption=f'Библиотека категория - «{category_code}»\nВыберите страницу:', reply_markup=markup.as_markup())
