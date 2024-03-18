@@ -3,9 +3,10 @@ from aiogram import types
 import keyboards as kb
 import phrase as phr
 from aiogram.utils.media_group import MediaGroupBuilder
-from aiogram.filters.command import Command
+from aiogram.filters.command import Command, CommandObject
 @dp.message(Command('start'))
-async def start(message: types.Message):
+async def start(message: types.Message,
+                command: CommandObject):
     user = db.return_user_info(message.from_user.id)
     if user != 0 and user['accept_paper'] == 1:
         await message.answer_photo(photo='AgACAgIAAxkBAAIZlGSSdZ8ekz_L3D1UdfCD_2cKPV97AAJNxzEbVxOYSDqKrtfuwW3mAQADAgADeQADLwQ',
@@ -15,8 +16,8 @@ async def start(message: types.Message):
 
 
 
-        if message.get_args():
-            game_code = message.get_args()
+        if command.args:
+            game_code = command.args
             game = db.return_game_info(game_code)
             media = MediaGroupBuilder()
             if db.return_user_info(message.from_user.id) != 0:
