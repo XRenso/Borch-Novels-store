@@ -87,7 +87,7 @@ async def get_genres_by_type(call:types.CallbackQuery, callback_data: kb.ShowGen
     if not len(markup['inline_keyboard']):
         await call.message.edit_caption(f'Игры отсутствуют в магазине ❌')
     else:
-        await call.message.edit_caption(f'Выберите интересующий вас жанр 👇', reply_markup=markup)
+        await call.message.edit_caption(f'Выберите интересующий вас жанр 👇', reply_markup=markup.as_markup())
 
 @dp.callback_query(kb.StoreAction_CallbackData.filter())
 async def store_handler(call:types.CallbackQuery, callback_data: kb.StoreAction_CallbackData):
@@ -101,7 +101,7 @@ async def store_handler(call:types.CallbackQuery, callback_data: kb.StoreAction_
             markup = kb.store_kb_genres(genres, type_code)
             markup.add(back_to_types)
             content = InputMediaPhoto(media='AgACAgIAAxkBAAIlRmS0kvRiHbkGzpyvclOYwC94Wfb8AAL9zjEbWFuhSWJYQDJSBo2bAQADAgADeQADLwQ', caption=f'Выберите интересующую вас жанр 👇')
-            await call.message.edit_media(content, reply_markup=markup)
+            await call.message.edit_media(content, reply_markup=markup.as_markup())
         case 'go_to_types':
             types = db.return_type()
             markup = kb.store_kb_types(types)
@@ -109,6 +109,6 @@ async def store_handler(call:types.CallbackQuery, callback_data: kb.StoreAction_
                 await call.message.edit_text(f'Отсутствует товар в магазине ❌')
             else:
                 content = InputMediaPhoto(media='AgACAgIAAxkBAAIlRmS0kvRiHbkGzpyvclOYwC94Wfb8AAL9zjEbWFuhSWJYQDJSBo2bAQADAgADeQADLwQ', caption=f'Выберите интересующую вас категорию 👇')
-                await call.message.edit_media(content, reply_markup=markup)
+                await call.message.edit_media(content, reply_markup=markup.as_markup())
 
 

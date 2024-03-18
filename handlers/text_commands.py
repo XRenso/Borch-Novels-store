@@ -22,7 +22,7 @@ async def get_text(message: types.Message, state:FSMContext):
                     else:
                         await message.answer_photo(
                             photo='AgACAgIAAxkBAAIwh2TlvPH-RIgfxZAjx5qUZJ8SXHa2AAKq2TEbo4EhS_6Xi0_d9uahAQADAgADeQADMAQ',
-                            caption='Ваша библиотека 📂', reply_markup=kb.lib_category(user['user_groups']))
+                            caption='Ваша библиотека 📂', reply_markup=kb.lib_category(user['user_groups']).as_markup())
 
             case phr.profile:
                 user_info = db.return_user_info(message.from_user.id)
@@ -58,7 +58,7 @@ async def get_text(message: types.Message, state:FSMContext):
                 if not len(markup['inline_keyboard']):
                     await message.answer(f'Отсутствует товар в магазине ❌')
                 else:
-                    await message.answer_photo(photo='AgACAgIAAxkBAAIlRmS0kvRiHbkGzpyvclOYwC94Wfb8AAL9zjEbWFuhSWJYQDJSBo2bAQADAgADeQADLwQ',caption=f'Выберите интересующую вас категорию 👇', reply_markup=markup)
+                    await message.answer_photo(photo='AgACAgIAAxkBAAIlRmS0kvRiHbkGzpyvclOYwC94Wfb8AAL9zjEbWFuhSWJYQDJSBo2bAQADAgADeQADLwQ',caption=f'Выберите интересующую вас категорию 👇', reply_markup=markup.as_markup())
 
             case phr.shop:
                 await message.answer_photo(photo='AgACAgIAAxkBAAIlSGS0kvRFxrhXUkBn47w7TfhKssj7AAL_zjEbWFuhSVPyV3miV65oAQADAgADeQADLwQ',caption='Выберите интересующую вас функцию 👇 ', reply_markup=kb.shop_kb)

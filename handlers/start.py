@@ -36,7 +36,7 @@ async def start(message: types.Message):
 
                     game_info_text = phr.get_product_info(game)
                     await message.answer_media_group(media=media.build())
-                    await message.answer(game_info_text, reply_markup=markup)
+                    await message.answer(game_info_text, reply_markup=markup.as_markup())
         except AttributeError:
             pass
     else:

@@ -21,7 +21,7 @@ async def achivments_games(call:types.CallbackQuery, callback_data: kb.ProfileAc
         await call.message.edit_media(content, reply_markup=markup)
     except:
         await call.message.delete()
-        await call.message.answer_photo(photo='AgACAgIAAxkBAAIlSWS0kvTmnIDiPDrB9RKkNIAyyqgnAAPPMRtYW6FJ1ybBvzYseRYBAAMCAAN5AAMvBA',caption='Выберите интересующее вас достижение 🤔', reply_markup=markup)
+        await call.message.answer_photo(photo='AgACAgIAAxkBAAIlSWS0kvTmnIDiPDrB9RKkNIAyyqgnAAPPMRtYW6FJ1ybBvzYseRYBAAMCAAN5AAMvBA',caption='Выберите интересующее вас достижение 🤔', reply_markup=markup.as_markup())
 
 @dp.callback_query(kb.ProfileAction_CallbackData.filter())
 async def profile_menu(call:types.CallbackQuery, callback_data: kb.ProfileAction_CallbackData):
@@ -29,7 +29,7 @@ async def profile_menu(call:types.CallbackQuery, callback_data: kb.ProfileAction
         case 'show_achivements':
             markup = kb.return_games_btn_achivement(db.return_user_games_with_achivement(call.message.chat.id)).add(kb.back_to_profile)
             content = InputMediaPhoto(media='AgACAgIAAxkBAAIlSWS0kvTmnIDiPDrB9RKkNIAyyqgnAAPPMRtYW6FJ1ybBvzYseRYBAAMCAAN5AAMvBA', caption='Выберите игру, в которой хотите увидеть ваши достижения 👇')
-            await call.message.edit_media(content, reply_markup=markup)
+            await call.message.edit_media(content, reply_markup=markup.as_markup())
         case 'back_to_profile':
             user_info = db.return_user_info(call.message.chat.id)
             curr_game = db.return_game_info(user_info['curr_game_code'])
@@ -54,6 +54,6 @@ async def profile_menu(call:types.CallbackQuery, callback_data: kb.ProfileAction
 
         case 'back_to_games':
             markup = kb.return_games_btn_achivement(db.return_user_games_with_achivement(call.message.chat.id)).add(kb.back_to_profile)
-            await call.message.edit_caption('Выберите игру, в которой хотите увидеть ваши достижения 👇', reply_markup=markup)
+            await call.message.edit_caption('Выберите игру, в которой хотите увидеть ваши достижения 👇', reply_markup=markup.as_markup())
         case 'no_achivements':
             await call.message.edit_caption('К сожалению у вас нет достижений ❌.\nИграйте в игры, чтобы их получить 🎮')

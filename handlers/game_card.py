@@ -14,13 +14,13 @@ async def show_game_info(call:types.CallbackQuery, callback_data:kb.GetGameInfo_
 
     game_info_text = phr.get_product_info(game)
     try:
-        await call.message.edit_text(game_info_text, reply_markup=markup)
+        await call.message.edit_text(game_info_text, reply_markup=markup.as_markup())
     except:
         try:
             await call.message.delete()
         except:
             await call.message.edit_caption('Сессия закрыта', reply_markup=None)
-        await call.message.answer(game_info_text,reply_markup=markup)
+        await call.message.answer(game_info_text,reply_markup=markup.as_markup())
 
 @dp.callback_query(kb.GameStatistic_CallbackData.filter())
 async def show_game_statistic(call:types.CallbackQuery, callback_data:kb.GameStatistic_CallbackData):

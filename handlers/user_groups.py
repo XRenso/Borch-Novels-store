@@ -32,7 +32,7 @@ async def get_user_group_games(call:types.CallbackQuery, callback_data:kb.GetUse
 async def open_user_group(call:types.CallbackQuery, callback_data:kb.BackToUserGroup_CallbackData):
     user = db.return_user_info(call.message.chat.id)
     if user:
-        await call.message.edit_caption(caption='Ваша библиотека 📂', reply_markup=kb.lib_category(user['user_groups']))
+        await call.message.edit_caption(caption='Ваша библиотека 📂', reply_markup=kb.lib_category(user['user_groups']).as_markup())
 
 @dp.callback_query(kb.ControlUserGroup_CallbackData.filter())
 async def control_user_group(call:types.CallbackQuery, callback_data:kb.ControlUserGroup_CallbackData):

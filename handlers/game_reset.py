@@ -17,7 +17,7 @@ async def reset_game(message:types.Message):
     if not len(db.return_user_library_games(message.from_user.id)):
         await message.answer('У вас нет игр ❌')
     else:
-        await message.answer(text, reply_markup=markup)
+        await message.answer(text, reply_markup=markup.as_markup())
 
 @dp.callback_query(kb.ResetGame_CallbackData.filter())
 async def confirm_reset(call:types.CallbackQuery, callback_data:kb.ResetGame_CallbackData):
@@ -43,7 +43,7 @@ async def return_to_lib(call:types.CallbackQuery, callback_data:kb.BackResetGame
     if not len(db.return_user_library_games(call.message.chat.id)):
         await call.message.edit_text('У вас нет игр ❌')
     else:
-        await call.message.edit_text(text, reply_markup=markup)
+        await call.message.edit_text(text, reply_markup=markup.as_markup())
 
 @dp.callback_query(kb.ConfirmResetGame_CallbackData.filter())
 async def confirm_reset(call:types.CallbackQuery, callback_data:kb.ConfirmResetGame_CallbackData):
@@ -79,4 +79,4 @@ async def show_games_from_group(call:types.CallbackQuery, callback_data:kb.GetUs
     if exist:
         markup = kb.reset_library(games)
         markup.add(InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.BackResetGame_CallbackData(ok='ok').pack()))
-        await call.message.edit_text(text=f'Выберите игру из категории «{group_name}»\nЧтобы удалить ей сохранение', reply_markup=markup)
+        await call.message.edit_text(text=f'Выберите игру из категории «{group_name}»\nЧтобы удалить ей сохранение', reply_markup=markup.as_markup())

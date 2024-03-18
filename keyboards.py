@@ -202,7 +202,7 @@ def return_games_btn_achivement(games):
         for i in games:
             game = db.return_game_info(i)
             markup.add(InlineKeyboardButton(text=game['game_name'], callback_data=ProfileAchivementGames_CallbackData(game_code=i).pack()))
-        return markup.as_markup()
+        return markup
 
 
 def return_achivements(achivments,game_code):
@@ -211,7 +211,7 @@ def return_achivements(achivments,game_code):
         achivment = db.return_achivement(game_code=game_code, achivement_code=i)
         if achivment != 0:
             markup.add(InlineKeyboardButton(text=achivment["name"], callback_data=ProfileAchivementCode_CallbackData(game_code=game_code,achivement_code=achivment['achivement_code']).pack()))
-    return markup.as_markup()
+    return markup
 
 
 def return_library(games, type='lib',page=0, category_code=None, type_code=None):
@@ -271,19 +271,19 @@ def lib_category(categories):
     markup = InlineKeyboardBuilder()
     for key,_ in categories.items():
         markup.row(InlineKeyboardButton(text=key, callback_data=GetUserGroup_CallbackData(group_name=key, page=0).pack()))
-    return markup.as_markup()
+    return markup
 def reset_library(games):
     markup = InlineKeyboardBuilder()
     if games !=0 :
         for i in games:
             markup.add(InlineKeyboardButton(text=i['game_name'], callback_data=ResetGame_CallbackData(game_code=i['game_code']).pack()))
-    return markup.as_markup()
+    return markup
 def reset_library_categories(categories):
     markup = InlineKeyboardBuilder()
     if categories != 0 :
         for key, _ in categories.items():
             markup.add(InlineKeyboardButton(text=key, callback_data=GetUserGroupForReset_CallbackData(group_name=key).pack()))
-    return markup.as_markup()
+    return markup
 
 def store_kb_genres(genre, type_code):
     markup = InlineKeyboardBuilder()
@@ -293,7 +293,7 @@ def store_kb_genres(genre, type_code):
 
     markup.row(*btn,width=1)
 
-    return markup.as_markup()
+    return markup
 
 def store_kb_types(type):
     markup = InlineKeyboardBuilder()
@@ -301,8 +301,8 @@ def store_kb_types(type):
     for i in type:
         btn.append(InlineKeyboardButton(text=db.return_type_name_by_code(i),callback_data=ShowGenresByType_CallbackData(type_code=i).pack()))
     markup.row(*btn,width=1)
-    return markup.as_markup()
-def get_game(game_code:str, have_it_user:int, price:int, user_id:int) -> InlineKeyboardMarkup:
+    return markup
+def get_game(game_code:str, have_it_user:int, price:int, user_id:int):
     check_frame = db.return_frame(1,game_code)
     game = db.return_game_info(game_code)
     markup = InlineKeyboardBuilder()
@@ -343,4 +343,5 @@ def get_game(game_code:str, have_it_user:int, price:int, user_id:int) -> InlineK
     if price == 0 and have_it_user == 1:
         markup.row(InlineKeyboardButton(text=phr.delete_game_from_lib, callback_data=DeleteGameFromLibrary_CallbackData(game_code=game_code).pack()))
     markup.row(InlineKeyboardButton(text=phr.share_game, switch_inline_query=game['game_name']))
-    return markup.as_markup()
+
+    return markup
