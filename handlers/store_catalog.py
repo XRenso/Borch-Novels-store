@@ -28,7 +28,7 @@ async def change_page_of_group(call:types.CallbackQuery, callback_data: kb.GetAl
     type_code = None
     match type:
         case 'store':
-            type_code = callback_data['type_code']
+            type_code = callback_data.type_code
     markup = InlineKeyboardBuilder()
     btn = []
     if type_code:
@@ -84,7 +84,7 @@ async def get_genres_by_type(call:types.CallbackQuery, callback_data: kb.ShowGen
     markup = kb.store_kb_genres(genres, type_code)
     back_to_types = InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.StoreAction_CallbackData(type_code=type_code,action='go_to_types').pack())
     markup.add(back_to_types)
-    if not len(markup['inline_keyboard']):
+    if not len(markup.as_markup().inline_keyboard):
         await call.message.edit_caption(f'Игры отсутствуют в магазине ❌')
     else:
         await call.message.edit_caption(f'Выберите интересующий вас жанр 👇', reply_markup=markup.as_markup())
@@ -105,7 +105,7 @@ async def store_handler(call:types.CallbackQuery, callback_data: kb.StoreAction_
         case 'go_to_types':
             types = db.return_type()
             markup = kb.store_kb_types(types)
-            if not len(markup['inline_keyboard']):
+            if not len(markup.as_markup().inline_keyboard):
                 await call.message.edit_text(f'Отсутствует товар в магазине ❌')
             else:
                 content = InputMediaPhoto(media='AgACAgIAAxkBAAIlRmS0kvRiHbkGzpyvclOYwC94Wfb8AAL9zjEbWFuhSWJYQDJSBo2bAQADAgADeQADLwQ', caption=f'Выберите интересующую вас категорию 👇')
