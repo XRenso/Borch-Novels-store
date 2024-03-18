@@ -201,7 +201,7 @@ def return_games_btn_achivement(games):
         markup = InlineKeyboardBuilder()
         for i in games:
             game = db.return_game_info(i)
-            markup.add(InlineKeyboardButton(text=game['game_name'], callback_data=ProfileAchivementGames_CallbackData(game_code=i).pack()))
+            markup.row(InlineKeyboardButton(text=game['game_name'], callback_data=ProfileAchivementGames_CallbackData(game_code=i).pack()))
         return markup
 
 

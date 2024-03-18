@@ -15,7 +15,7 @@ async def achivement_info(call:types.CallbackQuery, callback_data: kb.ProfileAch
 
 @dp.callback_query(kb.ProfileAchivementGames_CallbackData.filter())
 async def achivments_games(call:types.CallbackQuery, callback_data: kb.ProfileAchivementGames_CallbackData):
-    markup = kb.return_achivements(db.return_user_achivement_by_game_code(call.message.chat.id,callback_data.game_code), game_code=callback_data.game_code).add(kb.back_to_games)
+    markup = kb.return_achivements(db.return_user_achivement_by_game_code(call.message.chat.id,callback_data.game_code), game_code=callback_data.game_code).row(kb.back_to_games)
     try:
         content = InputMediaPhoto(media='AgACAgIAAxkBAAIlSWS0kvTmnIDiPDrB9RKkNIAyyqgnAAPPMRtYW6FJ1ybBvzYseRYBAAMCAAN5AAMvBA', caption='Выберите интересующее вас достижение 🤔')
         await call.message.edit_media(content, reply_markup=markup.as_markup())
@@ -27,7 +27,7 @@ async def achivments_games(call:types.CallbackQuery, callback_data: kb.ProfileAc
 async def profile_menu(call:types.CallbackQuery, callback_data: kb.ProfileAction_CallbackData):
     match callback_data.action:
         case 'show_achivements':
-            markup = kb.return_games_btn_achivement(db.return_user_games_with_achivement(call.message.chat.id)).add(kb.back_to_profile)
+            markup = kb.return_games_btn_achivement(db.return_user_games_with_achivement(call.message.chat.id)).row(kb.back_to_profile)
             content = InputMediaPhoto(media='AgACAgIAAxkBAAIlSWS0kvTmnIDiPDrB9RKkNIAyyqgnAAPPMRtYW6FJ1ybBvzYseRYBAAMCAAN5AAMvBA', caption='Выберите игру, в которой хотите увидеть ваши достижения 👇')
             await call.message.edit_media(content, reply_markup=markup.as_markup())
         case 'back_to_profile':
