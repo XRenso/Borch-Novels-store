@@ -74,7 +74,6 @@ async def change_frames(call, frame_num, state:FSMContext, failed:int=0):
                         content = None
 
                 markup = InlineKeyboardBuilder()
-                # frame_num = list(frame['variants_frame'].split('\n'))
                 for key, value in frame['variants'].items():
                     markup.row(InlineKeyboardButton(text=value, callback_data=kb.FrameChange_CallbackData(frame_num=int(key)).pack()))
                 if game['can_change_page']:

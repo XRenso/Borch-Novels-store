@@ -54,6 +54,6 @@ async def profile_menu(call:types.CallbackQuery, callback_data: kb.ProfileAction
 
         case 'back_to_games':
             markup = kb.return_games_btn_achivement(db.return_user_games_with_achivement(call.message.chat.id)).row(kb.back_to_profile)
-            await call.message.edit_caption('Выберите игру, в которой хотите увидеть ваши достижения 👇', reply_markup=markup.as_markup())
+            await call.message.edit_caption(caption='Выберите игру, в которой хотите увидеть ваши достижения 👇', reply_markup=markup.as_markup())
         case 'no_achivements':
             await call.message.edit_caption('К сожалению у вас нет достижений ❌.\nИграйте в игры, чтобы их получить 🎮')

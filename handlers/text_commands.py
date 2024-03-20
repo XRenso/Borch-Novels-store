@@ -74,7 +74,7 @@ async def get_text(message: types.Message, state:FSMContext):
                 user_paper = InlineKeyboardButton(text='Пользовательское соглашение', url='https://telegra.ph/Polzovatelskoe-soglashenie-06-21-6')
                 markup.add(user_paper)
                 markup.row(designer,programmist)
-                markup.add(tg_chanel)
+                markup.row(tg_chanel)
 
                 await message.answer_photo(photo='AgACAgIAAxkBAAIlRWS0kvQ3UB9D23YElI6zwb_iEr40AAL8zjEbWFuhSaYY_HtSoELTAQADAgADeQADLwQ',caption=phr.info, reply_markup=markup.as_markup())
     else:
