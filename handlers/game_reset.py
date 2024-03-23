@@ -21,13 +21,13 @@ async def reset_game(message:types.Message):
 
 @dp.callback_query(kb.ResetGame_CallbackData.filter())
 async def confirm_reset(call:types.CallbackQuery, callback_data:kb.ResetGame_CallbackData):
-    game = db.return_game_info(callback_data['game_code'])
+    game = db.return_game_info(callback_data.game_code)
     markup = InlineKeyboardBuilder()
     btn = []
-    btn.append(InlineKeyboardButton(text='Подтвердить',callback_data=kb.ConfirmResetGame_CallbackData(game_code=callback_data['game_code']).pack()))
+    btn.append(InlineKeyboardButton(text='Подтвердить',callback_data=kb.ConfirmResetGame_CallbackData(game_code=callback_data.game_code).pack()))
     btn.append(InlineKeyboardButton(text='Отменить',callback_data=kb.CancelResetGame_CallbackData(ok='joj').pack()))
     markup.row(*btn,width=2)
-    markup.add(InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.BackResetGame_CallbackData(ok='joj').pack()))
+    markup.row(InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.BackResetGame_CallbackData(ok='joj').pack()))
     await call.message.edit_text(f'Уверены ли вы в сбросе сохранения игры - {game["game_name"]}?', reply_markup=markup.as_markup())
 
 @dp.callback_query(kb.BackResetGame_CallbackData.filter())
@@ -50,7 +50,7 @@ async def confirm_reset(call:types.CallbackQuery, callback_data:kb.ConfirmResetG
     j = db.reset_game_setings(user_id=call.message.chat.id, game_code=callback_data.game_code)
     if j == 0:
         markup = InlineKeyboardBuilder()
-        markup.add(InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.BackResetGame_CallbackData(ok='ok').pack()))
+        markup.row(InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.BackResetGame_CallbackData(ok='ok').pack()))
         await call.message.edit_text('Произошла ошибка.\nВидимо игры уже больше нет в вашей библиотеке\nРекомендуем удалить её из группы', reply_markup=markup.as_markup())
         return
     await call.message.edit_text('Успешно сброшено ✅')
@@ -71,12 +71,12 @@ async def show_games_from_group(call:types.CallbackQuery, callback_data:kb.GetUs
                 games.append(db.return_game_info(i))
         except TypeError:
             markup = InlineKeyboardBuilder()
-            markup.add(InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.BackResetGame_CallbackData(ok='ok').pack()))
+            markup.row(InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.BackResetGame_CallbackData(ok='ok').pack()))
             await call.message.edit_text(f'Данной группы больше не существует. Нажмите назад, чтобы вернуться назад', reply_markup=markup.as_markup())
             exist = False
     else:
         games = db.return_user_library_games(call.message.chat.id)
     if exist:
         markup = kb.reset_library(games)
-        markup.add(InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.BackResetGame_CallbackData(ok='ok').pack()))
+        markup.row(InlineKeyboardButton(text=phr.back_to_game, callback_data=kb.BackResetGame_CallbackData(ok='ok').pack()))
         await call.message.edit_text(text=f'Выберите игру из категории «{group_name}»\nЧтобы удалить ей сохранение', reply_markup=markup.as_markup())
