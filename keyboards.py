@@ -276,13 +276,13 @@ def reset_library(games):
     markup = InlineKeyboardBuilder()
     if games !=0 :
         for i in games:
-            markup.add(InlineKeyboardButton(text=i['game_name'], callback_data=ResetGame_CallbackData(game_code=i['game_code']).pack()))
+            markup.row(InlineKeyboardButton(text=i['game_name'], callback_data=ResetGame_CallbackData(game_code=i['game_code']).pack()))
     return markup
 def reset_library_categories(categories):
     markup = InlineKeyboardBuilder()
     if categories != 0 :
         for key, _ in categories.items():
-            markup.add(InlineKeyboardButton(text=key, callback_data=GetUserGroupForReset_CallbackData(group_name=key).pack()))
+            markup.row(InlineKeyboardButton(text=key, callback_data=GetUserGroupForReset_CallbackData(group_name=key).pack()))
     return markup
 
 def store_kb_genres(genre, type_code):
