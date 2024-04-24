@@ -19,3 +19,13 @@ async def uspeh_buy(message:types.Message):
                                  f'\n Игра - {game["game_name"]}  - успешно добавлена в вашу библиотеку ✅', reply_markup=markup.as_markup())
         case 'donation':
             await message.answer(f'Спасибо за вашу поддержку на {message.successful_payment.total_amount//100} руб. \nЭти деньги помогут нам в развитии проекта')
+
+@dp.callback_query(kb.GetDemo_CallbackData.filter())
+async def get_demo(call:types.CallbackQuery, callback_data:kb.GetDemo_CallbackData):
+    game_code = callback_data.game_code
+    game = db.return_game_info(game_code)
+    db.give_game_to_user(game_code=game_code,user_id=call.message.chat.id,is_demo=1)
+    markup = InlineKeyboardBuilder().add(InlineKeyboardButton(text=phr.back_to_game,
+                                                              callback_data=kb.GetGameInfo_CallbackData(
+                                                                  game_code=game['game_code']).pack()))
+    await call.message.answer(f'Демо-версия успешно «{game["game_name"]}» добавлена в вашу библиотеку✅',reply_markup=markup.as_markup())
