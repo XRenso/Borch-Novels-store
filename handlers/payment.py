@@ -28,4 +28,4 @@ async def get_demo(call:types.CallbackQuery, callback_data:kb.GetDemo_CallbackDa
     markup = InlineKeyboardBuilder().add(InlineKeyboardButton(text=phr.back_to_game,
                                                               callback_data=kb.GetGameInfo_CallbackData(
                                                                   game_code=game['game_code']).pack()))
-    await call.message.answer(f'Демо-версия успешно «{game["game_name"]}» добавлена в вашу библиотеку✅',reply_markup=markup.as_markup())
+    await call.message.edit_text(f'Демо-версия успешно «{game["game_name"]}» добавлена в вашу библиотеку✅',reply_markup=markup.as_markup())
