@@ -317,14 +317,16 @@ def get_game(game_code:str, have_it_user:int, price:int, user_id:int):
                     case 0:
                         markup.row(InlineKeyboardButton(text='Получить 👇', callback_data=BuyGame_CallbackData(game_code=game_code).pack()))
                     case _:
+                            btns = []
                             if game_cfg == 0:
-                                markup.row(InlineKeyboardButton(text='Купить 💳', callback_data=BuyGame_CallbackData(game_code=game_code).pack()))
+                                btns.append(InlineKeyboardButton(text='Купить 💳', callback_data=BuyGame_CallbackData(game_code=game_code).pack()))
                             elif game_cfg['is_demo'] == 1:
-                                markup.row(InlineKeyboardButton(text='Купить полную версию 💳', callback_data=BuyGame_CallbackData(game_code=game_code).pack()))
+                                btns.append(InlineKeyboardButton(text='Купить полную версию 💳', callback_data=BuyGame_CallbackData(game_code=game_code).pack()))
                             if game_cfg == 0:
-                                markup.row(InlineKeyboardButton(text='Получить демо 👇', callback_data=GetDemo_CallbackData(game_code=game_code).pack()))
+                                btns.append(InlineKeyboardButton(text='Получить демо 👇', callback_data=GetDemo_CallbackData(game_code=game_code).pack()))
                             else:
-                                    markup.row(InlineKeyboardButton(text='Запустить 🎮', callback_data=PlayingGame_CallbackData(game_code=game_code).pack()))
+                                btns.append(InlineKeyboardButton(text='Запустить 🎮', callback_data=PlayingGame_CallbackData(game_code=game_code).pack()))
+                            markup.row(*btns)
     else:
         if have_it_user == 0:
             markup.row(InlineKeyboardButton(text='Продукт недоступен ❌', callback_data=UnavailableGame_CallbackData(game_code=game_code).pack()))
