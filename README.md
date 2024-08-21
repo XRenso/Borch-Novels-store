@@ -1,7 +1,6 @@
 # Borch-Novels-store
-Магазин цифрового контента на основе API телеграм
-тг канал проекта - https://t.me/BorchStore
-
+Магазин цифрового контента на основе API телеграм \
+[ТГ канал проекта](https://t.me/BorchStore)
 ## План
 1. [Описание](https://github.com/XRenso/Borch-Novels-store/edit/main/README.md#%D0%BE%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D0%B5)
 2. [Что реализовано?](https://github.com/XRenso/Borch-Novels-store/edit/main/README.md#%D1%87%D1%82%D0%BE-%D1%80%D0%B5%D0%B0%D0%BB%D0%B8%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%BE)
