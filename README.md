@@ -2,10 +2,10 @@
 Магазин цифрового контента на основе API телеграм \
 [ТГ канал проекта](https://t.me/BorchStore)
 ## План
-1. [Описание](https://github.com/XRenso/Borch-Novels-store/edit/main/README.md#%D0%BE%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D0%B5)
-2. [Что реализовано?](https://github.com/XRenso/Borch-Novels-store/edit/main/README.md#%D1%87%D1%82%D0%BE-%D1%80%D0%B5%D0%B0%D0%BB%D0%B8%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%BE)
-3. [Как запустить?](https://github.com/XRenso/Borch-Novels-store/edit/main/README.md#%D0%BA%D0%B0%D0%BA-%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D1%82%D0%B8%D1%82%D1%8C)
-4. [Условия использования](https://github.com/XRenso/Borch-Novels-store/edit/main/README.md#%D1%83%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D1%8F-%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F)
+1. [Описание](https://github.com/XRenso/Borch-Novels-store/main/README.md#%D0%BE%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D0%B5)
+2. [Что реализовано?](https://github.com/XRenso/Borch-Novels-store/main/README.md#%D1%87%D1%82%D0%BE-%D1%80%D0%B5%D0%B0%D0%BB%D0%B8%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%BE)
+3. [Как запустить?](https://github.com/XRenso/Borch-Novels-store/main/README.md#%D0%BA%D0%B0%D0%BA-%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D1%82%D0%B8%D1%82%D1%8C)
+4. [Условия использования](https://github.com/XRenso/Borch-Novels-store/main/README.md#%D1%83%D1%81%D0%BB%D0%BE%D0%B2%D0%B8%D1%8F-%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F)
 
 ## Описание
 Открываю данный код, поскольку проект теперь не поддерживается, а все данные и ключи утратили свою действительность. Это полностью рабочий телеграм бот, который работает на оснве aiogram при помощи вебхуков.
