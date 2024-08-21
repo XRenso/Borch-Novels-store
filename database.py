@@ -8,7 +8,7 @@ import small_logic
 
 class Mongo:
     def __init__(self):
-        self.connection = pymongo.MongoClient("mongodb://admin:safeKillPassword@79.143.29.191/admin")['store']
+        self.connection = pymongo.MongoClient("your_mongo_uri")['store']
         self.user = self.connection['user']
         self.frame = self.connection['frame']
         self.game = self.connection['game']
